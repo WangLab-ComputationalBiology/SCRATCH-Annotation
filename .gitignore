@@ -1,3 +1,4 @@
+# Nextflow
 .nextflow*
 work/
 data/
@@ -7,3 +8,9 @@ output/
 testing/
 testing*
 *.pyc
+
+# Quarto
+
+# Jupyter Notebook
+.ipynb_checkpoints
+.jupyter_cache/

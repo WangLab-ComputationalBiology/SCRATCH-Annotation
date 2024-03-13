@@ -1,10 +1,11 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl = 2
 
-include {  QUARTO_RENDER_PAGEA     } from './modules/moduleA/main'
-include {  QUARTO_RENDER_PAGEB     } from './modules/moduleB/main'
-include {  QUARTO_RENDER_PAGEC     } from './modules/moduleC/main'
-include {  QUARTO_RENDER_PROJECT   } from './modules/report/main'
+include { QUARTO_RENDER_PAGEA   } from './modules/local/metatime/annotation/main'
+include { QUARTO_RENDER_PAGEC   } from './modules/local/sctype/main'
+include { QUARTO_RENDER_PAGEB   } from './modules/local/celltypist/main'
+include { QUARTO_RENDER_PROJECT } from './modules/local/report/main'
+include { SCGPT_ANNOTATION      } from './modules/local/scgpt/annotation/main.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
