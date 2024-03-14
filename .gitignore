@@ -2,8 +2,8 @@
 .nextflow*
 work/
 data/
-results/
 output/
+test/
 .DS_Store
 testing/
 testing*
