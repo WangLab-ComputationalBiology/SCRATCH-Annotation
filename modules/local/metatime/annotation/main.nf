@@ -1,6 +1,9 @@
 process QUARTO_RENDER_PAGEA {
 
     tag "Performing analysis ${notebook.baseName}"
+    label 'process_medium'
+
+    container 'nf-quarto:latest'
 
     input:
         path(notebook)

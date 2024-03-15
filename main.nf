@@ -9,18 +9,21 @@ include { SCRATCH_ANNOTATION } from './subworkflows/local/scratch_annotation.nf'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-//
-// WORKFLOW: Execute a single named workflow for the pipeline
-// See: https://github.com/nf-core/rnaseq/issues/619
-//
 workflow {
 
-    ch_matrix = Channel.fromPath(params.matrix)
-    ch_annotation_dabatase = Channel.empty()
+    ch_matrix   = Channel.fromPath(params.matrix)
+    ch_database = Channel.empty()
 
     SCRATCH_ANNOTATION(
         ch_matrix,
-        ch_annotation_dabatase
+        ch_database
     )
 
+}
+
+workflow.onComplete {
+    log.info(
+        workflow.success ? "\nDone! Open the following report in your browser -> ${launchDir}/${params.project_name}/report/index.html\n" :
+                           "Oops... Something went wrong"
+    )
 }

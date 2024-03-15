@@ -1,9 +1,9 @@
 process SCGPT_ANNOTATION {
 
-    tag '$bam'
-    label 'process_single'
+    tag "Performing analysis ${notebook.baseName}"
+    label 'process_medium'
 
-    container ""
+    container 'nf-quarto:latest'
 
     input:
         path bam

@@ -25,8 +25,8 @@ include { SCGPT_ANNOTATION      } from '../../modules/local/scgpt/annotation/mai
 workflow SCRATCH_ANNOTATION {
 
     take:
-        ch_matrix // channel: []
-        ch_annotation_dabatase // channel: []
+        ch_matrix   // channel: []
+        ch_database // channel: []
 
     main:
 
@@ -39,7 +39,6 @@ workflow SCRATCH_ANNOTATION {
         ch_page_config = Channel.fromPath(params.page_config, checkIfExists: true)
             .collect()
 
-
         // Passing notebooks for respective functions
         first = QUARTO_RENDER_PAGEA(
             ch_notebookA,
@@ -47,7 +46,6 @@ workflow SCRATCH_ANNOTATION {
             params.project_name,
             params.paramA
         )
-
 
         second = QUARTO_RENDER_PAGEB(
             ch_notebookB,
@@ -74,7 +72,7 @@ workflow SCRATCH_ANNOTATION {
             .collect()
 
         // Creates a single channel with all cache/freeze folders
-        ch_cache = first.mix(second, third)
+        ch_cache = first.mix(second.cache, third)
             .collect()
 
         // Load SCRATCH/BTC template
@@ -92,5 +90,8 @@ workflow SCRATCH_ANNOTATION {
             ch_qmd,
             ch_cache
         )
+
+    emit:
+        ch_dumps = second.project_rds
 
 }

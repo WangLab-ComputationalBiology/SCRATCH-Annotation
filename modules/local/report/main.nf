@@ -1,7 +1,9 @@
 process QUARTO_RENDER_PROJECT {
 
     tag "Creating final report"
-    publishDir "${params.outdir}/${params.project_name}", mode: 'copy'
+    label 'process_low'
+
+    container 'nf-quarto:latest'
 
     input:
         path(template)

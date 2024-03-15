@@ -1,1 +1,1 @@
-rm -Rf ./work .nextflow*
+rm -Rf ./work .nextflow* ./Project

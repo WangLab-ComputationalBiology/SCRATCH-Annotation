@@ -36,14 +36,20 @@ print(Sys.time())
 
 ```{r}
 
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
+  geom_point() +
+  theme_classic()
+
+```
+
+```{r}
+
 print(params$paramB)
 
 ```
 
 ```{r}
 
-ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
-  geom_point() +
-  theme_classic()
+saveRDS(iris, file = paste0(params$project_name, "_step_02.RDS"))
 
 ```

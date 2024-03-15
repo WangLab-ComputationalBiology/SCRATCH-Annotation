@@ -2,12 +2,14 @@
 .nextflow*
 work/
 data/
-output/
-test/
+Project/
 .DS_Store
 testing/
 testing*
 *.pyc
+
+# Test
+test/
 
 # Quarto
 

@@ -1,6 +1,9 @@
 process QUARTO_RENDER_PAGEB {
 
     tag "Performing analysis ${notebook.baseName}"
+    label 'process_medium'
+
+    container 'nf-quarto:latest'
 
     input:
         path(notebook)
@@ -10,7 +13,8 @@ process QUARTO_RENDER_PAGEB {
         val(paramB)
 
     output:
-        path("_freeze/${notebook.baseName}"),   emit: cache
+        path("_freeze/${notebook.baseName}"),  emit: cache
+        path("${project_name}_step_02.RDS") ,  emit: project_rds
 
     when:
         task.ext.when == null || task.ext.when
