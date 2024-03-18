@@ -56,7 +56,6 @@ import matplotlib
 project_name = "Project"
 count_matrix = "/Users/affaustino/Projects/SCRATCH-Annotation/test/melanoma_yost_2018.csv"
 
-cell_model = "Immune_All_Low.pkl"
 work_directory = "/Users/affaustino/Projects/SCRATCH-Annotation/test"
 
 ```

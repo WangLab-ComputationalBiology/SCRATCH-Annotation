@@ -7,6 +7,7 @@ Project/
 testing/
 testing*
 *.pyc
+*.ipynb
 
 # Test
 test/
