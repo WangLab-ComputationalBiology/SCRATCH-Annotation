@@ -1,5 +1,5 @@
 ---
-title: "Module - scGPT Annotation"
+title: "Module - GeneVector Annotation"
 author: "Andre Fonseca"
 execute:
   cache: true
@@ -28,7 +28,6 @@ import celltypist
 import pandas as pd
 from celltypist import models
 import scanpy as sc
-import scgpt
 
 ```
 
@@ -46,15 +45,7 @@ work_directory = "/Users/affaustino/Projects/SCRATCH-Annotation/test"
 
 ## Loading data
 
-```{python}
-
-```
-
 ## Setting models
-
-```{python}
-
-```
 
 ## Saving Data object
 

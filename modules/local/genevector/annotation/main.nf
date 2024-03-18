@@ -1,4 +1,4 @@
-process QUARTO_RENDER_PAGEC {
+process GENEVECTOR_ANNOTATION {
 
     tag "Performing analysis ${notebook.baseName}"
     label 'process_medium'
@@ -10,7 +10,7 @@ process QUARTO_RENDER_PAGEC {
         path(config)
 
         val(project_name)
-        val(paramC)
+        val(paramA)
 
     output:
         path("_freeze/${notebook.baseName}"),   emit: cache
@@ -20,14 +20,12 @@ process QUARTO_RENDER_PAGEC {
 
     script:
         def project_name = project_name ? "-P project_name:${project_name}" : ""
-        def paramC       = paramC       ? "-P paramC:${paramC}" : ""
+        def paramA       = paramA       ? "-P paramA:${paramA}" : ""
         """
-        quarto render ${notebook} ${project_name} ${paramC}
+        quarto render ${notebook} ${project_name} ${paramA}
         """
     stub:
         """
-        mkdir -p _freeze && touch Empty
         """
 
 }
-

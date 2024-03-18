@@ -6,6 +6,7 @@ include { QUARTO_RENDER_PAGEC   } from '../../modules/local/sctype/main'
 include { QUARTO_RENDER_PAGEB   } from '../../modules/local/celltypist/main'
 include { QUARTO_RENDER_PROJECT } from '../../modules/local/report/main'
 include { SCGPT_ANNOTATION      } from '../../modules/local/scgpt/annotation/main.nf'
+//include { SCGPT_ANNOTATION      } from '../../modules/local/scgpt/annotation/main.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,8 +26,9 @@ include { SCGPT_ANNOTATION      } from '../../modules/local/scgpt/annotation/mai
 workflow SCRATCH_ANNOTATION {
 
     take:
-        ch_matrix   // channel: []
-        ch_database // channel: []
+        ch_matrix          // channel: []
+        ch_cell_malignancy // channel: []
+        ch_database        // channel: []
 
     main:
 
@@ -38,6 +40,10 @@ workflow SCRATCH_ANNOTATION {
         ch_template    = Channel.fromPath(params.template, checkIfExists: true)
         ch_page_config = Channel.fromPath(params.page_config, checkIfExists: true)
             .collect()
+
+        // Object/Data interoperability
+
+        // Subsetting based on cell malignancy annotation
 
         // Passing notebooks for respective functions
         first = QUARTO_RENDER_PAGEA(

@@ -11,8 +11,9 @@ include { SCRATCH_ANNOTATION } from './subworkflows/local/scratch_annotation.nf'
 
 workflow {
 
-    ch_matrix   = Channel.fromPath(params.matrix)
-    ch_database = Channel.empty()
+    ch_matrix          = Channel.fromPath(params.matrix)
+    ch_cell_malignancy = Channel.empty()
+    ch_database        = Channel.empty()
 
     SCRATCH_ANNOTATION(
         ch_matrix,

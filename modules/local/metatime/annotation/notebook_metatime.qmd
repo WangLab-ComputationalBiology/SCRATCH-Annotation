@@ -1,5 +1,5 @@
 ---
-title: "Module - scGPT Annotation"
+title: "Module - CellTypist"
 author: "Andre Fonseca"
 execute:
   cache: true
@@ -24,11 +24,28 @@ params:
 
 ```{python library}
 
-import celltypist
+import sys
+import os
+import numpy as np
 import pandas as pd
-from celltypist import models
+import matplotlib.pyplot as plt
+plt.rcParams['figure.dpi'] = 200
+import seaborn as sns
 import scanpy as sc
-import scgpt
+
+import importlib as imp
+import metatime
+import matplotlib
+import matplotlib.pyplot as plt
+
+from metatime import config
+from metatime import loaddata
+from metatime import mecmapper
+from metatime import mecs
+from metatime import annotator
+from metatime import plmapper
+from metatime import dmec
+import matplotlib
 
 ```
 

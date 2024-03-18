@@ -1,5 +1,5 @@
 ---
-title: "Module - scGPT Annotation"
+title: "Module - CellTypist"
 author: "Andre Fonseca"
 execute:
   cache: true
@@ -28,7 +28,6 @@ import celltypist
 import pandas as pd
 from celltypist import models
 import scanpy as sc
-import scgpt
 
 ```
 
@@ -48,11 +47,73 @@ work_directory = "/Users/affaustino/Projects/SCRATCH-Annotation/test"
 
 ```{python}
 
+count_matrix = pd.read_csv(count_matrix, engine = "pyarrow")
+count_matrix = count_matrix.transpose()
+
+```
+
+```{python}
+
+adata = sc.AnnData(count_matrix)
+
+```
+
+```{python}
+
+sc.pp.normalize_total(adata, target_sum = 1e4)
+sc.pp.log1p(adata)
+
+```
+
+```{python}
+
+sc.pl.highest_expr_genes(adata, n_top = 20)
+
 ```
 
 ## Setting models
 
 ```{python}
+
+# Enabling `force_update = True` will overwrite existing (old) models.
+models.download_models(force_update = True)
+
+```
+
+```{python}
+
+models.models_description()
+
+```
+
+```{python}
+
+model = models.Model.load(model = cell_model)
+
+```
+
+```{python}
+
+predictions = celltypist.annotate(
+    adata, model = cell_model, majority_voting = True)
+
+```
+
+```{python}
+
+adata = predictions.to_adata()
+
+```
+
+```{python}
+
+sc.tl.umap(adata)
+
+```
+
+```{python}
+
+sc.pl.umap(adata, color = ['majority_voting'], legend_loc = 'on data')
 
 ```
 
