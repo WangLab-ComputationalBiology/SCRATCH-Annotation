@@ -4,6 +4,7 @@ author: "Andre Fonseca"
 execute:
   cache: true
   freeze: auto
+jupyter: python3.8
 format:
   html:
     toc: true
@@ -24,10 +25,10 @@ params:
 
 ```{python library}
 
-import celltypist
 import pandas as pd
-from celltypist import models
 import scanpy as sc
+import celltypist
+from celltypist import models
 
 ```
 

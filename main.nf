@@ -17,6 +17,7 @@ workflow {
 
     SCRATCH_ANNOTATION(
         ch_matrix,
+        ch_cell_malignancy,
         ch_database
     )
 

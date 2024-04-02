@@ -17,3 +17,5 @@ test/
 # Jupyter Notebook
 .ipynb_checkpoints
 .jupyter_cache/
+.Rproj.user
+.Rproj

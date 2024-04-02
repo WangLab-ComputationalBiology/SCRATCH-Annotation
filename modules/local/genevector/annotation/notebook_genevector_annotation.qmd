@@ -38,8 +38,6 @@ import scanpy as sc
 project_name = "Project"
 count_matrix = "/Users/affaustino/Projects/SCRATCH-Annotation/test/melanoma_yost_2018.csv"
 
-
-
 work_directory = "/Users/affaustino/Projects/SCRATCH-Annotation/test"
 
 ```
