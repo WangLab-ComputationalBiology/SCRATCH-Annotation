@@ -24,10 +24,20 @@ params:
 
 ```{python library}
 
-import celltypist
-import pandas as pd
-from celltypist import models
 import scanpy as sc
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.sparse import csr_matrix
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import collections
+import os
+import pickle
+
+from genevector.data import GeneVectorDataset
+from genevector.model import GeneVector
+from genevector.embedding import GeneEmbedding, CellEmbedding
 
 ```
 
@@ -35,10 +45,37 @@ import scanpy as sc
 #| echo: False
 #| include: False
 
-project_name = "Project"
-count_matrix = "/Users/affaustino/Projects/SCRATCH-Annotation/test/melanoma_yost_2018.csv"
+project_name       = "Project"
+count_matrix       = "/Users/affaustino/Projects/SCRATCH-Annotation/test/melanoma_yost_2018.csv"
+vector_file        = "/Users/affaustino/Projects/SCRATCH-Annotation/test/melanoma_.vec"
+signed_mi          = True
+compute_mi         = True
+init_ortho         = True
+retrain            = False
+entropy_threshold  = 1
+embedding_size     = 100
+alpha              = 0.08
+beta               = 0.02
+gain               = 10
+device             = "cpu"
 
+annotated_h5ad     = "/Users/ceglian/Data/tcri/includE_tcr_{}_{}_annoated.h5ad".format(disease,subset)
+mutual_information = "/Users/ceglian/Data/tcri/include_tcr_{}_{}_{}_{}.p".format(disease,subset,signed_mi,str(entropy_threshold).replace(".",""))
+
+# Directory and outputs
 work_directory = "/Users/affaustino/Projects/SCRATCH-Annotation/test"
+
+```
+
+```{python}
+
+def removing_receptor_genes():
+    """ Description """
+    genes_to_keep  = ~adata.var_names.isin(
+        ["TRAV", "TRAJ", "TRAD", "TRBV", "TRBJ", "TRBD", "TRGV", "TRGJ", "TRGD", "TRDV", "TRDJ", "TRDD"])
+
+    adata_filtered = adata[:, genes_to_keep]
+    return adata_filtered
 
 ```
 
@@ -50,14 +87,27 @@ work_directory = "/Users/affaustino/Projects/SCRATCH-Annotation/test"
 
 ```
 
-## Setting models
+## Running GeneVector
 
 ```{python}
 
-
+gv_object = GeneVectorDataset(adata, load_expression = retrain, signed_mi = signed_mi, device = device)
 
 ```
 
+## Running GeneVector
+
+```{python}
+
+cmps = GeneVector(gv_object,
+                    output_file = vector_file,
+                    emb_dimension = embedding_size,
+                    gain = gain,
+                    compute_mi = compute_mi,
+                    init_ortho = init_ortho,
+                    device = device)
+
+```
 ## Saving Data object
 
 ```{python}

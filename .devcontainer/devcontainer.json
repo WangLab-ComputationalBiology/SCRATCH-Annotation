@@ -1,11 +1,12 @@
 {
-    "name": "ubuntu",
-    "image": "ubuntu:latest",
+    "name": "scagnostic",
+    "image": "oandrefonseca/scagnostic:main",
 
     // Configure tool-specific properties.
     "customizations": {
         "vscode": {
             "extensions": ["ms-python.python", "ms-python.vscode-pylance", "nf-core.nf-core-extensionpack"]
         }
-    }
+    },
+    "forwardPorts": [3000]
 }
