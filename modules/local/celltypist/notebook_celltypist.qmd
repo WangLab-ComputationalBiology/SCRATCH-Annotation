@@ -27,6 +27,7 @@ params:
 
 import pandas as pd
 import scanpy as sc
+import hdf5plugin
 import celltypist
 from celltypist import models
 
@@ -36,28 +37,37 @@ from celltypist import models
 #| echo: False
 #| include: False
 
-project_name = "Project"
-count_matrix = "/Users/affaustino/Projects/SCRATCH-Annotation/test/melanoma_yost_2018.csv"
+project_name   = "Project"
+anndata_object = "/Users/affaustino/Projects/SCRATCH-Annotation/test/Sohrab_data_annotation/Sohrab_count/Sohrab_T_cell_counts.h5ad"
+cell_database  = "/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv"
+cell_model     = ["Immune_All_High.pkl", "Immune_All_Low.pkl"]
+organism       = "Human"
+model_update   = False
 
-cell_model = "Immune_All_Low.pkl"
+# Directory and outputs
 work_directory = "/Users/affaustino/Projects/SCRATCH-Annotation/test"
+output_object  = "{work_directory}/{project_name}_{object_label}".format(work_directory = work_directory, project_name = project_name, object_label = "annotation_object.h5ad")
+annot_table    = "{work_directory}/{cell_model}".format(work_directory = work_directory, cell_model = "Immune_All")
 
 ```
 
 ## Loading data
-
 ```{python}
 
-count_matrix = pd.read_csv(count_matrix, engine = "pyarrow")
-count_matrix = count_matrix.transpose()
+try:
+    adata = sc.read_h5ad(anndata_object)
+except Exception as e:
+    print(f"Error loading AnnData file: {e}")
 
 ```
 
 ```{python}
 
-adata = sc.AnnData(count_matrix)
+cell_database = pd.read_csv(cell_database)
 
 ```
+
+## Normalizing dataset
 
 ```{python}
 
@@ -76,35 +86,78 @@ sc.pl.highest_expr_genes(adata, n_top = 20)
 
 ```{python}
 
-# Enabling `force_update = True` will overwrite existing (old) models.
-models.download_models(force_update = True)
+models.download_models(
+    force_update = model_update, model = cell_model
+)
 
 ```
 
 ```{python}
 
-models.models_description()
+model_low  = models.Model.load(model = cell_model[0])
+model_high = models.Model.load(model = cell_model[1])
+
+if organism == "Mouse":
+    model_low.convert()
+    model_high.convert()
+
+```
+
+## Prediction Low-granularity
+
+```{python}
+
+predictions_low = celltypist.annotate(
+    adata, model = cell_model[0], majority_voting = True
+)
 
 ```
 
 ```{python}
 
-model = models.Model.load(model = cell_model)
+predictions_low_adata = predictions_low.to_adata()
 
 ```
 
 ```{python}
 
-predictions = celltypist.annotate(
-    adata, model = cell_model, majority_voting = True)
+adata.obs["celltypist_cell_label_fine"] = predictions_low_adata.obs.loc[
+    adata.obs.index, "majority_voting"
+]
+adata.obs["celltypist_conf_score_fine"] = predictions_low_adata.obs.loc[
+    adata.obs.index, "conf_score"
+]
+
+```
+
+## Prediction High-granularity
+
+```{python}
+
+predictions_high = celltypist.annotate(
+    adata, model = cell_model[1], majority_voting = True
+)
 
 ```
 
 ```{python}
 
-adata = predictions.to_adata()
+predictions_high_adata = predictions_high.to_adata()
 
 ```
+
+```{python}
+
+adata.obs["celltypist_cell_label_coarse"] = predictions_high_adata.obs.loc[
+    adata.obs.index, "majority_voting"
+]
+adata.obs["celltypist_conf_score_coarse"] = predictions_high_adata.obs.loc[
+    adata.obs.index, "conf_score"
+]
+
+```
+
+## UMAP reduction
 
 ```{python}
 
@@ -114,7 +167,104 @@ sc.tl.umap(adata)
 
 ```{python}
 
-sc.pl.umap(adata, color = ['majority_voting'], legend_loc = 'on data')
+sc.pl.umap(
+    adata,
+    color=["celltypist_cell_label_fine", "celltypist_conf_score_fine"],
+    frameon=False,
+    sort_order=False,
+    wspace=1,
+)
+
+```
+
+```{python}
+
+sc.pl.umap(
+    adata,
+    color=["celltypist_cell_label_coarse", "celltypist_conf_score_coarse"],
+    frameon=False,
+    sort_order=False,
+    wspace=1,
+)
+
+```
+
+## Cell annotation similarity
+
+```{python}
+
+sc.pl.dendrogram(adata, groupby = "celltypist_cell_label_coarse")
+
+```
+
+## ViolinPlot
+
+```{python}
+
+top_genes = dict()
+for cell_type in adata.obs["celltypist_cell_label_coarse"].unique():
+    markers = list(model_high.extract_top_markers(cell_type, 3))
+    for gene in markers:
+        if gene in list(adata.var_names):
+            top_genes.setdefault(cell_type, []).append(gene)
+
+
+```
+
+```{python}
+
+all_markers = [item for sublist in top_genes.values() for item in sublist]
+
+```
+
+```{python}
+
+sc.pl.stacked_violin(
+    adata,
+    all_markers,
+    groupby = 'celltypist_cell_label_coarse',
+    dendrogram = Tru
+    )
+
+```
+
+## Differential Expression
+
+```{python}
+
+sc.tl.rank_genes_groups(
+    adata,
+    groupby = "celltypist_cell_label_coarse",
+    method = "wilcoxon",
+    key_added = "dea_cell_label"
+    )
+
+```
+
+```{python}
+
+sc.pl.rank_genes_groups_dotplot(
+    adata,
+    groupby = "celltypist_cell_label_coarse",
+    standard_scale = "var",
+    n_genes = 5,
+    key = "dea_cell_label"
+    )
+
+```
+
+## Curated markers
+
+```{python}
+
+sc.pl.dotplot(
+    adata,
+    var_names = {
+        ct: marker_genes_in_data[ct] for ct in cell_types_to_check
+    },
+    groupby = "transf_cell_type_certain",
+    standard_scale = "var",
+)
 
 ```
 
@@ -122,6 +272,12 @@ sc.pl.umap(adata, color = ['majority_voting'], legend_loc = 'on data')
 
 ```{python}
 
-adata.write_csvs("{work_directory}/{cell_model}".format(work_directory = work_directory, cell_model = cell_model.strip(".pkl")))
+adata.write_h5ad(output_object)
+
+```
+
+```{python}
+
+adata.write_csvs(annot_table)
 
 ```

@@ -35,8 +35,9 @@ print(opt)
 if(opt$type == "Seurat") {
 
   seurat_object <- readRDS(file = opt$file)
-  sce_object <- as.SingleCellExperiment(seurat_object
-)
+  sce_object <- as.SingleCellExperiment(
+    seurat_object)
+  
   output <- file.path(opt$outdir, gsub(".RDS", ".h5ad", basename(opt$file)))
 
   convertFormat(sce_object, from = "sce", to = "anndata",
