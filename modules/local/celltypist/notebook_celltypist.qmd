@@ -4,7 +4,7 @@ author: "Andre Fonseca"
 execute:
   cache: true
   freeze: auto
-jupyter: python3.8
+jupyter: py3817
 format:
   html:
     toc: true
@@ -169,10 +169,10 @@ sc.tl.umap(adata)
 
 sc.pl.umap(
     adata,
-    color=["celltypist_cell_label_fine", "celltypist_conf_score_fine"],
-    frameon=False,
-    sort_order=False,
-    wspace=1,
+    color = ["celltypist_cell_label_fine", "celltypist_conf_score_fine"],
+    frameon = False,
+    sort_order = False,
+    wspace = 1
 )
 
 ```
@@ -181,10 +181,10 @@ sc.pl.umap(
 
 sc.pl.umap(
     adata,
-    color=["celltypist_cell_label_coarse", "celltypist_conf_score_coarse"],
-    frameon=False,
-    sort_order=False,
-    wspace=1,
+    color = ["celltypist_cell_label_coarse", "celltypist_conf_score_coarse"],
+    frameon = False,
+    sort_order = False,
+    wspace = 1
 )
 
 ```
@@ -223,7 +223,7 @@ sc.pl.stacked_violin(
     adata,
     all_markers,
     groupby = 'celltypist_cell_label_coarse',
-    dendrogram = Tru
+    dendrogram = True
     )
 
 ```
@@ -257,6 +257,7 @@ sc.pl.rank_genes_groups_dotplot(
 
 ```{python}
 
+'''
 sc.pl.dotplot(
     adata,
     var_names = {
@@ -265,6 +266,7 @@ sc.pl.dotplot(
     groupby = "transf_cell_type_certain",
     standard_scale = "var",
 )
+'''
 
 ```
 

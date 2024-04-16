@@ -22,6 +22,8 @@ workflow {
         ch_database
     )
 
+    // SCRATCH_HARMONIZATION()
+
 }
 
 workflow.onComplete {

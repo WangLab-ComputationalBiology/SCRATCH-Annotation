@@ -5,8 +5,6 @@ include { QUARTO_RENDER_PAGEA   } from '../../modules/local/metatime/annotation/
 include { QUARTO_RENDER_PAGEC   } from '../../modules/local/sctype/main'
 include { QUARTO_RENDER_PAGEB   } from '../../modules/local/celltypist/main'
 include { QUARTO_RENDER_PROJECT } from '../../modules/local/report/main'
-include { SCGPT_ANNOTATION      } from '../../modules/local/scgpt/annotation/main.nf'
-//include { SCGPT_ANNOTATION      } from '../../modules/local/scgpt/annotation/main.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
