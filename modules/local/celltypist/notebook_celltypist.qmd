@@ -3,7 +3,7 @@ title: "Module - CellTypist"
 author: "Andre Fonseca"
 execute:
   cache: true
-  freeze: auto
+  freeze: true
 jupyter: py3817
 format:
   html:
@@ -12,31 +12,22 @@ format:
     toc-depth: 2
     code-fold: show
     code-tools: true
-    default-image-extension: svg
+    fig-align: 'center'
+    fig-format: png
+    fig-responsive: true
   ipynb: default
+lightbox:
+    match: auto
+    effect: zoom
+    loop: true
 format-links: [ipynb]
-params:
-    project_name: "Project"
 ---
 
-# Project Name: `r params$project_name`
-
-## Loading library
-
-```{python library}
-
-import pandas as pd
-import scanpy as sc
-import hdf5plugin
-import celltypist
-from celltypist import models
-
-```
-
 ```{python}
-#| echo: False
+#| tags: [parameters]
 #| include: False
 
+# Parameters
 project_name   = "Project"
 anndata_object = "/Users/affaustino/Projects/SCRATCH-Annotation/test/Sohrab_data_annotation/Sohrab_count/Sohrab_T_cell_counts.h5ad"
 cell_database  = "/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv"
@@ -51,6 +42,27 @@ annot_table    = "{work_directory}/{cell_model}".format(work_directory = work_di
 
 ```
 
+:::{.callout-important collapse="true"}
+
+Here we will print the parameters
+
+:::
+
+# Project Name: Project
+
+## Loading library
+
+```{python}
+
+import pandas as pd
+import scanpy as sc
+import session_info
+
+import celltypist
+from celltypist import models
+
+```
+
 ## Loading data
 ```{python}
 
@@ -58,12 +70,6 @@ try:
     adata = sc.read_h5ad(anndata_object)
 except Exception as e:
     print(f"Error loading AnnData file: {e}")
-
-```
-
-```{python}
-
-cell_database = pd.read_csv(cell_database)
 
 ```
 
@@ -166,6 +172,8 @@ sc.tl.umap(adata)
 ```
 
 ```{python}
+#| label: fig-umap-fine
+#| fig-cap: "Figure. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 
 sc.pl.umap(
     adata,
@@ -178,6 +186,8 @@ sc.pl.umap(
 ```
 
 ```{python}
+#| label: fig-umap-coarse
+#| fig-cap: "Figure. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 
 sc.pl.umap(
     adata,
@@ -192,6 +202,8 @@ sc.pl.umap(
 ## Cell annotation similarity
 
 ```{python}
+#| label: fig-dendrogram
+#| fig-cap: "Figure. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 
 sc.pl.dendrogram(adata, groupby = "celltypist_cell_label_coarse")
 
@@ -202,12 +214,12 @@ sc.pl.dendrogram(adata, groupby = "celltypist_cell_label_coarse")
 ```{python}
 
 top_genes = dict()
+
 for cell_type in adata.obs["celltypist_cell_label_coarse"].unique():
     markers = list(model_high.extract_top_markers(cell_type, 3))
     for gene in markers:
         if gene in list(adata.var_names):
             top_genes.setdefault(cell_type, []).append(gene)
-
 
 ```
 
@@ -218,6 +230,8 @@ all_markers = [item for sublist in top_genes.values() for item in sublist]
 ```
 
 ```{python}
+#| label: fig-violin
+#| fig-cap: "Figure. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 
 sc.pl.stacked_violin(
     adata,
@@ -242,6 +256,8 @@ sc.tl.rank_genes_groups(
 ```
 
 ```{python}
+#| label: fig-dotplot
+#| fig-cap: "Figure. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 
 sc.pl.rank_genes_groups_dotplot(
     adata,
@@ -250,23 +266,6 @@ sc.pl.rank_genes_groups_dotplot(
     n_genes = 5,
     key = "dea_cell_label"
     )
-
-```
-
-## Curated markers
-
-```{python}
-
-'''
-sc.pl.dotplot(
-    adata,
-    var_names = {
-        ct: marker_genes_in_data[ct] for ct in cell_types_to_check
-    },
-    groupby = "transf_cell_type_certain",
-    standard_scale = "var",
-)
-'''
 
 ```
 
@@ -281,5 +280,13 @@ adata.write_h5ad(output_object)
 ```{python}
 
 adata.write_csvs(annot_table)
+
+```
+
+## Session info
+
+```{python}
+
+session_info.show()
 
 ```

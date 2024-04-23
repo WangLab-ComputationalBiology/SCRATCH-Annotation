@@ -1,0 +1,25 @@
+---
+title: "Module - {}"
+author: "Andre Fonseca"
+execute:
+  cache: true
+  freeze: true
+jupyter: py3817
+format:
+  html:
+    toc: true
+    toc-location: right
+    toc-depth: 2
+    code-fold: show
+    code-tools: true
+    default-image-extension: svg
+  ipynb: default
+lightbox: true
+format-links: [ipynb]
+---
+
+## Loading library
+
+```{python library}
+
+```

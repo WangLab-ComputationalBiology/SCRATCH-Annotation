@@ -1,24 +1,30 @@
 # Nextflow
 .nextflow*
 work/
-data/
-Project/
 .DS_Store
 testing/
 testing*
-*.pyc
-*.ipynb
-*.sqlite
 
 # Test
-test/
+Project/
+data/
+figures/
+output/
+TODO.md
 
 # Quarto
-notebook_*_files
+notebook_*_files/
+notebook_*_cache/
 notebook_*.html
 
 # Jupyter Notebook
 .ipynb_checkpoints
 .jupyter_cache/
+*.pyc
+*.ipynb
+*.sqlite
+
+# R environments
 .Rproj.user
 .Rproj
+.Rhistory
