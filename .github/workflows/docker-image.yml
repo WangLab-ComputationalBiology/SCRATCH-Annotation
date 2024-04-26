@@ -6,8 +6,7 @@ on:
   push:
     branches: [ main ]
     tags: [ 'v*.*.*' ]
-    paths:
-      - 'docker/scratch-annotation.Dockerfile'
+    paths: ['docker/scratch-annotation.Dockerfile']
 
 env:
   REGISTRY: docker.io
