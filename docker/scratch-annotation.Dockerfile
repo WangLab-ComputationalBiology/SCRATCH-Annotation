@@ -73,22 +73,22 @@ ARG R_BIOC_DEPS="c(\
 # Setting repository URL
 ARG R_REPO="http://cran.us.r-project.org"
 
-# Caching R-lib on the building process
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages(${R_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages(${WEB_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages(${R_BIOC_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages('R.utils', Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
+# Caching R-lib on the building process --mount=type=cache,target=/usr/local/lib/R
+RUN Rscript -e "install.packages(${R_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
+RUN Rscript -e "install.packages(${WEB_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
+RUN Rscript -e "install.packages(${R_BIOC_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
+RUN Rscript -e "install.packages('R.utils', Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
 
-# # Install Seurat Wrappers
+# Install Seurat Wrappers
 RUN wget https://github.com/satijalab/seurat/archive/refs/heads/seurat5.zip -O /opt/seurat-v5.zip
 RUN wget https://github.com/satijalab/seurat-data/archive/refs/heads/seurat5.zip -O /opt/seurat-data.zip
 RUN wget https://github.com/satijalab/seurat-wrappers/archive/refs/heads/seurat5.zip -O /opt/seurat-wrappers.zip
 
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "devtools::install_local('/opt/seurat-v5.zip')"
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
+RUN Rscript -e "devtools::install_local('/opt/seurat-v5.zip')"
+RUN Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
+RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
 
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "devtools::install_github(${DEV_DEPS}, repos = \"${R_REPO}\")"
+RUN Rscript -e "devtools::install_github(${DEV_DEPS}, repos = \"${R_REPO}\")"
 
 # Set the working directory
 WORKDIR /data
