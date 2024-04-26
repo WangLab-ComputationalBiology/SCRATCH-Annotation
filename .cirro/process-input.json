@@ -1,0 +1,4 @@
+{
+    "input_cell_markers_db": "$.params.dataset.paramJson.param_1",
+    "seurat_object": "$.params.inputs[0].s3|/data/"
+}

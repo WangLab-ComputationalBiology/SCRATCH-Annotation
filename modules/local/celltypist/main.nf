@@ -1,4 +1,4 @@
-process QUARTO_RENDER_PAGEB {
+process CELLTYPIST_ANNOTATION {
 
     tag "Performing analysis ${notebook.baseName}"
     label 'process_medium'
@@ -7,26 +7,28 @@ process QUARTO_RENDER_PAGEB {
 
     input:
         path(notebook)
+        path(anndata_object)
         path(config)
 
-        val(project_name)
-        val(paramB)
-
     output:
-        path("_freeze/${notebook.baseName}"),  emit: cache
-        path("${project_name}_step_02.RDS") ,  emit: project_rds
+        path("_freeze/${notebook.baseName}/*"),           emit: cache
+        path("${params.project_name}_celltypist.h5ad") ,  emit: project_object
 
     when:
         task.ext.when == null || task.ext.when
 
     script:
-        def project_name = project_name ? "-P project_name:${project_name}" : ""
-        def paramB       = paramB       ? "-P paramB:${paramB}" : ""
+        def param_file = task.ext.args ? "-P anndata_object:${anndata_object} ${task.ext.args}" : ""
         """
-        quarto render ${notebook} ${project_name} ${paramB}
+        quarto render ${notebook} ${param_file}
         """
     stub:
+        def param_file = task.ext.args ? "-P anndata_object:${anndata_object} ${task.ext.args}" : ""
         """
+        touch ${params.project_name}_celltypist.h5ad
+        mkdir -p _freeze/${notebook.baseName}
+        touch _freeze/${notebook.baseName}/${notebook.baseName}.html
+        echo ${param_file} > _freeze/${notebook.baseName}/params.yml
         """
 
 }

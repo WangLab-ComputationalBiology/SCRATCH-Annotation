@@ -12,6 +12,12 @@ figures/
 output/
 TODO.md
 
+# Data
+*.h5ad
+*.RDS
+*.sqlite
+*.pt
+
 # Quarto
 notebook_*_files/
 notebook_*_cache/
@@ -22,7 +28,6 @@ notebook_*.html
 .jupyter_cache/
 *.pyc
 *.ipynb
-*.sqlite
 
 # R environments
 .Rproj.user

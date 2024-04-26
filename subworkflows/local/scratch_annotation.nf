@@ -1,19 +1,18 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl = 2
 
-include { QUARTO_RENDER_PAGEA   } from '../../modules/local/metatime/annotation/main'
-include { QUARTO_RENDER_PAGEC   } from '../../modules/local/sctype/main'
-include { QUARTO_RENDER_PAGEB   } from '../../modules/local/celltypist/main'
-include { QUARTO_RENDER_PROJECT } from '../../modules/local/report/main'
 
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Check mandatory parameters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
+// include { QUARTO_RENDER_PAGEB   } from '../../modules/local/metatime/annotation/main'
+// include { QUARTO_RENDER_PAGEC   } from '../../modules/local/sctype/main'
 
-// def checkPathParamList = [params.paramA, params.paramB, params.paramC]
-// for (param in checkPathParamList) if (param) file(param, checkIfExists: true)
+include { HELPER_SEURAT_SUBSET      } from '../../modules/local/helpers/subset/main.nf'
+// include { HELPER_SCEASY_CONVERTER   } from '../../modules/local/helpers/convert/main.nf'
+// include { CELLTYPIST_ANNOTATION     } from '../../modules/local/celltypist/main.nf'
+// include { SCYTPE_MAJOR_ANNOTATION   } from '../../modules/local/sctype/main.nf'
+// include { SCYTPE_STATE_ANNOTATION   } from '../../modules/local/sctype/main.nf'
+
+
+// include { QUARTO_RENDER_PROJECT } from '../../modules/local/report/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,9 +23,9 @@ include { QUARTO_RENDER_PROJECT } from '../../modules/local/report/main'
 workflow SCRATCH_ANNOTATION {
 
     take:
-        ch_matrix          // channel: []
-        ch_cell_malignancy // channel: []
-        ch_database        // channel: []
+        ch_single_object    // channel: []
+        ch_cell_malignancy  // channel: []
+        ch_database         // channel: []
 
     main:
 
@@ -39,63 +38,76 @@ workflow SCRATCH_ANNOTATION {
         ch_page_config = Channel.fromPath(params.page_config, checkIfExists: true)
             .collect()
 
-        // Object/Data interoperability
-
         // Subsetting based on cell malignancy annotation
-
-        // Passing notebooks for respective functions
-        first = QUARTO_RENDER_PAGEA(
-            ch_notebookA,
-            ch_page_config,
-            params.project_name,
-            params.paramA
+        ch_filtered_object = HELPER_SEURAT_SUBSET(
+            ch_single_object,
+            ch_cell_malignancy
         )
 
-        second = QUARTO_RENDER_PAGEB(
-            ch_notebookB,
-            ch_page_config,
-            params.project_name,
-            params.paramB
-        )
+        ch_filtered_object
+            .ifEmpty("Malignant cells were not filtered. Running annotation in all cells.")
+            .view()
 
-        // Adding conditions for skipping notebooks/analysis
-        (ch_notebookC, third) = params.skip_python
-            ? [Channel.empty(), Channel.empty()]
-            : [
-                ch_notebookC,
-                QUARTO_RENDER_PAGEC(
-                    ch_notebookC,
-                    ch_page_config,
-                    params.project_name,
-                    params.paramC
-                )
-            ]
+        // Object/Data interoperability
+        // if(params.cell_mask.contains("NO_FILE")) {
+        //     ch_filtered_object = ch_single_object
+        // }
 
-        // Gathering all notebooks
-        ch_qmd = ch_notebookA.mix(ch_notebookB, ch_notebookC)
-            .collect()
+        // ch_anndata_object = HELPER_SCEASY_CONVERTER(
+        //     ch_filtered_object
+        // )
 
-        // Creates a single channel with all cache/freeze folders
-        ch_cache = first.mix(second.cache, third)
-            .collect()
+        // // Passing notebooks for respective functions
+        // one = CELLTYPIST_ANNOTATION(
+        //     ch_notebookA,
+        //     ch_anndata_object,
+        //     ch_page_config
+        // )
+        
+        // second = QUARTO_RENDER_PAGEB(
+        //     ch_notebookB,
+        //     ch_filtered_object,
+        //     ch_page_config,
+        // )
 
-        // Load SCRATCH/BTC template
-        ch_template = ch_template
-            .collect()
+        // // Adding conditions for skipping notebooks/analysis
+        // (ch_notebookC, third) = params.skip_python
+        //     ? [Channel.empty(), Channel.empty()]
+        //     : [
+        //         ch_notebookC,
+        //         QUARTO_RENDER_PAGEC(
+        //             ch_notebookC,
+        //             ch_page_config,
+        //             params.project_name,
+        //             params.paramC
+        //         )
+        //     ]
 
-        // Inspecting channels content
-        ch_cache.view()
-        ch_page_config.view()
-        ch_qmd.view()
+        // // Gathering all notebooks
+        // ch_qmd = ch_notebookA.mix(ch_notebookB, ch_notebookC)
+        //     .collect()
 
-        // Gathering intermediate pages and rendering the project
-        QUARTO_RENDER_PROJECT(
-            ch_template,
-            ch_qmd,
-            ch_cache
-        )
+        // // Creates a single channel with all cache/freeze folders
+        // ch_cache = first.mix(second.cache, third)
+        //     .collect()
+
+        // // Load SCRATCH/BTC template
+        // ch_template = ch_template
+        //     .collect()
+
+        // // Inspecting channels content
+        // ch_cache.view()
+        // ch_page_config.view()
+        // ch_qmd.view()
+
+        // // Gathering intermediate pages and rendering the project
+        // QUARTO_RENDER_PROJECT(
+        //     ch_template,
+        //     ch_qmd,
+        //     ch_cache
+        // )
 
     emit:
-        ch_dumps = second.project_rds
+        ch_dumps = Channel.empty()
 
 }

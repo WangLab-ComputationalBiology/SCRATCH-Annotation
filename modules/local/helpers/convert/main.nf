@@ -1,32 +1,27 @@
-process QUARTO_RENDER_PAGEB {
+process HELPER_SCEASY_CONVERTER {
 
-    tag "Performing analysis ${notebook.baseName}"
+    tag "Converting Seurat to AnnData"
     label 'process_medium'
 
     container 'oandrefonseca/scagnostic:main'
+    publishDir "${params.outdir}/${params.project_name}", mode: 'copy', overwrite: true
 
     input:
-        path(notebook)
-        path(config)
-
-        val(project_name)
-        val(paramB)
+        path(seurat_object)
 
     output:
-        path("_freeze/${notebook.baseName}"),  emit: cache
-        path("${project_name}_step_02.RDS") ,  emit: project_rds
+        path("${seurat_object.baseName}_filtered.h5ad") ,  emit: project_rds
 
     when:
         task.ext.when == null || task.ext.when
 
     script:
-        def project_name = project_name ? "-P project_name:${project_name}" : ""
-        def paramB       = paramB       ? "-P paramB:${paramB}" : ""
         """
-        quarto render ${notebook} ${project_name} ${paramB}
+        Rscript sceasy_converter.R -f ${seurat_object} -o ${seurat_object}
         """
     stub:
         """
+        touch ${seurat_object.baseName}_filtered.h5ad
         """
 
 }

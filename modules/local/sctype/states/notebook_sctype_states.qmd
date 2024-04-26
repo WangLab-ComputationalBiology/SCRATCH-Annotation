@@ -466,10 +466,10 @@ seurat_object <- UCell::AddModuleScore_UCell(
 
 ### Feature Plot
 
-This is illustrated well by @fig-umap-fine.
+This is illustrated well by @fig-feat-markers
 
 ```{r feature_plot}
-#| label: fig-umap-fine
+#| label: fig-feat-markers
 #| fig-width: 15
 #| fig-height: 10
 #| fig-align: center

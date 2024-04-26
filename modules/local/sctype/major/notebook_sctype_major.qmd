@@ -70,6 +70,7 @@ Here we will print the parameters
 This is a Quarto book
 
 ```{r}
+#| output: false
 
 library(readr)
 library(dplyr)
@@ -80,6 +81,7 @@ library(HGNChelper)
 ```
 
 ```{r}
+#| include: false
 
 gene_sets_prepare <- function(path_to_db_file, cell_type){
 
@@ -382,6 +384,10 @@ if(length(non_malignant_markers_valid) > 1) {
 ### Feature Plot
 
 ```{r feature_plot}
+#| label: fig-feat-markers
+#| fig-width: 15
+#| fig-height: 10
+#| fig-align: center
 
 FeaturePlot(
   object = seurat_object,
@@ -395,6 +401,10 @@ FeaturePlot(
 ### Violin Plot
 
 ```{r violin_plot}
+#| label: fig-violin
+#| fig-width: 15
+#| fig-height: 10
+#| fig-align: center
 
 VlnPlot(
   object = seurat_object,
@@ -455,8 +465,8 @@ SCP::CellStatPlot(
 
 if(auto_save) {
 
-  saveRDS(seurat_object, file = paste0('data/', project_name, '_annotation_object.RDS'))
-  write_tsv(cell_markers_database, file = 'data/cell_markers_database.tsv')
+  #saveRDS(seurat_object, file = paste0('data/', project_name, '_annotation_object.RDS'))
+  #write_tsv(cell_markers_database, file = 'data/cell_markers_database.tsv')
 
 }
 
