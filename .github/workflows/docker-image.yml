@@ -1,11 +1,16 @@
 name: Publish Docker image
 
 on:
+  schedule:
+    - cron: '15 1 * * *'
   push:
-    branches:
-      - main
+    branches: [ main ]
+    tags: [ 'v*.*.*' ]
     paths:
       - 'docker/scratch-annotation.Dockerfile'
+
+env:
+  REGISTRY: docker.io
 
 jobs:
   push_to_registry:
