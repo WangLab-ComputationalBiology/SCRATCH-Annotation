@@ -1,8 +1,11 @@
 name: Publish Docker image
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
+    paths:
+      - 'docker/scratch-annotation.Dockerfile'
 
 jobs:
   push_to_registry:
@@ -25,12 +28,12 @@ jobs:
           images: my-docker-hub-namespace/my-docker-hub-repository
           flavor: |
             latest=false
-            suffix=-${{ github.event.release.tag_name }}
+            suffix=-${{ github.ref_name }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
-          context: .
+          context: ./docker
           file: ./docker/scratch-annotation.Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
