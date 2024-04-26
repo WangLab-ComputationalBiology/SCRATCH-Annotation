@@ -29,9 +29,17 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: oandrefonseca/scratch-annotation
-          flavor: |
-            latest=false
-            suffix=-${{ github.ref_name }}
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha            
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v2
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
@@ -41,3 +49,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha,scope=${{ matrix.image_name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image_name }}
+
