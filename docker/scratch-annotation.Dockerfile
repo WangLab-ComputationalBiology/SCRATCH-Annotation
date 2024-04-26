@@ -71,10 +71,10 @@ ARG R_BIOC_DEPS="c(\
 ARG R_REPO='http://cran.us.r-project.org'
 
 # Caching R-lib on the building process
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages(${R_DEPS}, Ncpus = 8, repos = \"${R_REPO}\", clean = TRUE)"
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages(${WEB_DEPS}, Ncpus = 8, repos = \"${R_REPO}\", clean = TRUE)"
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages(${R_BIOC_DEPS}, Ncpus = 8, repos = \"${R_REPO}\", clean = TRUE)"
-RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages('R.utils', Ncpus = 8, repos = \"${R_REPO}\", clean = TRUE)"
+RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages(${R_DEPS}, Ncpus = 8, repos = "${R_REPO}", clean = TRUE)"
+RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages(${WEB_DEPS}, Ncpus = 8, repos = "${R_REPO}", clean = TRUE)"
+RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages(${R_BIOC_DEPS}, Ncpus = 8, repos = "${R_REPO}", clean = TRUE)"
+RUN --mount=type=cache,target=/usr/local/lib/R Rscript -e "install.packages('R.utils', Ncpus = 8, repos = "${R_REPO}", clean = TRUE)"
 
 # Install Seurat Wrappers
 RUN wget https://github.com/satijalab/seurat/archive/refs/heads/seurat5.zip -O /opt/seurat-v5.zip
