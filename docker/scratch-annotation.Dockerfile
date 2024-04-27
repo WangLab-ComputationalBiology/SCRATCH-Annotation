@@ -27,7 +27,7 @@ RUN apt-get install -y \
     python3-pip
 
 # Install Python packages for data science
-RUN python3 -m pip install --no-cache-dir numpy pandas scikit-learn matplotlib seaborn jupyter
+RUN python3 -m pip install --no-cache-dir numpy scanpy anndata pandas scikit-learn matplotlib seaborn jupyter
 RUN python3 -m pip install --no-cache-dir jupyter-cache
 RUN python3 -m pip install --no-cache-dir papermill
 
@@ -90,6 +90,15 @@ RUN Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
 RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
 
 RUN Rscript -e "devtools::install_github(${DEV_DEPS}, repos = \"${R_REPO}\")"
+
+# Install R packages related to cell annotation
+# ARG R_ANNOT_DEPS="c(\)"
+
+# RUN Rscript -e "install.packages(${R_ANNOT_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
+
+# Install Python packages related to cell annotation
+RUN python3 -m pip install --no-cache-dir scSpectra
+RUN python3 -m pip install --no-cache-dir celltypist 
 
 # Set the working directory
 WORKDIR /data
