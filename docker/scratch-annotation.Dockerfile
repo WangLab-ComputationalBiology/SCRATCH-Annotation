@@ -104,7 +104,7 @@ RUN python3 -m pip install --no-cache-dir celltypist
 RUN python3 -m pip install --no-cache-dir session_info
 
 # Installing celltypist models
-RUN python3 -m celltypist
+RUN mkdir /.celltypist
 
 # Set the working directory
 WORKDIR /data
