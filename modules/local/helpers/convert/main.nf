@@ -17,7 +17,7 @@ process HELPER_SCEASY_CONVERTER {
 
     script:
         """
-        sceasy_converter.R -f ${seurat_object} -o ${seurat_object}
+        sceasy_converter.R -f ${seurat_object}
         """
     stub:
         """
