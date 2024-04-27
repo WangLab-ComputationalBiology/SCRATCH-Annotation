@@ -90,7 +90,6 @@ RUN Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
 RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
 
 RUN Rscript -e "devtools::install_github(${DEV_DEPS}, repos = \"${R_REPO}\")"
-RUN Rscript -e "devtools::install_github("cellgeni/sceasy")"
 
 # Set the working directory
 WORKDIR /data
