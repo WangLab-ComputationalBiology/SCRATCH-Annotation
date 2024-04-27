@@ -6,7 +6,7 @@ nextflow.enable.dsl = 2
 // include { QUARTO_RENDER_PAGEC   } from '../../modules/local/sctype/main'
 
 include { HELPER_SEURAT_SUBSET      } from '../../modules/local/helpers/subset/main.nf'
-// include { HELPER_SCEASY_CONVERTER   } from '../../modules/local/helpers/convert/main.nf'
+include { HELPER_SCEASY_CONVERTER   } from '../../modules/local/helpers/convert/main.nf'
 // include { CELLTYPIST_ANNOTATION     } from '../../modules/local/celltypist/main.nf'
 // include { SCYTPE_MAJOR_ANNOTATION   } from '../../modules/local/sctype/main.nf'
 // include { SCYTPE_STATE_ANNOTATION   } from '../../modules/local/sctype/main.nf'
@@ -49,13 +49,13 @@ workflow SCRATCH_ANNOTATION {
             .view()
 
         // Object/Data interoperability
-        // if(params.cell_mask.contains("NO_FILE")) {
-        //     ch_filtered_object = ch_single_object
-        // }
+        if(params.cell_mask.contains("NO_FILE")) {
+            ch_filtered_object = ch_single_object
+        }
 
-        // ch_anndata_object = HELPER_SCEASY_CONVERTER(
-        //     ch_filtered_object
-        // )
+        ch_anndata_object = HELPER_SCEASY_CONVERTER(
+            ch_filtered_object
+        )
 
         // // Passing notebooks for respective functions
         // one = CELLTYPIST_ANNOTATION(

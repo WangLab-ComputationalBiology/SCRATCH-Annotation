@@ -3,7 +3,7 @@ process HELPER_SCEASY_CONVERTER {
     tag "Converting Seurat to AnnData"
     label 'process_medium'
 
-    container 'oandrefonseca/scagnostic:main'
+    container 'oandrefonseca/scratch-annotation:main'
     publishDir "${params.outdir}/${params.project_name}", mode: 'copy', overwrite: true
 
     input:
@@ -17,7 +17,7 @@ process HELPER_SCEASY_CONVERTER {
 
     script:
         """
-        Rscript sceasy_converter.R -f ${seurat_object} -o ${seurat_object}
+        sceasy_converter.R -f ${seurat_object} -o ${seurat_object}
         """
     stub:
         """

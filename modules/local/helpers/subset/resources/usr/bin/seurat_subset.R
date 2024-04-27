@@ -15,7 +15,7 @@ option_list <- list(
               help = "Input dump name", metavar = "character"),
   make_option(c("-m", "--metadata"), type = "character",
               help = "Metadata with cell status (TME/Malignant)", metavar = "character"),
-  make_option(c("-o", "--outdir"), type = "character", default = NULL,
+  make_option(c("-o", "--outdir"), type = "character", default = './',
               help = "Output directory path", metavar = "character")
 )
 

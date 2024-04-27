@@ -3,7 +3,7 @@ process HELPER_SEURAT_SUBSET {
     tag "Removing malignant cells"
     label 'process_medium'
 
-    container 'oandrefonseca/scrpackages:main'
+    container 'oandrefonseca/scratch-annotation:main'
     publishDir "${params.outdir}/${params.project_name}", mode: 'copy', overwrite: true
 
     input:
@@ -18,7 +18,7 @@ process HELPER_SEURAT_SUBSET {
 
     script:
         """
-        seurat_subset.R -f ${seurat_object} -m ${cell_malignancy} -o ${seurat_object}
+        seurat_subset.R -f ${seurat_object} -m ${cell_malignancy}
         """
     stub:
         """
