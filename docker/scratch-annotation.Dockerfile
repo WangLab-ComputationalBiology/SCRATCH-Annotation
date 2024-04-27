@@ -103,9 +103,13 @@ RUN python3 -m pip install --no-cache-dir scSpectra
 RUN python3 -m pip install --no-cache-dir celltypist 
 RUN python3 -m pip install --no-cache-dir session_info
 
+# Setting celltypist variable
+ENV CELLTYPIST_FOLDER=/opt/celltypist
+RUN chmod 777 /opt/celltypist
+
 # Installing celltypist models
-COPY setup.py .
-RUN python3 setup.py
+COPY setup.py /opt/
+RUN python3 /opt/setup.py
 
 # Set the working directory
 WORKDIR /data
