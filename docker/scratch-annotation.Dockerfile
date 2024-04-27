@@ -39,7 +39,8 @@ ARG R_DEPS="c(\
     'patchwork', \
     'BiocManager', \
     'remotes', \
-    'optparse' \
+    'optparse', \
+    'R.utils' \
     )"
 
 ARG DEV_DEPS="c(\
@@ -69,7 +70,6 @@ ARG R_BIOC_DEPS="c(\
     'lme4', \
     'terra', \ 
     'ggrastr', \
-    'SingleCellExperiment' \
     )"
 
 # Setting repository URL
@@ -78,8 +78,9 @@ ARG R_REPO="http://cran.us.r-project.org"
 # Caching R-lib on the building process --mount=type=cache,target=/usr/local/lib/R
 RUN Rscript -e "install.packages(${R_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
 RUN Rscript -e "install.packages(${WEB_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
-RUN Rscript -e "install.packages(${R_BIOC_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
-RUN Rscript -e "install.packages('R.utils', Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
+
+# Install BiocManager
+RUN Rscript -e "BiocManager::install(${R_BIOC_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)"
 
 # Install Seurat Wrappers
 RUN wget https://github.com/satijalab/seurat/archive/refs/heads/seurat5.zip -O /opt/seurat-v5.zip
