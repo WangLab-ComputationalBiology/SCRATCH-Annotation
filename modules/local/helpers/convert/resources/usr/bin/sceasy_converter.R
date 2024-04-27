@@ -38,7 +38,7 @@ if(opt$type == "Seurat") {
   sce_object <- as.SingleCellExperiment(
     seurat_object)
   
-  output <- file.path(opt$outdir, gsub(".RDS", ".h5ad", basename(opt$file)))
+  output <- file.path(opt$outdir, gsub(".RDS", "_filtered.h5ad", basename(opt$file)))
 
   convertFormat(sce_object, from = "sce", to = "anndata",
                 outFile = output)

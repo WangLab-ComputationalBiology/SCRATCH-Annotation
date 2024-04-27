@@ -7,7 +7,7 @@ nextflow.enable.dsl = 2
 
 include { HELPER_SEURAT_SUBSET      } from '../../modules/local/helpers/subset/main.nf'
 include { HELPER_SCEASY_CONVERTER   } from '../../modules/local/helpers/convert/main.nf'
-// include { CELLTYPIST_ANNOTATION     } from '../../modules/local/celltypist/main.nf'
+include { CELLTYPIST_ANNOTATION     } from '../../modules/local/celltypist/main.nf'
 // include { SCYTPE_MAJOR_ANNOTATION   } from '../../modules/local/sctype/main.nf'
 // include { SCYTPE_STATE_ANNOTATION   } from '../../modules/local/sctype/main.nf'
 
@@ -31,7 +31,7 @@ workflow SCRATCH_ANNOTATION {
 
         // Importing notebook
         ch_notebookA   = Channel.fromPath(params.notebookA, checkIfExists: true)
-        ch_notebookB   = Channel.fromPath(params.notebookB, checkIfExists: true)
+        ch_celltypist  = Channel.fromPath(params.notebook_celltypist, checkIfExists: true)
         ch_notebookC   = Channel.fromPath(params.notebookC, checkIfExists: true)
 
         ch_template    = Channel.fromPath(params.template, checkIfExists: true)
@@ -58,11 +58,11 @@ workflow SCRATCH_ANNOTATION {
         )
 
         // // Passing notebooks for respective functions
-        // one = CELLTYPIST_ANNOTATION(
-        //     ch_notebookA,
-        //     ch_anndata_object,
-        //     ch_page_config
-        // )
+        celltypist = CELLTYPIST_ANNOTATION(
+            ch_celltypist,
+            ch_anndata_object,
+            ch_page_config
+        )
         
         // second = QUARTO_RENDER_PAGEB(
         //     ch_notebookB,

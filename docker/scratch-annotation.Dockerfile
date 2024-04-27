@@ -101,6 +101,10 @@ RUN Rscript -e "devtools::install_github(${DEV_DEPS}, repos = \"${R_REPO}\")"
 # Install Python packages related to cell annotation
 RUN python3 -m pip install --no-cache-dir scSpectra
 RUN python3 -m pip install --no-cache-dir celltypist 
+RUN python3 -m pip install --no-cache-dir session_info
+
+# Installing celltypist models
+RUN python3 -m celltypist
 
 # Set the working directory
 WORKDIR /data
