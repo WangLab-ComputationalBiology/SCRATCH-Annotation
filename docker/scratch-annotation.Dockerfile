@@ -40,7 +40,9 @@ ARG R_DEPS="c(\
     'BiocManager', \
     'remotes', \
     'optparse', \
-    'R.utils' \
+    'R.utils', \
+    'here', \
+    'HGNChelper' \
     )"
 
 ARG DEV_DEPS="c(\

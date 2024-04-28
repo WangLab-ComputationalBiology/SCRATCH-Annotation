@@ -1,5 +1,5 @@
 ---
-title: "Module - Sctype major cell annotation"
+title: "Module - Sctype Major cell annotation"
 description: | 
   Description
 execute:
@@ -22,7 +22,7 @@ lightbox:
 format-links: [ipynb]
 params:
   project_name: 'Project'
-  project_object: '/Users/affaustino/Projects/SCRATCH-Annotation/data/Ovarian_main_cluster_object.20k.RDS'
+  seurat_object: '/Users/affaustino/Projects/SCRATCH-Annotation/data/Ovarian_main_cluster_object.20k.RDS'
   input_cell_markers_db: '/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv'
   input_annotation_level: 'Major cells'
   n_threads: 8
@@ -36,7 +36,7 @@ params:
 
 # Project parameters 
 project_name <- params$project_name
-project_object <- params$project_object
+seurat_object <- params$seurat_object
 
 # Inputs and thresholds
 input_cell_markers_db <- params$input_cell_markers_db
@@ -220,7 +220,7 @@ file.create('figures/annotation/.empty')
 ```{r loading_rds}
 
 # Reading seurat object
-seurat_object <- readRDS(file = project_object)
+seurat_object <- readRDS(file = seurat_object)
 
 # Setting random seed
 random_seed <- 2203
@@ -466,6 +466,7 @@ SCP::CellStatPlot(
 if(auto_save) {
 
   #saveRDS(seurat_object, file = paste0('data/', project_name, '_annotation_object.RDS'))
+  #
   #write_tsv(cell_markers_database, file = 'data/cell_markers_database.tsv')
 
 }

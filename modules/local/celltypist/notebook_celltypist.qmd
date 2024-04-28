@@ -1,6 +1,6 @@
 ---
 title: "Module - CellTypist"
-author: "Andre Fonseca"
+author: "SCRATCH"
 execute:
   cache: true
   freeze: true
@@ -27,17 +27,19 @@ format-links: [ipynb]
 #| tags: [parameters]
 #| include: False
 
+import os
+
 # Parameters
 project_name   = "Project"
-anndata_object = "/Users/affaustino/Projects/SCRATCH-Annotation/test/Sohrab_data_annotation/Sohrab_count/Sohrab_T_cell_counts.h5ad"
+anndata_object = "/Users/affaustino/Projects/SCRATCH-Annotation/data/Sohrab_data_annotation/Sohrab_count/Sohrab_T_cell_counts.h5ad"
 cell_database  = "/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv"
 cell_model     = ["Immune_All_High.pkl", "Immune_All_Low.pkl"]
 organism       = "Human"
 model_update   = False
 
 # Directory and outputs
-work_directory = "/Users/affaustino/Projects/SCRATCH-Annotation/test"
-output_object  = "{work_directory}/{project_name}_{object_label}".format(work_directory = work_directory, project_name = project_name, object_label = "annotation_object.h5ad")
+work_directory = os.getcwd()
+output_object  = "{work_directory}/{project_name}_{object_label}".format(work_directory = work_directory, project_name = project_name, object_label = "celltypist_annotation.h5ad")
 annot_table    = "{work_directory}/{cell_model}".format(work_directory = work_directory, cell_model = "Immune_All")
 
 ```

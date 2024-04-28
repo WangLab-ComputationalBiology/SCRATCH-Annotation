@@ -1,4 +1,4 @@
-process QUARTO_RENDER_PAGEC {
+process SCYTPE_MAJOR_ANNOTATION {
 
     tag "Performing analysis ${notebook.baseName}"
     label 'process_medium'
@@ -7,10 +7,8 @@ process QUARTO_RENDER_PAGEC {
 
     input:
         path(notebook)
+        path(seurat_object)
         path(config)
-
-        val(project_name)
-        val(paramC)
 
     output:
         path("_freeze/${notebook.baseName}"),   emit: cache
@@ -19,10 +17,9 @@ process QUARTO_RENDER_PAGEC {
         task.ext.when == null || task.ext.when
 
     script:
-        def project_name = project_name ? "-P project_name:${project_name}" : ""
-        def paramC       = paramC       ? "-P paramC:${paramC}" : ""
+        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P ${task.ext.args}" : ""
         """
-        quarto render ${notebook} ${project_name} ${paramC}
+        quarto render ${notebook} ${param_file}
         """
     stub:
         """
