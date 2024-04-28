@@ -108,7 +108,6 @@ RUN python3 -m pip install --no-cache-dir session_info
 
 # Setting celltypist variable
 ENV CELLTYPIST_FOLDER=/opt/celltypist
-RUN chmod 777 /opt/celltypist
 
 # Installing celltypist models
 COPY setup.py /opt/
