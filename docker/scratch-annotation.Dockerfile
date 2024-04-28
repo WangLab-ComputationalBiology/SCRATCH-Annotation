@@ -47,7 +47,8 @@ ARG R_DEPS="c(\
 
 ARG DEV_DEPS="c(\
     'bnprks/BPCells', \
-    'cellgeni/sceasy' \
+    'cellgeni/sceasy', \
+    'zhanghao-njmu/SCP' \
     )"
 
 ARG WEB_DEPS="c(\
