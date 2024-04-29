@@ -14,7 +14,8 @@ format:
     code-tools: true
     df-print: paged
     default-image-extension: svg
-  ipynb: default
+  ipynb:
+    prefer-html: true
 lightbox:
     match: auto
     effect: zoom
@@ -465,9 +466,22 @@ SCP::CellStatPlot(
 
 if(auto_save) {
 
-  #saveRDS(seurat_object, file = paste0('data/', project_name, '_annotation_object.RDS'))
+  saveRDS(seurat_object, file = paste0("data/", project_name, "_major_annotation_object.RDS"))
+
   #
-  #write_tsv(cell_markers_database, file = 'data/cell_markers_database.tsv')
+
+  annotation_table <- seurat_object@meta.data %>%
+    select(seurat_clusters, sctype) %>%
+    tibble::rownames_to_column(var = "barcode")
+
+  write_csv(annotation_table, file = paste0("data/", project_name, "_major_annotation.csv"))
+  
+  #
+
+  annotation_list <- paste0(
+    names(table(annotation_table$sctype)), ":", table(annotation_table$sctype)
+  )
+  write_lines(annotation_list, file = paste0("data/", project_name, "_major_annotation.list.txt"))
 
 }
 

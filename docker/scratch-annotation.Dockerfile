@@ -114,6 +114,9 @@ ENV CELLTYPIST_FOLDER=/opt/celltypist
 COPY setup.py /opt/
 RUN python3 /opt/setup.py
 
+# Added as needed - TO REFACTOR
+RUN Rscript -e "BiocManager::install('UCell')"
+
 # Set the working directory
 WORKDIR /data
 

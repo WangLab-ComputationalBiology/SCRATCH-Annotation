@@ -23,15 +23,16 @@ lightbox:
 format-links: [ipynb]
 params:
   project_name: 'Project'
-  project_object: '/Users/affaustino/Projects/SCRATCH-Annotation/data/Project_annotation_object.RDS'
+  seurat_object: '/Users/affaustino/Projects/SCRATCH-Annotation/data/Project_annotation_object.RDS'
   input_cell_markers_db: '/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv'
   input_cell_population: 'T-Cells'
   input_annotation_level: 'Major cells'
   thr_n_features: 2000
   thr_npc: 25
+  thr_resolution: 0.25
   n_threads: 8
   n_memory: 16
-  workdir: !expr here::here()
+  work_directory: !expr here::here()
   auto_save: TRUE
 ---
 
@@ -40,7 +41,7 @@ params:
 
 # Project parameters 
 project_name <- params$project_name
-project_object <- params$project_object
+seurat_object <- params$seurat_object
 
 # Inputs and thresholds
 input_cell_markers_db <- params$input_cell_markers_db
@@ -58,7 +59,7 @@ n_threads <- params$n_threads
 n_memory <- params$n_memory
 
 # Output parameters
-work_directory <- params$workdir
+work_directory <- params$work_directory
 timestamp <- params$timestamp
 auto_save <- params$auto_save
 
@@ -227,7 +228,7 @@ for(sub_directory in c('data', 'figures', 'figures/states')) {
 ```{r loading_rds}
 
 # Reading seurat object
-seurat_object <- readRDS(file = project_object)
+seurat_object <- readRDS(file = seurat_object)
 
 # Setting random seed
 random_seed <- 2203
@@ -265,8 +266,10 @@ seurat_object <- ScaleData(seurat_object)
 
 ```{r}
 
+# Moving clonotye expansion signal
 filtering_vst_markers <- list(
-  "T-Cells" = "^TR[ABDG][VDJ]"
+  "T-Cells" = "^TR[ABDG][VDJ]",
+  "B-Cells" = "IGH[KL]V.*"
 )
 
 if(input_cell_population %in% names(filtering_vst_markers)) {
@@ -278,8 +281,6 @@ if(input_cell_population %in% names(filtering_vst_markers)) {
 
 
 ```
-
-
 
 ## Dimensionality Reduction
 
@@ -307,7 +308,7 @@ seurat_object <- FindNeighbors(
 seurat_object <- FindClusters(
   object = seurat_object,
   graph.name = paste0('snn_npc', thr_npc),
-  resolution = 0.25
+  resolution = thr_resolution
 )
 
 # Running UMAP reduction

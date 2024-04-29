@@ -28,7 +28,7 @@ process CELLTYPIST_ANNOTATION {
         def param_file = task.ext.args ? "-P anndata_object:${anndata_object} -P ${task.ext.args}" : ""
         """
         touch ${params.project_name}_celltypist_annotation.h5ad
-        mkdir -p _freeze/${notebook.baseName}
+        mkdir -p _freeze/${notebook.baseName} Immune_All
         touch _freeze/${notebook.baseName}/${notebook.baseName}.html
         echo ${param_file} > _freeze/${notebook.baseName}/params.yml
         """

@@ -5,7 +5,7 @@ include { HELPER_SEURAT_SUBSET      } from '../../modules/local/helpers/subset/m
 include { HELPER_SCEASY_CONVERTER   } from '../../modules/local/helpers/convert/main.nf'
 include { CELLTYPIST_ANNOTATION     } from '../../modules/local/celltypist/main.nf'
 include { SCYTPE_MAJOR_ANNOTATION   } from '../../modules/local/sctype/major/main.nf'
-// include { SCYTPE_STATE_ANNOTATION   } from '../../modules/local/sctype/state/main.nf'
+include { SCYTPE_STATE_ANNOTATION   } from '../../modules/local/sctype/state/main.nf'
 
 // include { QUARTO_RENDER_PROJECT } from '../../modules/local/report/main'
 
@@ -25,9 +25,9 @@ workflow SCRATCH_ANNOTATION {
     main:
 
         // Importing notebook
-        ch_notebook_celltypist  = Channel.fromPath(params.notebook_celltypist, checkIfExists: true)
-        ch_notebook_scytpe_mj   = Channel.fromPath(params.notebook_sctype_major, checkIfExists: true)
-        ch_notebook_scytpe_st   = Channel.fromPath(params.notebook_sctype_state, checkIfExists: true)
+        ch_notebook_celltypist = Channel.fromPath(params.notebook_celltypist, checkIfExists: true)
+        ch_notebook_scytpe_mj  = Channel.fromPath(params.notebook_sctype_major, checkIfExists: true)
+        ch_notebook_scytpe_st  = Channel.fromPath(params.notebook_sctype_state, checkIfExists: true)
 
         ch_template    = Channel.fromPath(params.template, checkIfExists: true)
         ch_page_config = Channel.fromPath(params.page_config, checkIfExists: true)
@@ -52,33 +52,41 @@ workflow SCRATCH_ANNOTATION {
             ch_filtered_object
         )
 
-        // Passing notebooks for respective functions
+        // Performing automatic annotation with Celltypist
         ch_celltypist = CELLTYPIST_ANNOTATION(
             ch_notebook_celltypist,
             ch_anndata_object,
             ch_page_config
         )
-
-        ch_celltypist.cache.view()
         
+        // Performing scType hierarchical annotation - Major cell type
         ch_sctype_major = SCYTPE_MAJOR_ANNOTATION(
             ch_notebook_scytpe_mj,
             ch_filtered_object,
-            ch_page_config,
+            ch_page_config
         )
 
+        ch_sctype_major_object = ch_sctype_major.seurat_rds
+        ch_sctype_major_object
+            .view()
+
         // Reading major cell list
-        // ch_major_list = ch_sctype_major.out.major_list
-        // ch_major_list = Channel.fromPath(ch_major_list)
-        //     .splitText()
+        ch_major_list = ch_sctype_major.major_list
+            .splitText()
+            .map{ it -> it.split(":") }
+            .filter{ it[0] != "Unknown" }
+            .map{ it[0] }
 
-        // ch_sctype_state = QUARTO_RENDER_PAGEB(
-        //     ch_notebook_scytpe_st,
-        //     ch_major_list,
-        //     ch_filtered_object,
-        //     ch_page_config,
-        // )
+        ch_major_list
+            .view()
 
+        // Performing scType hierarchical annotation - Subtypes/states cell type
+        ch_sctype_state = SCYTPE_STATE_ANNOTATION(
+            ch_notebook_scytpe_st,
+            ch_sctype_major_object,
+            ch_major_list,
+            ch_page_config,
+        )
 
         // // Gathering all notebooks
         // ch_qmd = ch_notebookA.mix(ch_notebookB, ch_notebookC)
