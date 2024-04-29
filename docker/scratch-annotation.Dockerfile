@@ -72,7 +72,8 @@ ARG R_BIOC_DEPS="c(\
     'limma', \
     'lme4', \
     'terra', \ 
-    'ggrastr' \
+    'ggrastr', \
+    'Rsamtools' \
     )"
 
 # Setting repository URL
