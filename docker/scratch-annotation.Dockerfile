@@ -94,7 +94,7 @@ RUN Rscript -e "devtools::install_local('/opt/seurat-v5.zip')"
 RUN Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
 RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
 
-RUN Rscript -e "devtools::install_github(${DEV_DEPS}, repos = \"${R_REPO}\")"
+RUN Rscript -e "devtools::install_github(${DEV_DEPS})"
 
 # Install R packages related to cell annotation
 # ARG R_ANNOT_DEPS="c(\)"

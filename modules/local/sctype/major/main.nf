@@ -3,7 +3,8 @@ process SCYTPE_MAJOR_ANNOTATION {
     tag "Performing analysis ${notebook.baseName}"
     label 'process_medium'
 
-    container 'nf-quarto:latest'
+    container 'oandrefonseca/scratch-annotation:main'
+    publishDir "${params.outdir}/${params.project_name}", mode: 'copy', overwrite: true
 
     input:
         path(notebook)
