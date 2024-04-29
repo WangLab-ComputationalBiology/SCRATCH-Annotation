@@ -1,5 +1,5 @@
 ---
-title: "Module - Sctype T-cell annotation"
+title: "Module - Sctype Subtype/State annotation"
 description: | 
   Description
 execute:
@@ -15,7 +15,8 @@ format:
     df-print: paged
     default-image-extension: svg
     fig-align: center
-  ipynb: default
+  ipynb:
+    prefer-html: true
 lightbox:
     match: auto
     effect: zoom
@@ -51,6 +52,7 @@ input_annotation_level <- strsplit(
 
 thr_n_features <- params$thr_n_features
 thr_npc <- params$thr_npc
+thr_resolution <- params$thr_resolution
 
 # Optional parameters
 
@@ -323,7 +325,7 @@ seurat_object <- RunUMAP(
 
 ## Cell annotation
 
-```{r laading_markers}
+```{r loading_markers}
 
 # Get cell-type-specific gene sets from our in-built database (DB)
 cell_markers_database <- read_csv(file = input_cell_markers_db, show_col_types = FALSE)
@@ -571,8 +573,8 @@ SCP::CellStatPlot(
 
 if(auto_save) {
 
-  #saveRDS(seurat_object, file = glue::glue('./data/{project_name}_{input_cell_population}_annotation.RDS'))
-  #write_tsv(cell_markers_database, file = './data/cell_markers_database.tsv')
+  saveRDS(seurat_object, file = paste0('./data/', project_name, '_', input_cell_population, '_subtype_annotation.RDS'))
+  write_tsv(cell_markers_database, file = './data/cell_markers_database.tsv')
 
 }
 
