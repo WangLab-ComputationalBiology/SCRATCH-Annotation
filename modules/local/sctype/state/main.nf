@@ -15,10 +15,9 @@ process SCYTPE_STATE_ANNOTATION {
         )
 
     output:
-        path("_freeze/${notebook.baseName}"),                               emit: cache
-        path("data/${params.project_name}_subtype_annotation_object.RDS"),  emit: seurat_rds
-        path("data/${params.project_name}_subtype_annotation.csv"),         emit: annotation
-        path("data/${params.project_name}_subtype_annotation.list.txt"),    emit: major_list
+        path("_freeze/${notebook.baseName}"),                                          emit: cache
+        path("data/${params.project_name}_${cell_population}_annotation_object.RDS"),  emit: seurat_rds
+        path("data/${params.project_name}_${cell_population}_annotation.csv"),         emit: annotation
 
     when:
         task.ext.when == null || task.ext.when
@@ -33,9 +32,9 @@ process SCYTPE_STATE_ANNOTATION {
         mkdir -p _freeze/${notebook.baseName}
         mkdir -p data
 
-        touch data/${params.project_name}_subtype_annotation_object.RDS
-        touch data/${params.project_name}_subtype_annotation.csv
-        touch data/${params.project_name}_subtype_annotation.list.txt
+        touch data/${params.project_name}_${cell_population}_annotation_object.RDS
+        touch data/${params.project_name}_${cell_population}_annotation.csv
+        touch data/${params.project_name}_${cell_population}_annotation.list.txt
 
         echo ${param_file} > _freeze/param_file.yml
         """

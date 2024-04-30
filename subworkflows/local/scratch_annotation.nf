@@ -74,7 +74,7 @@ workflow SCRATCH_ANNOTATION {
         ch_major_list = ch_sctype_major.major_list
             .splitText()
             .map{ it -> it.split(":") }
-            .filter{ !(it[0] =~ "Unknown|Fibroblast") }
+            .filter{ !(it[0] =~ "Unknown|Fibroblast|NK_Cells|Plasma") }
             .map{ it[0] }
 
         ch_major_list

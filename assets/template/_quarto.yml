@@ -4,6 +4,7 @@ project:
 
 execute:
   freeze: auto
+  cache: false
 
 website:
   title: "BTC scRNA Report"

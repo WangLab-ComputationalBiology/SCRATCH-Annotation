@@ -2,8 +2,8 @@
 title: "Module - CellTypist"
 author: "SCRATCH"
 execute:
-  cache: true
   freeze: true
+  cache: false
 jupyter: python3
 format:
   html:
@@ -15,7 +15,8 @@ format:
     fig-align: 'center'
     fig-format: png
     fig-responsive: true
-  ipynb: default
+  ipynb:
+    prefer-html: true
 lightbox:
     match: auto
     effect: zoom
@@ -274,6 +275,7 @@ sc.pl.rank_genes_groups_dotplot(
 ## Saving Data object
 
 ```{python}
+#| cache: false
 
 adata.write_h5ad(output_object)
 
