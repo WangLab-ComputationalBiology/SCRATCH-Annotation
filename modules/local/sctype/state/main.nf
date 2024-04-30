@@ -24,7 +24,7 @@ process SCYTPE_STATE_ANNOTATION {
         task.ext.when == null || task.ext.when
 
     script:
-        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_cell_population:'${cell_population}' -P ${task.ext.args}" : ""
+        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_parent_level:'${cell_population}' -P ${task.ext.args}" : ""
         """
         quarto render ${notebook} ${param_file}
         """

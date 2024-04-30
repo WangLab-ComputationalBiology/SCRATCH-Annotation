@@ -89,10 +89,13 @@ workflow SCRATCH_ANNOTATION {
         ch_state_combine
             .view()
 
-        // // Performing scType hierarchical annotation - Subtypes/states cell type
+        // Performing scType hierarchical annotation - Subtypes/states cell type
         ch_sctype_state = SCYTPE_STATE_ANNOTATION(
             ch_state_combine
         )
+
+        // ch_sctype_state
+        //     .view()
 
         // // Gathering all notebooks
         // ch_qmd = ch_notebookA.mix(ch_notebookB, ch_notebookC)

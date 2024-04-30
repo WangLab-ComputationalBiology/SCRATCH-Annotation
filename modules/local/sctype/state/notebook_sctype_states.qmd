@@ -3,7 +3,6 @@ title: "Module - Sctype Subtype/State annotation"
 description: | 
   Description
 execute:
-  cache: true
   freeze: auto
 format:
   html:
@@ -45,8 +44,8 @@ seurat_object <- params$seurat_object
 
 # Inputs and thresholds
 input_cell_markers_db <- params$input_cell_markers_db
-input_annotation_level <- strsplit(
-  params$input_annotation_level, split = ';')[[1]]
+input_parent_level <- strsplit(
+  params$input_parent_level, split = ';')[[1]]
 
 thr_n_features <- params$thr_n_features
 thr_npc <- params$thr_npc
@@ -241,7 +240,7 @@ set.seed(random_seed)
 # Extracting cells for downstream annotation
 seurat_object <- subset(
   seurat_object,
-  subset = sctype == input_cell_population
+  subset = sctype == input_parent_level
 )
 
 ```
@@ -272,10 +271,10 @@ filtering_vst_markers <- list(
   "B-Cells" = "IGH[KL]V.*"
 )
 
-if(input_cell_population %in% names(filtering_vst_markers)) {
+if(input_parent_level %in% names(filtering_vst_markers)) {
   
   VariableFeatures(seurat_object) <- grep(
-    filtering_vst_markers[[input_cell_population]], VariableFeatures(seurat_object), value = TRUE, invert = TRUE)
+    filtering_vst_markers[[input_parent_level]], VariableFeatures(seurat_object), value = TRUE, invert = TRUE)
   
 }
 
@@ -396,10 +395,10 @@ sctype_best_scored <- sctype_best_scored %>%
 
 # Adding the markers information
 cell_list <- cell_markers_database[
-  cell_markers_database$cell_annotation %in% sctype_best_scored$type, c("cell_type", "cell_annotation", "markers")]
+  cell_markers_database$cell_annotation %in% sctype_best_scored$type, c("cell_group", "cell_annotation", "markers")]
 
 cell_list <- cell_list %>%
-  group_by(cell_type, cell_annotation) %>%
+  group_by(cell_group, cell_annotation) %>%
   summarize(signature = paste(markers, collapse = ","))
 
 
@@ -415,7 +414,7 @@ sctype_best_scored <- merge(
 )
 
 sctype_best_scored <- sctype_best_scored %>%
-  select(cell_type, type, cluster, scores, signature)
+  select(cell_group, type, cluster, scores, signature)
 
 # Printing output table
 DT::datatable(
@@ -568,11 +567,12 @@ SCP::CellStatPlot(
 ## Saving Seurat object
 
 ```{r object_dump}
+#| cache: false
 
 if(auto_save) {
 
-  saveRDS(seurat_object, file = paste0('./data/', project_name, '_', input_cell_population, '_subtype_annotation.RDS'))
-  write_tsv(cell_markers_database, file = './data/cell_markers_database.tsv')
+  saveRDS(seurat_object, file = paste0('data/', project_name, '_', input_parent_level, '_annotation.RDS'))
+  #write_tsv(cell_markers_database, file = './data/cell_markers_database.tsv')
 
 }
 

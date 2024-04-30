@@ -464,6 +464,7 @@ SCP::CellStatPlot(
 ## Saving Seurat object
 
 ```{r object_dump}
+#| cache: false
 
 if(auto_save) {
 
