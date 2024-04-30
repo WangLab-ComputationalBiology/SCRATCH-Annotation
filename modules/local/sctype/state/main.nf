@@ -1,16 +1,18 @@
 process SCYTPE_STATE_ANNOTATION {
 
-    tag "Running scType annotation - ${cell_population} subset/State cells"
+    tag "Running scType annotation - ${cell_population} subsets/states"
     label 'process_medium'
 
     container 'oandrefonseca/scratch-annotation:main'
     publishDir "${params.outdir}/${params.project_name}", mode: 'copy', overwrite: true
 
     input:
-        path(notebook)
-        path(seurat_object)
-        val(cell_population)
-        path(config)
+        tuple(
+            path(notebook),
+            path(seurat_object),
+            val(cell_population),
+            path(config)
+        )
 
     output:
         path("_freeze/${notebook.baseName}"),                               emit: cache
@@ -22,7 +24,7 @@ process SCYTPE_STATE_ANNOTATION {
         task.ext.when == null || task.ext.when
 
     script:
-        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_cell_population:"${cell_population}" -P ${task.ext.args}" : ""
+        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_cell_population:'${cell_population}' -P ${task.ext.args}" : ""
         """
         quarto render ${notebook} ${param_file}
         """

@@ -26,8 +26,7 @@ params:
   project_name: 'Project'
   seurat_object: '/Users/affaustino/Projects/SCRATCH-Annotation/data/Project_annotation_object.RDS'
   input_cell_markers_db: '/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv'
-  input_cell_population: 'T-Cells'
-  input_annotation_level: 'Major cells'
+  input_parent_level: 'T-Cells'
   thr_n_features: 2000
   thr_npc: 25
   thr_resolution: 0.25
@@ -46,7 +45,6 @@ seurat_object <- params$seurat_object
 
 # Inputs and thresholds
 input_cell_markers_db <- params$input_cell_markers_db
-input_cell_population <- params$input_cell_population
 input_annotation_level <- strsplit(
   params$input_annotation_level, split = ';')[[1]]
 
@@ -330,7 +328,7 @@ seurat_object <- RunUMAP(
 # Get cell-type-specific gene sets from our in-built database (DB)
 cell_markers_database <- read_csv(file = input_cell_markers_db, show_col_types = FALSE)
 cell_markers_database <- cell_markers_database %>%
-  filter(cell_type %in% c("CD4 & CD8 T cells", "CD8T cells", "CD4T cells")) %>%
+  filter(parent_level == input_parent_level) %>%
   as.data.frame()
 
 ```
@@ -339,7 +337,7 @@ cell_markers_database <- cell_markers_database %>%
 
 # Formatting Cellmarkers database
 gene_list_db <- list(
-  'gs_positive' = split(cell_markers_database$markers, f = cell_markers_database$annotation)
+  'gs_positive' = split(cell_markers_database$markers, f = cell_markers_database$cell_annotation)
 )
 
 # Load example scRNA-seq matrix
@@ -398,16 +396,16 @@ sctype_best_scored <- sctype_best_scored %>%
 
 # Adding the markers information
 cell_list <- cell_markers_database[
-  cell_markers_database$annotation %in% sctype_best_scored$type, c("cell_type", "annotation", "markers")]
+  cell_markers_database$cell_annotation %in% sctype_best_scored$type, c("cell_type", "cell_annotation", "markers")]
 
 cell_list <- cell_list %>%
-  group_by(cell_type, annotation) %>%
+  group_by(cell_type, cell_annotation) %>%
   summarize(signature = paste(markers, collapse = ","))
 
 
 cell_list <- cell_list %>%
   dplyr::rename(
-    type = annotation
+    type = cell_annotation
   )
 
 sctype_best_scored <- merge(

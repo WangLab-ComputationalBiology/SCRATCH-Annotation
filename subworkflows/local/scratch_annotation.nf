@@ -74,18 +74,24 @@ workflow SCRATCH_ANNOTATION {
         ch_major_list = ch_sctype_major.major_list
             .splitText()
             .map{ it -> it.split(":") }
-            .filter{ it[0] != "Unknown" }
+            .filter{ !(it[0] =~ "Unknown|Fibroblast") }
             .map{ it[0] }
 
         ch_major_list
             .view()
 
-        // Performing scType hierarchical annotation - Subtypes/states cell type
+        // Combining multiple inputs at once
+        ch_state_combine = ch_notebook_scytpe_st
+            .combine(ch_sctype_major_object)
+            .combine(ch_major_list)
+            .combine(ch_page_config)
+
+        ch_state_combine
+            .view()
+
+        // // Performing scType hierarchical annotation - Subtypes/states cell type
         ch_sctype_state = SCYTPE_STATE_ANNOTATION(
-            ch_notebook_scytpe_st,
-            ch_sctype_major_object,
-            ch_major_list,
-            ch_page_config,
+            ch_state_combine
         )
 
         // // Gathering all notebooks
