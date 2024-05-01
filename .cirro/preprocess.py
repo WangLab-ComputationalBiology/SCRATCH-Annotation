@@ -5,7 +5,7 @@ import pandas as pd
 
 def setup_input_parameters(ds: PreprocessDataset):
 
-    # If the user did not select a custom Meta-Program CSV, use the default
+    # If the user did not select a custom malignant table, use the default
     if ds.params.get("input_cell_mask") is None:
         ds.add_param(
             "input_cell_mask",

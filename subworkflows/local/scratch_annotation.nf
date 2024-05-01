@@ -7,7 +7,7 @@ include { CELLTYPIST_ANNOTATION     } from '../../modules/local/celltypist/main.
 include { SCYTPE_MAJOR_ANNOTATION   } from '../../modules/local/sctype/major/main.nf'
 include { SCYTPE_STATE_ANNOTATION   } from '../../modules/local/sctype/state/main.nf'
 // include { METATIME_ANNOTATION       } from '../../modules/local/sctype/state/main.nf'
-include { QUARTO_RENDER_PROJECT     } from '../../modules/local/report/main'
+// include { QUARTO_RENDER_PROJECT     } from '../../modules/local/report/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -63,6 +63,7 @@ workflow SCRATCH_ANNOTATION {
         ch_sctype_major = SCYTPE_MAJOR_ANNOTATION(
             ch_notebook_scytpe_mj,
             ch_filtered_object,
+            ch_database,
             ch_page_config
         )
 
@@ -89,6 +90,7 @@ workflow SCRATCH_ANNOTATION {
         ch_sctype_state = SCYTPE_STATE_ANNOTATION(
             ch_notebook_scytpe_st,
             ch_sctype_major_object,
+            ch_database,
             ch_major_list,
             ch_page_config
         )

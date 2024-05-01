@@ -8,6 +8,7 @@ process SCYTPE_MAJOR_ANNOTATION {
     input:
         path(notebook)
         path(seurat_object)
+        path(cell_annotation)
         path(config)
 
     output:
@@ -20,7 +21,7 @@ process SCYTPE_MAJOR_ANNOTATION {
         task.ext.when == null || task.ext.when
 
     script:
-        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P ${task.ext.args}" : ""
+        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_cell_markers_db:${cell_annotation} -P ${task.ext.args}" : ""
         """
         quarto render ${notebook} ${param_file}
         """

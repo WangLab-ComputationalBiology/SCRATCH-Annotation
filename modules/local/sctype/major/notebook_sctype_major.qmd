@@ -23,8 +23,8 @@ lightbox:
 format-links: [ipynb]
 params:
   project_name: 'Project'
-  seurat_object: '/Users/affaustino/Projects/SCRATCH-Annotation/data/Ovarian_main_cluster_object.20k.RDS'
-  input_cell_markers_db: '/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv'
+  seurat_object: '/SCRATCH-Annotation/data/Ovarian_main_cluster_object.20k.RDS'
+  input_cell_markers_db: '/SCRATCH-Annotation/assets/cell_markers_database.csv'
   input_parent_level: 'Lineage_markers'
   n_threads: 8
   n_memory: 16
@@ -231,7 +231,7 @@ set.seed(random_seed)
 
 ## Cell annotation
 
-```{r laading_markers}
+```{r loading_markers}
 
 # Get cell-type-specific gene sets from our in-built database (DB)
 cell_markers_database <- read_csv(file = input_cell_markers_db, show_col_types = FALSE)

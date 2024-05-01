@@ -32,8 +32,8 @@ import os
 
 # Parameters
 project_name   = "Project"
-anndata_object = "/Users/affaustino/Projects/SCRATCH-Annotation/data/Sohrab_data_annotation/Sohrab_count/Sohrab_T_cell_counts.h5ad"
-cell_database  = "/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv"
+anndata_object = "/SCRATCH-Annotation/data/Sohrab_data_annotation/Sohrab_count/Sohrab_T_cell_counts.h5ad"
+cell_database  = "/SCRATCH-Annotation/assets/cell_markers_database.csv"
 cell_model     = ["Immune_All_High.pkl", "Immune_All_Low.pkl"]
 organism       = "Human"
 model_update   = False

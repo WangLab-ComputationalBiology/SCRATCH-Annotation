@@ -24,8 +24,8 @@ lightbox:
 format-links: [ipynb]
 params:
   project_name: 'Project'
-  seurat_object: '/Users/affaustino/Projects/SCRATCH-Annotation/data/Project_annotation_object.RDS'
-  input_cell_markers_db: '/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv'
+  seurat_object: '/SCRATCH-Annotation/data/Project_annotation_object.RDS'
+  input_cell_markers_db: '/SCRATCH-Annotation/assets/cell_markers_database.csv'
   input_parent_level: 'T-Cells'
   thr_n_features: 2000
   thr_npc: 25
