@@ -18,8 +18,8 @@ if __name__ == "__main__":
     ds = PreprocessDataset.from_running()
     setup_input_parameters(ds)
 
-    ds.logger.info("\nPrinting out parameters:")
-    ds.logger.info(ds.params)
-
-    ds.logger.info("\nPrinting exported paths:")
+    ds.logger.info("Printing exported paths:")
     ds.logger.info(os.environ['PATH'])
+
+    ds.logger.info("Printing out parameters:")
+    ds.logger.info(ds.params)
