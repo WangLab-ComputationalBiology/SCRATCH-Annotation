@@ -21,8 +21,8 @@ if (params.annotation_db) { annotation_db = file(params.annotation_db) } else { 
 workflow {
 
     // Mandatory inputs
-    ch_single_object   = Channel.fromPath(seurat_object)
-    ch_database        = Channel.fromPath(annotation_db)
+    ch_single_object   = Channel.fromPath(seurat_object, checkIfExists: true)
+    ch_database        = Channel.fromPath(annotation_db, checkIfExists: true)
 
     // Optional inputs
     ch_cell_malignancy = Channel.fromPath(params.input_cell_mask)

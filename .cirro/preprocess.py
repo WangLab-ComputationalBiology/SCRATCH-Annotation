@@ -24,6 +24,6 @@ if __name__ == "__main__":
 
     ds = PreprocessDataset.from_running()
     setup_input_parameters(ds)
-    
-    # log
+
+    ds.logger.info("Printing out parameters:")
     ds.logger.info(ds.params)

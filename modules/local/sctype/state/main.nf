@@ -5,7 +5,6 @@ process SCYTPE_STATE_ANNOTATION {
 
     container 'oandrefonseca/scratch-annotation:main'
 
-    // Change to each
     input:
         path(notebook)
         path(seurat_object)
