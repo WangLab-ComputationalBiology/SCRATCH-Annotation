@@ -9,7 +9,7 @@ def setup_input_parameters(ds: PreprocessDataset):
     if ds.params.get("input_cell_mask") is None:
         ds.add_param(
             "input_cell_mask",
-            "./assets/NO_FILE"
+            "${baseDir}/assets/NO_FILE"
         )
 
 if __name__ == "__main__":
