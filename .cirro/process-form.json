@@ -50,7 +50,7 @@
                         "properties": {
                             "input_cell_mask_source": {
                             "enum": [
-                                "Default"
+                                "Not Applicable"
                             ]
                             }
                         }
