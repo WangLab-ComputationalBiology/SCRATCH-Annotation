@@ -6,6 +6,7 @@ include { HELPER_SCEASY_CONVERTER   } from '../../modules/local/helpers/convert/
 include { CELLTYPIST_ANNOTATION     } from '../../modules/local/celltypist/main.nf'
 include { SCYTPE_MAJOR_ANNOTATION   } from '../../modules/local/sctype/major/main.nf'
 include { SCYTPE_STATE_ANNOTATION   } from '../../modules/local/sctype/state/main.nf'
+// include { METATIME_ANNOTATION       } from '../../modules/local/sctype/state/main.nf'
 include { QUARTO_RENDER_PROJECT     } from '../../modules/local/report/main'
 
 /*
