@@ -16,14 +16,13 @@ def setup_input_parameters(ds: PreprocessDataset):
     if ds.params.get("cell_mask") is None:
         ds.add_param(
             "cell_mask",
-            "./assets/meta_programs_database.csv"
+            "./assets/NO_FILE"
         )
 
 
 if __name__ == "__main__":
 
     ds = PreprocessDataset.from_running()
-
     setup_input_parameters(ds)
     
     # log

@@ -9,7 +9,7 @@ include { SCRATCH_ANNOTATION } from './subworkflows/local/scratch_annotation.nf'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-if (params.input) { seurat_object = file(params.input) } else { exit 1, 'Please, provide a --input <PATH/TO/seurat_object.RDS> !' }
+if (params.input_seurat_object) { seurat_object = file(params.input_seurat_object) } else { exit 1, 'Please, provide a --input <PATH/TO/seurat_object.RDS> !' }
 if (params.annotation_db) { annotation_db = file(params.annotation_db) } else { exit 1, 'Please check the assets folder.' }
 
 /*
@@ -25,7 +25,7 @@ workflow {
     ch_database        = Channel.fromPath(annotation_db)
 
     // Optional inputs
-    ch_cell_malignancy = Channel.fromPath(params.cell_mask)
+    ch_cell_malignancy = Channel.fromPath(params.input_cell_mask)
 
     // Running subworkflows
     SCRATCH_ANNOTATION(
