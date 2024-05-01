@@ -13,9 +13,9 @@ def setup_input_parameters(ds: PreprocessDataset):
         )
 
     # If the user did not select a custom Meta-Program CSV, use the default
-    if ds.params.get("cell_mask") is None:
+    if ds.params.get("input_cell_mask") is None:
         ds.add_param(
-            "cell_mask",
+            "input_cell_mask",
             "./assets/NO_FILE"
         )
 
