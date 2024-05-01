@@ -105,6 +105,7 @@ RUN Rscript -e "devtools::install_github(${DEV_DEPS})"
 # Install Python packages related to cell annotation
 RUN python3 -m pip install --no-cache-dir scSpectra
 RUN python3 -m pip install --no-cache-dir celltypist 
+RUN python3 -m pip install --no-cache-dir metatime
 RUN python3 -m pip install --no-cache-dir session_info
 
 # Setting celltypist variable

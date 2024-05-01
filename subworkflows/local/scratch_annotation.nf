@@ -43,7 +43,7 @@ workflow SCRATCH_ANNOTATION {
             .view()
 
         // Object/Data interoperability
-        if(params.cell_mask.contains("NO_FILE")) {
+        if(params.input_cell_mask.contains("NO_FILE")) {
             ch_filtered_object = ch_single_object
         }
 
@@ -71,7 +71,7 @@ workflow SCRATCH_ANNOTATION {
         ch_major_list = ch_sctype_major.major_list
             .splitText()
             .map{ it -> it.split(":") }
-            .filter{ !(it[0] =~ "Unknown|Fibroblast|NK_Cells|Plasma") }
+            .filter{ !(it[0] =~ "Unknown|Fibroblast|NK_Cells") }
             .map{ it[0] }
 
         // Combining multiple inputs at once
@@ -81,33 +81,52 @@ workflow SCRATCH_ANNOTATION {
             .combine(ch_page_config)
 
         // Performing scType hierarchical annotation - Subtypes/states cell type
+        // ch_sctype_state = SCYTPE_STATE_ANNOTATION(
+        //     ch_state_combine
+        // )
+
         ch_sctype_state = SCYTPE_STATE_ANNOTATION(
-            ch_state_combine
+            ch_notebook_scytpe_st,
+            ch_sctype_major_object,
+            ch_major_list,
+            ch_page_config
         )
+
+        // Aggregating cell annotation
+        // ch_sctype_agg = ch_sctype_state.annotation
+        //     .collect()
+
+        // ch_sctype_agg
+        //     .view()
+
+        // ch_sctype_agg = SCTYPE_AGGREGATE_ANNOTATION(
+
+        // )
+
 
         // Gathering all notebooks
-        ch_qmd = ch_notebook_celltypist.mix(ch_notebook_scytpe_mj)
-            .collect()
+        // ch_qmd = ch_notebook_celltypist.mix(ch_notebook_scytpe_mj)
+        //     .collect()
 
         // Creates a single channel with all cache/freeze folders
-        ch_cache = ch_celltypist.cache.mix(ch_sctype_major.cache)
-            .collect()
+        // ch_cache = ch_celltypist.cache.mix(ch_sctype_major.cache)
+            // .collect()
 
         // Load SCRATCH/BTC template
-        ch_template = ch_template
-            .collect()
+        // ch_template = ch_template
+        //     .collect()
 
         // // Inspecting channels content
-        ch_cache.view()
-        ch_page_config.view()
-        ch_qmd.view()
+        // ch_cache.view()
+        // ch_page_config.view()
+        // ch_qmd.view()
 
         // Gathering intermediate pages and rendering the project
-        QUARTO_RENDER_PROJECT(
-            ch_template,
-            ch_qmd,
-            ch_cache
-        )
+        // QUARTO_RENDER_PROJECT(
+        //     ch_template,
+        //     ch_qmd,
+        //     ch_cache
+        // )
 
     emit:
         ch_dumps = Channel.empty()

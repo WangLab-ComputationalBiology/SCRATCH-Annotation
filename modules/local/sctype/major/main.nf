@@ -4,7 +4,6 @@ process SCYTPE_MAJOR_ANNOTATION {
     label 'process_medium'
 
     container 'oandrefonseca/scratch-annotation:main'
-    publishDir "${params.outdir}/${params.project_name}", mode: 'copy', overwrite: true
 
     input:
         path(notebook)

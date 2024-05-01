@@ -4,15 +4,13 @@ process SCYTPE_STATE_ANNOTATION {
     label 'process_medium'
 
     container 'oandrefonseca/scratch-annotation:main'
-    publishDir "${params.outdir}/${params.project_name}", mode: 'copy', overwrite: true
 
+    // Change to each
     input:
-        tuple(
-            path(notebook),
-            path(seurat_object),
-            val(cell_population),
-            path(config)
-        )
+        path(notebook)
+        path(seurat_object)
+        each(cell_population)
+        path(config)
 
     output:
         path("_freeze/${notebook.baseName}"),                                          emit: cache
