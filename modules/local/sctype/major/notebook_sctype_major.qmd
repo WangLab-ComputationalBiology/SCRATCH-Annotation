@@ -14,13 +14,10 @@ format:
     code-tools: true
     df-print: paged
     default-image-extension: svg
-  ipynb:
-    prefer-html: true
 lightbox:
     match: auto
     effect: zoom
     loop: true
-format-links: [ipynb]
 params:
   project_name: 'Project'
   seurat_object: '/SCRATCH-Annotation/data/Ovarian_main_cluster_object.20k.RDS'

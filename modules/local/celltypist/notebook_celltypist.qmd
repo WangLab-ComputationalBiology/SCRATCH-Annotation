@@ -15,13 +15,10 @@ format:
     fig-align: 'center'
     fig-format: png
     fig-responsive: true
-  ipynb:
-    prefer-html: true
 lightbox:
     match: auto
     effect: zoom
     loop: true
-format-links: [ipynb]
 ---
 
 ```{python}

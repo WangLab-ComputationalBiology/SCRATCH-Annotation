@@ -15,13 +15,10 @@ format:
     df-print: paged
     default-image-extension: svg
     fig-align: center
-  ipynb:
-    prefer-html: true
 lightbox:
     match: auto
     effect: zoom
     loop: true
-format-links: [ipynb]
 params:
   project_name: 'Project'
   seurat_object: '/SCRATCH-Annotation/data/Project_annotation_object.RDS'
