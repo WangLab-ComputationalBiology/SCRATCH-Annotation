@@ -24,38 +24,38 @@
                         "enum": [
                             "Not Applicable",
                             "Custom"
-                        ],
+                            ],
                         "default": "Not Applicable"
                     }
                 },
                 "dependencies": {
                     "input_cell_mask_source": {
                     "oneOf": [
-                        {
+                            {
+                                "properties": {
+                                    "input_cell_mask_source": {
+                                        "enum": [
+                                            "Custom"
+                                        ]
+                                    },
+                                    "input_cell_mask": {
+                                        "type": "string",
+                                        "pathType": "references",
+                                        "file": "**/spreadsheet_csv/**/spreadsheet.csv",
+                                        "title": "Malignant mask CSV file (optional)"
+                                    }
+                                }
+                            },
+                            {
                             "properties": {
                                 "input_cell_mask_source": {
-                                    "enum": [
+                                "enum": [
                                         "Not Applicable"
-                                    ]
-                                },
-                                "input_cell_mask": {
-                                    "type": "string",
-                                    "pathType": "references",
-                                    "file": "**/spreadsheet_csv/**/spreadsheet.csv",
-                                    "title": "Malignant mask CSV file (optional)"
+                                        ]
+                                    }
                                 }
                             }
-                        },
-                        {
-                        "properties": {
-                            "input_cell_mask_source": {
-                            "enum": [
-                                "Not Applicable"
-                            ]
-                            }
-                        }
-                        }
-                    ]
+                        ]
                     }
                 }
             },
