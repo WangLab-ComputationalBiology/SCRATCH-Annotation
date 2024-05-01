@@ -2,6 +2,7 @@
 
 from cirro.helpers.preprocess_dataset import PreprocessDataset
 import pandas as pd
+import os
 
 def setup_input_parameters(ds: PreprocessDataset):
 
@@ -17,5 +18,8 @@ if __name__ == "__main__":
     ds = PreprocessDataset.from_running()
     setup_input_parameters(ds)
 
-    ds.logger.info("Printing out parameters:")
+    ds.logger.info("\nPrinting out parameters:")
     ds.logger.info(ds.params)
+
+    ds.logger.info("\nPrinting exported paths:")
+    ds.logger.info(os.environ['PATH'])
