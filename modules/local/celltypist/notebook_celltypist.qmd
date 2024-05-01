@@ -2,7 +2,7 @@
 title: "Module - CellTypist"
 author: "SCRATCH"
 execute:
-  freeze: true
+  freeze: auto
   cache: false
 jupyter: python3
 format:

@@ -6,8 +6,7 @@ include { HELPER_SCEASY_CONVERTER   } from '../../modules/local/helpers/convert/
 include { CELLTYPIST_ANNOTATION     } from '../../modules/local/celltypist/main.nf'
 include { SCYTPE_MAJOR_ANNOTATION   } from '../../modules/local/sctype/major/main.nf'
 include { SCYTPE_STATE_ANNOTATION   } from '../../modules/local/sctype/state/main.nf'
-
-// include { QUARTO_RENDER_PROJECT } from '../../modules/local/report/main'
+include { QUARTO_RENDER_PROJECT     } from '../../modules/local/report/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,8 +66,6 @@ workflow SCRATCH_ANNOTATION {
         )
 
         ch_sctype_major_object = ch_sctype_major.seurat_rds
-        ch_sctype_major_object
-            .view()
 
         // Reading major cell list
         ch_major_list = ch_sctype_major.major_list
@@ -77,49 +74,40 @@ workflow SCRATCH_ANNOTATION {
             .filter{ !(it[0] =~ "Unknown|Fibroblast|NK_Cells|Plasma") }
             .map{ it[0] }
 
-        ch_major_list
-            .view()
-
         // Combining multiple inputs at once
         ch_state_combine = ch_notebook_scytpe_st
             .combine(ch_sctype_major_object)
             .combine(ch_major_list)
             .combine(ch_page_config)
 
-        ch_state_combine
-            .view()
-
         // Performing scType hierarchical annotation - Subtypes/states cell type
         ch_sctype_state = SCYTPE_STATE_ANNOTATION(
             ch_state_combine
         )
 
-        // ch_sctype_state
-        //     .view()
+        // Gathering all notebooks
+        ch_qmd = ch_notebook_celltypist.mix(ch_notebook_scytpe_mj)
+            .collect()
 
-        // // Gathering all notebooks
-        // ch_qmd = ch_notebookA.mix(ch_notebookB, ch_notebookC)
-        //     .collect()
+        // Creates a single channel with all cache/freeze folders
+        ch_cache = ch_celltypist.cache.mix(ch_sctype_major.cache)
+            .collect()
 
-        // // Creates a single channel with all cache/freeze folders
-        // ch_cache = first.mix(second.cache, third)
-        //     .collect()
-
-        // // Load SCRATCH/BTC template
-        // ch_template = ch_template
-        //     .collect()
+        // Load SCRATCH/BTC template
+        ch_template = ch_template
+            .collect()
 
         // // Inspecting channels content
-        // ch_cache.view()
-        // ch_page_config.view()
-        // ch_qmd.view()
+        ch_cache.view()
+        ch_page_config.view()
+        ch_qmd.view()
 
-        // // Gathering intermediate pages and rendering the project
-        // QUARTO_RENDER_PROJECT(
-        //     ch_template,
-        //     ch_qmd,
-        //     ch_cache
-        // )
+        // Gathering intermediate pages and rendering the project
+        QUARTO_RENDER_PROJECT(
+            ch_template,
+            ch_qmd,
+            ch_cache
+        )
 
     emit:
         ch_dumps = Channel.empty()

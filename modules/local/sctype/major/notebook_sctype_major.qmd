@@ -3,8 +3,8 @@ title: "Module - Sctype Major cell annotation"
 description: | 
   Description
 execute:
-  cache: true
   freeze: auto
+  cache: false
 format:
   html:
     toc: true
