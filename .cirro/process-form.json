@@ -25,7 +25,7 @@
                             "Not Applicable",
                             "Custom"
                         ],
-                        "default": "Default"
+                        "default": "Not Applicable"
                     }
                 },
                 "dependencies": {
@@ -35,14 +35,14 @@
                             "properties": {
                                 "input_cell_mask_source": {
                                     "enum": [
-                                        "Custom"
+                                        "Not Applicable"
                                     ]
                                 },
                                 "input_cell_mask": {
                                     "type": "string",
                                     "pathType": "references",
-                                    "file": "**/spreadsheet_csv/**/spreadsheet.csv",
-                                    "title": "Cell annotation CSV file (optional)"
+                                    "file": "**/data/**_main_cell_status.csv",
+                                    "title": "Malignant mask CSV file (optional)"
                                 }
                             }
                         },
