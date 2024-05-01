@@ -74,7 +74,7 @@
                         "title": "Number features for FindVariableFeatures"
                     },
                     "thr_resolution": {
-                        "type": "integer",
+                        "type": "number",
                         "default": 0.25,
                         "title": "Resolution threshold"
                     },
