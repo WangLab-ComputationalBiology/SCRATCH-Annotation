@@ -41,7 +41,7 @@
                                     "input_cell_mask": {
                                         "type": "string",
                                         "pathType": "references",
-                                        "file": "**/spreadsheet_csv/**/spreadsheet.csv",
+                                        "file": "**/data/**_main_cell_status.csv",
                                         "title": "Malignant mask CSV file (optional)"
                                     }
                                 }
