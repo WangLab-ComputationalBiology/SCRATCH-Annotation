@@ -1,5 +1,5 @@
 # Use a specific version of Ubuntu as the base image
-FROM --platform=linux/x86_64 rocker/verse:latest
+FROM --platform=linux/x86_64 rocker/verse:4.4.0
 
 # Set environment variable to use Docker BuildKit
 ENV DOCKER_BUILDKIT=1
@@ -20,6 +20,10 @@ RUN apt-get update && apt-get install -y \
     libcurl4-gnutls-dev \
     libssl-dev \
     libxml2-dev
+
+# Updating quarto to Quarto v1.4.553
+RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.553/quarto-1.4.553-linux-amd64.deb -o /opt/quarto-1.4.553-linux-amd64.deb
+RUN cd /opt/ && dpkg -i quarto-1.4.553-linux-amd64.deb
 
 # Install Python3
 RUN apt-get install -y \
@@ -73,7 +77,8 @@ ARG R_BIOC_DEPS="c(\
     'lme4', \
     'terra', \ 
     'ggrastr', \
-    'Rsamtools' \
+    'Rsamtools', \
+    'UCell' \
     )"
 
 # Setting repository URL
@@ -95,6 +100,7 @@ RUN Rscript -e "devtools::install_local('/opt/seurat-v5.zip')"
 RUN Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
 RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
 
+# Install packages on Github
 RUN Rscript -e "devtools::install_github(${DEV_DEPS})"
 
 # Install R packages related to cell annotation
@@ -114,9 +120,6 @@ ENV CELLTYPIST_FOLDER=/opt/celltypist
 # Installing celltypist models
 COPY setup.py /opt/
 RUN python3 /opt/setup.py
-
-# Added as needed - TO REFACTOR
-RUN Rscript -e "BiocManager::install('UCell')"
 
 # Set the working directory
 WORKDIR /data
