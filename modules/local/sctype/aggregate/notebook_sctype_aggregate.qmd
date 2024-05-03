@@ -1,0 +1,176 @@
+---
+title: "Module - Sctype Aggregate annotation"
+description: | 
+  Description
+execute:
+  freeze: auto
+  cache: false
+format:
+  html:
+    toc: true
+    toc-location: right
+    toc-depth: 2
+    code-fold: show
+    code-tools: true
+    df-print: paged
+    default-image-extension: svg
+    fig-align: center
+lightbox:
+    match: auto
+    effect: zoom
+    loop: true
+params:
+  project_name: 'Project'
+  seurat_object: 'data/Project_major_annotation_object.RDS'
+  annotation_metadata: 'data/annotations/Project_Epithelial_annotation.csv;data/annotations/Project_Myeloid_annotation.csv;data/annotations/Project_Endothelial_Cells_annotation.csv;data/annotations/Project_B-Plasma_Cells_annotation.csv'
+  n_threads: 8
+  n_memory: 16
+  work_directory: !expr here::here()
+  auto_save: TRUE
+---
+
+```{r setup}
+#| include: false
+
+# Project parameters 
+project_name <- params$project_name
+seurat_object <- params$seurat_object
+
+# Inputs and thresholds
+annotation_metadata <- strsplit(
+  params$annotation_metadata, split = ';')[[1]]
+
+# Optional parameters
+
+# Dataflow/Computational parameters
+n_threads <- params$n_threads
+n_memory <- params$n_memory
+
+# Output parameters
+work_directory <- params$work_directory
+timestamp <- params$timestamp
+auto_save <- params$auto_save
+
+# Rmarkdown options
+knitr::opts_knit$set(
+  root.dir = work_directory
+  )
+
+```
+
+:::{.callout-important collapse="true"}
+
+Here we will print the parameters
+
+:::
+
+# Project: `r params$project_name`
+
+```{r}
+#| output: false
+
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(Seurat)
+library(HGNChelper)
+
+```
+
+## Folder structure
+
+```{r project_directory}
+#| output: false
+
+if(!dir.exists(work_directory)) {
+  dir.create(work_directory, recursive = T)
+}
+
+for(sub_directory in c('data', 'figures', 'figures/states')) {
+  dir.create(paste0(work_directory, '/', sub_directory))
+}
+
+```
+
+## Loading Seurat object
+
+```{r}
+
+# Reading seurat object
+seurat_object <- readRDS(file = seurat_object)
+
+# Setting random seed
+random_seed <- 2203
+set.seed(random_seed)
+
+```
+
+## Adding metadata
+
+```{r}
+#| output: false
+
+# Read and combine all data files into a single data frame
+annotation_metadata_aggregate <- purrr::map_df(
+    annotation_metadata, read_csv
+  )
+
+```
+
+```{r}
+
+annotation_metadata_aggregate <- annotation_metadata_aggregate[
+  !is.na(annotation_metadata_aggregate$sctype),]
+
+annotation_metadata_aggregate <- annotation_metadata_aggregate %>%
+  tibble::column_to_rownames(var = "barcode") %>%
+  dplyr::rename(
+    scytpe_subset = sctype
+  )
+
+```
+
+
+```{r}
+
+seurat_object <- AddMetaData(
+  seurat_object,
+  annotation_metadata_aggregate
+)
+
+seurat_object$scytpe_subset <-
+  seurat_object@meta.data[is.na(seurat_object@meta.data$scytpe_subset), 'sctype']
+
+```
+
+## Data Visualization
+
+```{r annotation_umap}
+#| label: fig-feat-markers
+#| fig-width: 15
+#| fig-height: 10
+#| fig-align: center
+#| layout-nrow: 2
+
+SCP::CellDimPlot(
+  srt = seurat_object, 
+  group.by = "sctype",
+  reduction = "umap",
+  label = TRUE, 
+  label_repel = TRUE,
+  show_stat = TRUE,
+  theme_use = "theme_blank"
+)
+
+SCP::CellDimPlot(
+  srt = seurat_object, 
+  group.by = "scytpe_subset",
+  reduction = "umap",
+  label = TRUE, 
+  label_repel = TRUE,
+  show_stat = TRUE,
+  theme_use = "theme_blank"
+)
+
+
+```

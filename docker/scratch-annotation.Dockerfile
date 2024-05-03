@@ -22,8 +22,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev
 
 # Updating quarto to Quarto v1.4.553
-RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.553/quarto-1.4.553-linux-amd64.deb -o /opt/quarto-1.4.553-linux-amd64.deb
-RUN cd /opt/ && dpkg -i quarto-1.4.553-linux-amd64.deb
+RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.553/quarto-1.4.553-linux-amd64.deb -O /opt/quarto-1.4.553-linux-amd64.deb
+RUN cd /opt && dpkg -i quarto-1.4.553-linux-amd64.deb
 
 # Install Python3
 RUN apt-get install -y \

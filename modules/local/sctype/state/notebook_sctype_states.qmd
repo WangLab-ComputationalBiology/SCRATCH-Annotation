@@ -21,9 +21,9 @@ lightbox:
     loop: true
 params:
   project_name: 'Project'
-  seurat_object: '/SCRATCH-Annotation/data/Project_annotation_object.RDS'
-  input_cell_markers_db: '/SCRATCH-Annotation/assets/cell_markers_database.csv'
-  input_parent_level: 'T-Cells'
+  seurat_object: 'data/Project_major_annotation_object.RDS'
+  input_cell_markers_db: 'assets/cell_markers_database.csv'
+  input_parent_level: 'T_Cells'
   thr_n_features: 2000
   thr_npc: 25
   thr_resolution: 0.25
@@ -61,18 +61,6 @@ timestamp <- params$timestamp
 auto_save <- params$auto_save
 
 # Rmarkdown options
-knitr::opts_chunk$set(
-  echo = TRUE,
-  error = TRUE,
-  cache = FALSE,
-  message = FALSE, 
-  warning = FALSE,
-  fig.height = 8, 
-  fig.width = 12,
-  fig.align = 'center',
-  dpi = 300
-  )
-
 knitr::opts_knit$set(
   root.dir = work_directory
   )
@@ -255,6 +243,28 @@ seurat_object <- subset(
 
 ```
 
+```{r loading_markers}
+
+# Get cell-type-specific gene sets from our in-built database (DB)
+cell_markers_database <- read_csv(file = input_cell_markers_db, show_col_types = FALSE)
+cell_markers_database <- cell_markers_database %>%
+  filter(parent_level == input_parent_level) %>%
+  as.data.frame()
+
+# Adding group@state label
+cell_markers_database <- cell_markers_database %>%
+  rowwise() %>%
+  mutate(
+    group_state = paste0(cell_group, "@", cell_annotation)
+  )
+
+# Formatting Cellmarkers database
+gene_list_db <- list(
+  'gs_positive' = split(cell_markers_database$markers, f = cell_markers_database$group_state)
+)
+
+```
+
 ## Counts normalization
 
 ```{r normalization}
@@ -265,9 +275,9 @@ seurat_object <- NormalizeData(
   normalization.method = "LogNormalize",
   scale.factor = 10000)
 
+# Retrieving HVG
 seurat_object <- FindVariableFeatures(
   seurat_object, selection.method = "vst", nfeatures = thr_n_features)
-seurat_object <- ScaleData(seurat_object)
 
 ```
 
@@ -277,8 +287,8 @@ seurat_object <- ScaleData(seurat_object)
 
 # Moving clonotye expansion signal
 filtering_vst_markers <- list(
-  "T-Cells" = "^TR[ABDG][VDJ]",
-  "B-Cells" = "IGH[KL]V.*"
+  "T_Cells" = "^TR[ABDG][VDJ]",
+  "B_Plasma_Cells" = "IGH[KL]V.*"
 )
 
 if(input_parent_level %in% names(filtering_vst_markers)) {
@@ -288,6 +298,8 @@ if(input_parent_level %in% names(filtering_vst_markers)) {
   
 }
 
+# Scaling the dataset
+seurat_object <- ScaleData(seurat_object)
 
 ```
 
@@ -332,25 +344,10 @@ seurat_object <- RunUMAP(
 
 ## Cell annotation
 
-```{r loading_markers}
-
-# Get cell-type-specific gene sets from our in-built database (DB)
-cell_markers_database <- read_csv(file = input_cell_markers_db, show_col_types = FALSE)
-cell_markers_database <- cell_markers_database %>%
-  filter(parent_level == input_parent_level) %>%
-  as.data.frame()
-
-```
-
 ```{r sctype_annotation}
 
-# Formatting Cellmarkers database
-gene_list_db <- list(
-  'gs_positive' = split(cell_markers_database$markers, f = cell_markers_database$cell_annotation)
-)
-
 # Load example scRNA-seq matrix
-seurat_scaled <- GetAssayData(
+seurat_scaled <- LayerData(
   seurat_object,
   layer = "scale.data"
 )
@@ -397,6 +394,9 @@ for(cl in unique(sctype_best_scored$cluster)) {
 
 ```
 
+
+## Cell composition
+
 ```{r sctype_classification}
 
 # View results
@@ -431,7 +431,7 @@ DT::datatable(
   sctype_best_scored,
   class = 'cell-border stripe',
   options = list(dom = 'tip')
-  )
+)
 
 ```
 
@@ -470,7 +470,10 @@ seurat_object <- UCell::AddModuleScore_UCell(
   seurat_object,
   ncores = n_threads,
   features = non_malignant_markers_valid
-  )
+)
+
+colnames(seurat_object@meta.data) <- 
+  gsub('_UCell$', '', colnames(seurat_object@meta.data))
 
 ```
 
@@ -486,10 +489,10 @@ This is illustrated well by @fig-feat-markers
 
 FeaturePlot(
   object = seurat_object,
-  features = paste0(names(non_malignant_markers), "_UCell"),
+  features = names(non_malignant_markers),
   label = TRUE,
   min.cutoff = 'q1'
-  )
+)
 
 ```
 
@@ -503,8 +506,9 @@ FeaturePlot(
 
 VlnPlot(
   object = seurat_object,
-  features = paste0(names(non_malignant_markers), "_UCell")
-  )
+  ncol = 2,
+  features = unique(seurat_object$sctype)
+)
 
 ```
 ## BubblePlot
