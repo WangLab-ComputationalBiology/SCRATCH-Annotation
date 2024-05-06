@@ -31,7 +31,7 @@ process SCYTPE_MAJOR_ANNOTATION {
         mkdir -p data
         touch data/${params.project_name}_major_annotation_object.RDS
         touch data/${params.project_name}_major_annotation.csv
-        touch data/${params.project_name}_major_annotation.list.txt
+        echo "B_Plasma_Cells\nEndothelial_Cells\nEpithelial\nFibroblast\nMyeloid\nNK_Cells\nT_Cells" > data/${params.project_name}_major_annotation.list.txt
         """
 
 }

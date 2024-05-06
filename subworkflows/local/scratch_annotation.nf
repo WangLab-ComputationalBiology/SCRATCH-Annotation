@@ -74,13 +74,13 @@ workflow SCRATCH_ANNOTATION {
             .splitText()
             .map{ it -> it.split(":") }
             .filter{ !(it[0] =~ "Unknown|Fibroblast|NK_Cells") }
-            .map{ it[0] }
+            .map{ it[0].trim() }
 
         // Combining multiple inputs at once
-        ch_state_combine = ch_notebook_scytpe_st
-            .combine(ch_sctype_major_object)
-            .combine(ch_major_list)
-            .combine(ch_page_config)
+        // ch_state_combine = ch_notebook_scytpe_st
+        //     .combine(ch_sctype_major_object)
+        //     .combine(ch_major_list)
+        //     .combine(ch_page_config)
 
         // Performing scType hierarchical annotation - Subtypes/states cell type
         // ch_sctype_state = SCYTPE_STATE_ANNOTATION(

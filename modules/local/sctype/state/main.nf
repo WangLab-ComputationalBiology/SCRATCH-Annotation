@@ -26,13 +26,13 @@ process SCYTPE_STATE_ANNOTATION {
         quarto render ${notebook} ${param_file}
         """
     stub:
+        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_cell_markers_db:${cell_annotation} -P input_parent_level:'${cell_population}' -P ${task.ext.args}" : ""
         """
         mkdir -p _freeze/${notebook.baseName}
         mkdir -p data
 
         touch data/${params.project_name}_${cell_population}_annotation_object.RDS
         touch data/${params.project_name}_${cell_population}_annotation.csv
-        touch data/${params.project_name}_${cell_population}_annotation.list.txt
 
         echo ${param_file} > _freeze/param_file.yml
         """

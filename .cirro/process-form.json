@@ -75,7 +75,7 @@
                     },
                     "thr_resolution": {
                         "type": "number",
-                        "default": 0.25,
+                        "default": 0.50,
                         "title": "Resolution threshold"
                     },
                     "skip_sctype": {
