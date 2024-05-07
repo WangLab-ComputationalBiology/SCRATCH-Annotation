@@ -97,14 +97,14 @@ sc.pp.log1p(adata)
 
 ```{python}
 #| label: fig-hvg-plot
-#| fig-cap: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+#| fig-cap: 'HVG'
 
 sc.pl.highest_expr_genes(adata, n_top = 20)
 
 ```
 
 :::{.callout-tip}
-The @fig-hvg-plot displays lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+The @fig-hvg-plot shows highly variable genes on the dataset.
 :::
 
 ## Setting models
@@ -222,7 +222,7 @@ sc.pl.umap(
 ```
 
 :::{.callout-tip}
-The @fig-umap-high shows Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+The @fig-umap-high cell annotation based on Celltypist `Immune_All_High`.
 :::
 
 ```{python}
@@ -250,6 +250,10 @@ sc.pl.umap(
 
 ```
 
+:::{.callout-tip}
+The @fig-umap-low cell annotation based on Celltypist `Immune_All_Low`.
+:::
+
 ## Cell annotation similarity
 
 ```{python}
@@ -261,7 +265,7 @@ sc.pl.dendrogram(adata, groupby = "celltypist_cell_label_coarse")
 ```
 
 :::{.callout-tip}
-The @fig-dendrogram shows Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+The @fig-dendrogram displays the hierarchical clustering across the cell types. This is a native function from scanpy, please refer to `scanpy.tl.dendrogram`.
 :::
 
 ## ViolinPlot
@@ -311,7 +315,7 @@ for cell, genes in top_genes.items():
 ```
 
 :::{.callout-tip}
-The @fig-violin-module shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
+The @fig-violin-module displays the overall distribution associated with a specific categorical variable across cell groups, such as gene sets corresponding to cell types or labels.
 :::
 
 ```{python}

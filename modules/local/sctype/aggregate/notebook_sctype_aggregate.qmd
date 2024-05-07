@@ -171,13 +171,13 @@ SCP::CellDimPlot(
 ```
 
 :::{.callout-tip}
-The @fig-sctype-final shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
+The @fig-sctype-final displays the final annotation after the hierarchical approach. Major cell types are shown when not further informantion is available on the cell annotation database.
 :::
 
 ## scType dendrogram
 
 ```{r annotation_tree}
-#| code-fold: true
+#| warning: false
 
 # Aggregate data by annotations
 cell_average <- AverageExpression(
@@ -207,7 +207,6 @@ cell_hierarchical <- stats::hclust(cell_dist_matrix)
 #| fig-width: 10
 #| fig-height: 12
 #| fig-align: center
-#| output: false
 
 # Printing dendrogram
 
@@ -216,7 +215,7 @@ plot(cell_hierarchical, main = "Dendrogram", xlab = "Index", ylab = "Height")
 ```
 
 :::{.callout-tip}
-The @fig-dendrogram-final shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
+[Beta] The @fig-dendrogram-final displays the hierarchical clustering across the cell types based on average normalized expression from `scale.data`. The average expression per cell population is correlated based on Pearson. Therefore, correlated cells should display closet distances, i.e., clustering into near branches.
 :::
 
 ## Cell composition
@@ -239,7 +238,7 @@ SCP::CellStatPlot(
 ```
 
 :::{.callout-tip}
-The @fig-bar-composition shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
+The @fig-bar-composition provides an overall view of cell composition across distinct clusters on the dataset.
 :::
 
 ## Saving Seurat object

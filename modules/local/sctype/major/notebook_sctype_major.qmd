@@ -404,6 +404,10 @@ SCP::CellDimPlot(
 
 ```
 
+:::{.callout-tip}
+The @fig-umap-annotation displays a major cell type annotation. The accuracy might change depending on co-confounding factors, and clustering resolution. For inspecting the results, please check the Differential expression analysis.
+:::
+
 ## Module-score
 
 ```{r calculating_module_score}
@@ -457,6 +461,10 @@ FeaturePlot(
 
 ```
 
+:::{.callout-tip}
+The @fig-feat-markers represents a 'FeaturePlot' which allows coloring the cells based on a categorical variable, e.g., module score associated with cell lineage marker or state signatures.
+:::
+
 ### Violin Plot
 
 ```{r violin_plot}
@@ -472,6 +480,10 @@ VlnPlot(
   )
 
 ```
+
+:::{.callout-tip}
+The @fig-violin displays the overall distribution associated with a specific categorical variable across cell groups, such as gene sets corresponding to cell types or labels.
+:::
 
 ## Differential expression
 
@@ -556,6 +568,10 @@ SCP::CellStatPlot(
 )
 
 ```
+
+:::{.callout-tip}
+The @fig-bar-composition provides an overall view of cell composition across distinct clusters on the dataset.
+:::
 
 ## Saving Seurat object
 

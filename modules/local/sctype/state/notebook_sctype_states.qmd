@@ -461,13 +461,13 @@ SCP::CellDimPlot(
 
 ```
 
+:::{.callout-tip}
+The @fig-umap-state displays a substype/state cell type annotation. The accuracy might change depending on co-confounding factors, and clustering resolution. For inspecting the results, please check the Differential expression analysis.
+:::
+
 ## Module-score
 
 ```{r calculating_module_score}
-#| label: fig-module-score
-#| fig-width: 15
-#| fig-height: 10
-#| fig-align: center
 
 # Calculating ModuleScore
 non_malignant_markers <- gene_list_db$gs_positive
@@ -488,37 +488,34 @@ colnames(seurat_object@meta.data) <-
 
 ```
 
-:::{.callout-tip}
-The @fig-module-score shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
-:::
-
 ### Feature Plot
 
 ```{r feature_plot}
 #| label: fig-feat-markers
-#| fig-width: 15
-#| fig-height: 10
+#| fig-width: 14
+#| fig-height: 20
 #| fig-align: center
 
 FeaturePlot(
   object = seurat_object,
   features = names(non_malignant_markers),
   label = TRUE,
+  ncol = 2,
   min.cutoff = 'q1'
 )
 
 ```
 
 :::{.callout-tip}
-The @fig-feat-markers shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
+The @fig-feat-markers represents a 'FeaturePlot' which allows coloring the cells based on a categorical variable, e.g., module score associated with cell lineage marker or state signatures.
 :::
 
 ### Violin Plot
 
 ```{r violin_plot}
 #| label: fig-violin
-#| fig-width: 15
-#| fig-height: 10
+#| fig-width: 14
+#| fig-height: 20
 #| fig-align: center
 
 VlnPlot(
@@ -530,7 +527,7 @@ VlnPlot(
 ```
 
 :::{.callout-tip}
-The @fig-violin shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
+The @fig-violin displays the overall distribution associated with a specific categorical variable across cell groups, such as gene sets corresponding to cell types or labels.
 :::
 
 ## BubblePlot
@@ -553,9 +550,43 @@ annot_dotplot <- DotPlot(seurat_object, features = non_malignant_markers_list, g
 annot_dotplot
 
 ```
+
 :::{.callout-tip}
-The @fig-bubble shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
+The @fig-bubble enables a visual inspection of gene expression levels across different clusters, highlighting both the percentage of cells expressing a gene and the average expression level within each cluster.
 :::
+
+## Differential expression
+
+```{r differential}
+
+all_markers <- FindAllMarkers(
+  object = seurat_object,
+  only.pos = FALSE, 
+  test.use = input_deg_method,
+  max.cells.per.ident = 500,
+  logfc.threshold = thr_fold_change,
+  random.seed = random_seed,
+  min.pct = thr_min_percentage
+  )
+
+```
+
+```{r deg_table, message = FALSE, warning = FALSE, echo = TRUE}
+
+# Reordering all markers data.frame
+all_markers <- all_markers %>%
+  select(cluster, gene, pct.1, pct.2, p_val, avg_log2FC)
+
+# Printing out all markers
+DT::datatable(all_markers, 
+    class = 'cell-border stripe',
+    rownames = FALSE,
+    filter = 'top',
+    width = '100%', 
+    options = list(scrollX = TRUE)
+    )
+
+```
 
 ## Cluster composition per cell type
 
