@@ -1,14 +1,16 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl = 2
 
-include { HELPER_SEURAT_SUBSET          } from '../../modules/local/helpers/subset/main.nf'
-include { HELPER_SCEASY_CONVERTER       } from '../../modules/local/helpers/convert/main.nf'
-include { CELLTYPIST_ANNOTATION         } from '../../modules/local/celltypist/main.nf'
-include { SCYTPE_MAJOR_ANNOTATION       } from '../../modules/local/sctype/major/main.nf'
-include { SCYTPE_STATE_ANNOTATION       } from '../../modules/local/sctype/state/main.nf'
-include { SCYTPE_AGGREGATE_ANNOTATION   } from '../../modules/local/sctype/aggregate/main.nf'
+include { HELPER_SEURAT_SUBSET                                 } from '../../modules/local/helpers/subset/main.nf'
+include { HELPER_SCEASY_CONVERTER as SCEASY_CONVERTER_ONE      } from '../../modules/local/helpers/convert/main.nf'
+include { CELLTYPIST_ANNOTATION                                } from '../../modules/local/celltypist/main.nf'
+include { SCYTPE_MAJOR_ANNOTATION                              } from '../../modules/local/sctype/major/main.nf'
+include { SCYTPE_STATE_ANNOTATION                              } from '../../modules/local/sctype/state/main.nf'
+include { SCYTPE_AGGREGATE_ANNOTATION                          } from '../../modules/local/sctype/aggregate/main.nf'
+include { HELPER_SCEASY_CONVERTER as SCEASY_CONVERTER_TWO      } from '../../modules/local/helpers/convert/main.nf'
 
 // include { METATIME_ANNOTATION       } from '../../modules/local/sctype/state/main.nf'
+
 // include { QUARTO_RENDER_PROJECT     } from '../../modules/local/report/main'
 
 /*
@@ -51,7 +53,7 @@ workflow SCRATCH_ANNOTATION {
             ch_filtered_object = ch_single_object
         }
 
-        ch_anndata_object = HELPER_SCEASY_CONVERTER(
+        ch_anndata_object = SCEASY_CONVERTER_ONE(
             ch_filtered_object
         )
 
@@ -98,10 +100,9 @@ workflow SCRATCH_ANNOTATION {
             ch_page_config
         )
 
-        // Recovering all HTML reports
-        ch_qmd = ch_notebook_celltypist.mix(ch_notebook_scytpe_mj)
-            .collect()
-
+        SCEASY_CONVERTER_TWO(
+            ch_sctype_agg.seurat_rds
+        )
         
     emit:
         ch_dumps = Channel.empty()

@@ -13,7 +13,7 @@ process CELLTYPIST_ANNOTATION {
 
     output:
         path("_freeze/${notebook.baseName}")                           , emit: cache
-        path("data/${params.project_name}_celltypist_annotation.h5ad") , emit: project_object
+        path("data/${params.project_name}_celltypist_annotation.h5ad") , emit: ann_object
         path("data/Immune_All")                                        , emit: csv_file
         path("${notebook.baseName}.html")                              , emit: html
 
