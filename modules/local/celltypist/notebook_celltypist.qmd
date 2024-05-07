@@ -37,10 +37,13 @@ cell_model     = ["Immune_All_High.pkl", "Immune_All_Low.pkl"]
 organism       = "Human"
 model_update   = False
 
-# Directory and outputs
+# Preparing directories
 work_directory = os.getcwd()
-output_object  = "{work_directory}/{object_label}".format(work_directory = work_directory, object_label = "celltypist_annotation.h5ad")
-annot_table    = "{work_directory}/{cell_model}".format(work_directory = work_directory, cell_model = "Immune_All")
+os.mkdir(os.path.join(work_directory, 'data')) 
+
+# Directory and outputs
+output_object  = "{work_directory}/data/{object_label}".format(work_directory = work_directory, object_label = "celltypist_annotation.h5ad")
+annot_table    = "{work_directory}/data/{cell_model}".format(work_directory = work_directory, cell_model = "Immune_All")
 
 ```
 
