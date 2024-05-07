@@ -28,6 +28,7 @@ params:
   input_cell_markers_db: 'assets/cell_markers_database.csv'
   input_parent_level: 'B_Plasma_Cells'
   thr_n_features: 2000
+  input_deg_method: 'wilcox'
   thr_npc: 25
   thr_resolution: 0.25
   n_threads: 8
@@ -48,6 +49,7 @@ input_cell_markers_db <- params$input_cell_markers_db
 input_parent_level <- strsplit(
   params$input_parent_level, split = ';')[[1]]
 
+input_deg_method <- params$input_deg_method
 thr_n_features <- params$thr_n_features
 thr_npc <- params$thr_npc
 thr_resolution <- params$thr_resolution
