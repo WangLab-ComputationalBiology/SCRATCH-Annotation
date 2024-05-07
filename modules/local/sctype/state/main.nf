@@ -26,7 +26,7 @@ process SCYTPE_STATE_ANNOTATION {
         def notebook_cell_type = "notebook_${cell_population}"
         """
         mv ${notebook} ${notebook_cell_type}.qmd
-        quarto render ${notebook_cell_type} ${param_file}
+        quarto render ${notebook_cell_type}.qmd ${param_file}
         """
     stub:
         def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_cell_markers_db:${cell_annotation} -P input_parent_level:'${cell_population}' -P ${task.ext.args}" : ""
