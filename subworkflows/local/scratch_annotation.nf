@@ -98,7 +98,7 @@ workflow SCRATCH_ANNOTATION {
             ch_page_config
         )
 
-        // Reports all notebooks
+        // Recovering all HTML reports
         ch_qmd = ch_notebook_celltypist.mix(ch_notebook_scytpe_mj)
             .collect()
 

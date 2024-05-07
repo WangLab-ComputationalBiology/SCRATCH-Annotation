@@ -34,7 +34,8 @@ process CELLTYPIST_ANNOTATION {
         touch data/${params.project_name}_celltypist_annotation.h5ad
         mkdir -p _freeze/${notebook.baseName} data/Immune_All
         touch _freeze/${notebook.baseName}/${notebook.baseName}.html
-        
+        touch ${notebook.baseName}.html
+
         echo ${param_file} > _freeze/${notebook.baseName}/params.yml
         """
 
