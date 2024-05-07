@@ -10,7 +10,7 @@ process HELPER_SCEASY_CONVERTER {
         path(seurat_object)
 
     output:
-        path("${seurat_object.baseName}_filtered.h5ad") ,  emit: project_rds
+        path("${seurat_object.baseName}.h5ad") ,  emit: project_rds
 
     when:
         task.ext.when == null || task.ext.when
@@ -21,7 +21,7 @@ process HELPER_SCEASY_CONVERTER {
         """
     stub:
         """
-        touch ${seurat_object.baseName}_filtered.h5ad
+        touch ${seurat_object.baseName}.h5ad
         """
 
 }
