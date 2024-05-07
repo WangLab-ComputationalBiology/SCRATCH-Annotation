@@ -16,7 +16,7 @@ process SCYTPE_STATE_ANNOTATION {
         path("_freeze/notebook_${cell_population}")                                   , emit: cache
         path("data/${params.project_name}_${cell_population}_annotation_object.RDS")  , emit: seurat_rds
         path("data/${params.project_name}_${cell_population}_annotation.csv")         , emit: annotation
-        path("notebook_${cell_population}.html")                                      , emit: html
+        path("report/notebook_${cell_population}.html")                               , emit: html
 
     when:
         task.ext.when == null || task.ext.when
@@ -37,7 +37,9 @@ process SCYTPE_STATE_ANNOTATION {
 
         touch data/${params.project_name}_${cell_population}_annotation_object.RDS
         touch data/${params.project_name}_${cell_population}_annotation.csv
-        touch ${notebook_cell_type}.html
+        
+        mkdir -p report
+        touch report/${notebook_cell_type}.html
 
         echo ${param_file} > _freeze/param_file.yml
         """
