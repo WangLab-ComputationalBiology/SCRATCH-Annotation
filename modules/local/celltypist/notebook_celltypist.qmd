@@ -39,10 +39,11 @@ model_update   = False
 
 # Preparing directories
 work_directory = os.getcwd()
-os.mkdir(os.path.join(work_directory, 'data')) 
+if not os.path.exists(os.path.join(work_directory, 'data')):
+    os.mkdir(os.path.join(work_directory, 'data')) 
 
 # Directory and outputs
-output_object  = "{work_directory}/data/{object_label}".format(work_directory = work_directory, object_label = "celltypist_annotation.h5ad")
+output_object  = "{work_directory}/data/{project_name}_{object_label}".format(work_directory = work_directory, project_name = project_name, object_label = "celltypist_annotation.h5ad")
 annot_table    = "{work_directory}/data/{cell_model}".format(work_directory = work_directory, cell_model = "Immune_All")
 
 ```
@@ -220,7 +221,7 @@ sc.pl.umap(
 ```
 
 :::{.callout-tip}
-The @fig-umap-fine shows Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+The @fig-umap-high shows Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 :::
 
 ```{python}
