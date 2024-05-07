@@ -98,30 +98,11 @@ workflow SCRATCH_ANNOTATION {
             ch_page_config
         )
 
-        // Gathering all notebooks
-        // ch_qmd = ch_notebook_celltypist.mix(ch_notebook_scytpe_mj)
-        //     .collect()
+        // Reports all notebooks
+        ch_qmd = ch_notebook_celltypist.mix(ch_notebook_scytpe_mj)
+            .collect()
 
-        // Creates a single channel with all cache/freeze folders
-        // ch_cache = ch_celltypist.cache.mix(ch_sctype_major.cache)
-            // .collect()
-
-        // Load SCRATCH/BTC template
-        // ch_template = ch_template
-        //     .collect()
-
-        // // Inspecting channels content
-        // ch_cache.view()
-        // ch_page_config.view()
-        // ch_qmd.view()
-
-        // Gathering intermediate pages and rendering the project
-        // QUARTO_RENDER_PROJECT(
-        //     ch_template,
-        //     ch_qmd,
-        //     ch_cache
-        // )
-
+        
     emit:
         ch_dumps = Channel.empty()
 

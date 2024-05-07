@@ -12,8 +12,9 @@ process SCYTPE_AGGREGATE_ANNOTATION {
         path(config)
 
     output:
-        path("_freeze/${notebook.baseName}"),                  emit: cache
-        path("data/${params.project_name}_sctype_final_object.RDS"),  emit: seurat_rds
+        path("_freeze/${notebook.baseName}")                          , emit: cache
+        path("data/${params.project_name}_sctype_final_object.RDS")   , emit: seurat_rds
+        path("${notebook.baseName}.html")                             , emit: html
 
     when:
         task.ext.when == null || task.ext.when
@@ -30,6 +31,7 @@ process SCYTPE_AGGREGATE_ANNOTATION {
         
         mkdir -p data
         touch data/${params.project_name}_sctype_final_object.RDS
+        touch ${notebook.baseName}.html
 
         echo ${param_file} > _freeze/param_file.yml
         """

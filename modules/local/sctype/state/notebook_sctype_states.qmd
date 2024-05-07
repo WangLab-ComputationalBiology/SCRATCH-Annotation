@@ -467,7 +467,6 @@ SCP::CellDimPlot(
 #| fig-width: 15
 #| fig-height: 10
 #| fig-align: center
-#| output: false
 
 # Calculating ModuleScore
 non_malignant_markers <- gene_list_db$gs_positive

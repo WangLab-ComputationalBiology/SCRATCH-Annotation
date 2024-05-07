@@ -240,3 +240,32 @@ SCP::CellStatPlot(
 :::{.callout-tip}
 The @fig-bar-composition shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
 :::
+
+## Saving Seurat object
+
+```{r object_dump}
+#| cache: false
+
+if(auto_save) {
+
+  saveRDS(seurat_object, file = paste0("data/", project_name, "_sctype_final_object.RDS"))
+
+}
+
+```
+
+## Parameters log
+
+```{r params_log, message = FALSE, warning = FALSE, echo = FALSE}
+
+print(params)
+
+```
+
+## Session info
+
+```{r session_info, message = FALSE, warning = FALSE, echo = FALSE}
+
+sessionInfo()
+
+```

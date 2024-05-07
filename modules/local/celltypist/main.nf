@@ -15,6 +15,7 @@ process CELLTYPIST_ANNOTATION {
         path("_freeze/${notebook.baseName}")                           , emit: cache
         path("data/${params.project_name}_celltypist_annotation.h5ad") , emit: project_object
         path("data/Immune_All")                                        , emit: csv_file
+        path("${notebook.baseName}.html")                              , emit: html
 
     when:
         task.ext.when == null || task.ext.when

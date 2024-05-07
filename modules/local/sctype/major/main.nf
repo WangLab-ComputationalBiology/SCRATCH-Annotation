@@ -12,10 +12,11 @@ process SCYTPE_MAJOR_ANNOTATION {
         path(config)
 
     output:
-        path("_freeze/${notebook.baseName}"),                             emit: cache
-        path("data/${params.project_name}_major_annotation_object.RDS"),  emit: seurat_rds
-        path("data/${params.project_name}_major_annotation.csv"),         emit: annotation
-        path("data/${params.project_name}_major_annotation.list.txt"),    emit: major_list
+        path("_freeze/${notebook.baseName}")                             , emit: cache
+        path("data/${params.project_name}_major_annotation_object.RDS")  , emit: seurat_rds
+        path("data/${params.project_name}_major_annotation.csv")         , emit: annotation
+        path("data/${params.project_name}_major_annotation.list.txt")    , emit: major_list
+        path("${notebook.baseName}.html")                                , emit: html
 
     when:
         task.ext.when == null || task.ext.when
@@ -32,7 +33,8 @@ process SCYTPE_MAJOR_ANNOTATION {
 
         touch data/${params.project_name}_major_annotation_object.RDS
         touch data/${params.project_name}_major_annotation.csv
-        
+        touch ${notebook.baseName}.html
+
         echo "B_Plasma_Cells\nEndothelial_Cells\nEpithelial\nFibroblast\nMyeloid\nNK_Cells\nT_Cells" > data/${params.project_name}_major_annotation.list.txt
         """
 

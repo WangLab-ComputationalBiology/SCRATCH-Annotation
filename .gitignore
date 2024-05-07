@@ -22,7 +22,10 @@ TODO.md
 notebook_*_files/
 notebook_*_cache/
 notebook_*.html
+_freeze/*
+report/*
 tmp/
+
 
 # Jupyter Notebook
 .ipynb_checkpoints
