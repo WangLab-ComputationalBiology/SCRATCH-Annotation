@@ -1,11 +1,13 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl = 2
 
-include { HELPER_SEURAT_SUBSET      } from '../../modules/local/helpers/subset/main.nf'
-include { HELPER_SCEASY_CONVERTER   } from '../../modules/local/helpers/convert/main.nf'
-include { CELLTYPIST_ANNOTATION     } from '../../modules/local/celltypist/main.nf'
-include { SCYTPE_MAJOR_ANNOTATION   } from '../../modules/local/sctype/major/main.nf'
-include { SCYTPE_STATE_ANNOTATION   } from '../../modules/local/sctype/state/main.nf'
+include { HELPER_SEURAT_SUBSET          } from '../../modules/local/helpers/subset/main.nf'
+include { HELPER_SCEASY_CONVERTER       } from '../../modules/local/helpers/convert/main.nf'
+include { CELLTYPIST_ANNOTATION         } from '../../modules/local/celltypist/main.nf'
+include { SCYTPE_MAJOR_ANNOTATION       } from '../../modules/local/sctype/major/main.nf'
+include { SCYTPE_STATE_ANNOTATION       } from '../../modules/local/sctype/state/main.nf'
+include { SCYTPE_AGGREGATE_ANNOTATION   } from '../../modules/local/sctype/aggregate/main.nf'
+
 // include { METATIME_ANNOTATION       } from '../../modules/local/sctype/state/main.nf'
 // include { QUARTO_RENDER_PROJECT     } from '../../modules/local/report/main'
 
@@ -28,6 +30,7 @@ workflow SCRATCH_ANNOTATION {
         ch_notebook_celltypist = Channel.fromPath(params.notebook_celltypist, checkIfExists: true)
         ch_notebook_scytpe_mj  = Channel.fromPath(params.notebook_sctype_major, checkIfExists: true)
         ch_notebook_scytpe_st  = Channel.fromPath(params.notebook_sctype_state, checkIfExists: true)
+        ch_notebook_scytpe_ag  = Channel.fromPath(params.notebook_sctype_agg, checkIfExists: true)
 
         ch_template    = Channel.fromPath(params.template, checkIfExists: true)
         ch_page_config = Channel.fromPath(params.page_config, checkIfExists: true)
@@ -76,17 +79,6 @@ workflow SCRATCH_ANNOTATION {
             .filter{ !(it[0] =~ "Unknown|Fibroblast|NK_Cells") }
             .map{ it[0].trim() }
 
-        // Combining multiple inputs at once
-        // ch_state_combine = ch_notebook_scytpe_st
-        //     .combine(ch_sctype_major_object)
-        //     .combine(ch_major_list)
-        //     .combine(ch_page_config)
-
-        // Performing scType hierarchical annotation - Subtypes/states cell type
-        // ch_sctype_state = SCYTPE_STATE_ANNOTATION(
-        //     ch_state_combine
-        // )
-
         ch_sctype_state = SCYTPE_STATE_ANNOTATION(
             ch_notebook_scytpe_st,
             ch_sctype_major_object,
@@ -96,16 +88,15 @@ workflow SCRATCH_ANNOTATION {
         )
 
         // Aggregating cell annotation
-        // ch_sctype_agg = ch_sctype_state.annotation
-        //     .collect()
+        ch_sctype_agg = ch_sctype_state.annotation
+            .collect()
 
-        // ch_sctype_agg
-        //     .view()
-
-        // ch_sctype_agg = SCTYPE_AGGREGATE_ANNOTATION(
-
-        // )
-
+        ch_sctype_agg = SCYTPE_AGGREGATE_ANNOTATION(
+            ch_notebook_scytpe_ag,
+            ch_sctype_major_object,
+            ch_sctype_agg,
+            ch_page_config
+        )
 
         // Gathering all notebooks
         // ch_qmd = ch_notebook_celltypist.mix(ch_notebook_scytpe_mj)

@@ -13,15 +13,18 @@ format:
     code-fold: show
     code-tools: true
     df-print: paged
-    default-image-extension: svg
+    fig-format: png
+    fig-dpi: 300
+    fig-responsive: true
+    fig-align: center
 lightbox:
     match: auto
     effect: zoom
     loop: true
 params:
   project_name: 'Project'
-  seurat_object: './data/Yost_main_cluster_object.RDS'
-  input_cell_markers_db: './assets/cell_markers_database.csv'
+  seurat_object: '/Users/affaustino/Projects/SCRATCH-Annotation/data/Yost_main_cluster_object.RDS'
+  input_cell_markers_db: '/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv'
   input_parent_level: 'Lineage_markers'
   input_deg_method: 'wilcox'
   input_top_deg: 20
@@ -372,6 +375,7 @@ DT::datatable(
 
 ```{r annotation_umap}
 #| label: fig-umap-annotation
+#| fig-cap: "UMAP"
 #| fig-width: 15
 #| fig-height: 10
 #| fig-align: center
@@ -399,7 +403,7 @@ SCP::CellDimPlot(
 
 ```
 
-## Module-score {.tabset}
+## Module-score
 
 ```{r calculating_module_score}
 
@@ -438,6 +442,7 @@ if(length(non_malignant_markers_valid) > 1) {
 
 ```{r feature_plot}
 #| label: fig-feat-markers
+#| fig-cap: "FeaturePlot"
 #| fig-width: 15
 #| fig-height: 10
 #| fig-align: center
@@ -455,6 +460,7 @@ FeaturePlot(
 
 ```{r violin_plot}
 #| label: fig-violin
+#| fig-cap: "ViolinPlot"
 #| fig-width: 15
 #| fig-height: 10
 #| fig-align: center
@@ -468,12 +474,13 @@ VlnPlot(
 
 ## Differential expression
 
-```{r}
+```{r differential}
 
 all_markers <- FindAllMarkers(
   object = seurat_object,
   only.pos = FALSE, 
   test.use = input_deg_method,
+  max.cells.per.ident = 500,
   logfc.threshold = thr_fold_change,
   random.seed = random_seed,
   min.pct = thr_min_percentage
@@ -533,7 +540,9 @@ seurat_cluster_composition <- seurat_cluster_composition %>%
 ```
 
 ```{r barplot_composition}
-#| fig-width: 15
+#| label: fig-bar-composition
+#| fig-cap: 'Barplot'
+#| fig-width: 18
 #| fig-height: 10
 #| fig-align: center
 
@@ -569,6 +578,7 @@ if(auto_save) {
   annotation_list <- paste0(
     names(table(annotation_table$sctype)), ":", table(annotation_table$sctype)
   )
+  
   write_lines(annotation_list, file = paste0("data/", project_name, "_major_annotation.list.txt"))
 
 }

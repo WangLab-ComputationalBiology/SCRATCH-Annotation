@@ -1,5 +1,5 @@
 ---
-title: "Module - Sctype Subtype/State annotation"
+title: "Module - Sctype Major cell annotation"
 description: | 
   Description
 execute:
@@ -15,24 +15,24 @@ format:
     df-print: paged
     fig-format: png
     fig-dpi: 300
-    fig-responsive: true
-    fig-align: center
 lightbox:
     match: auto
     effect: zoom
     loop: true
 params:
   project_name: 'Project'
-  seurat_object: '/Users/affaustino/Projects/SCRATCH-Annotation/data/Project_major_annotation_object.RDS'
-  input_cell_markers_db: 'assets/cell_markers_database.csv'
-  input_parent_level: 'B_Plasma_Cells'
-  thr_n_features: 2000
-  thr_npc: 25
-  thr_resolution: 0.25
+  seurat_object: '/Users/affaustino/Projects/SCRATCH-Annotation/data/Yost_main_cluster_object.RDS'
+  input_cell_markers_db: '/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv'
+  input_parent_level: 'Lineage_markers'
+  input_deg_method: 'wilcox'
+  input_top_deg: 20
+  input_n_features: 2000
+  thr_fold_change: 0.25
+  thr_min_percentage: 0.1
   n_threads: 8
   n_memory: 16
   work_directory: !expr here::here()
-  auto_save: TRUE
+  auto_save: true
 ---
 
 ```{r setup}
@@ -47,11 +47,11 @@ input_cell_markers_db <- params$input_cell_markers_db
 input_parent_level <- strsplit(
   params$input_parent_level, split = ';')[[1]]
 
-thr_n_features <- params$thr_n_features
-thr_npc <- params$thr_npc
-thr_resolution <- params$thr_resolution
-
 # Optional parameters
+input_deg_method <- params$input_deg_method
+input_top_deg <- params$input_top_deg
+thr_fold_change <- params$thr_fold_change
+thr_min_percentage <- params$thr_min_percentage
 
 # Dataflow/Computational parameters
 n_threads <- params$n_threads
@@ -69,15 +69,15 @@ knitr::opts_knit$set(
 
 ```
 
-:::{.callout-important collapse="true"}
 
+::: {.callout-important collapse="true"}
 Here we will print the parameters
-
 :::
 
-# Project: `r params$project_name`
+## Project - `r params$project_name`
 
 This is a Quarto book
+
 
 ```{r}
 #| output: false
@@ -87,6 +87,11 @@ library(dplyr)
 library(ggplot2)
 library(Seurat)
 library(HGNChelper)
+library(future)
+
+# Setting plan and memory limit
+options(future.globals.maxSize = n_memory*1024^3)
+plan("multicore", workers = n_threads)
 
 ```
 
@@ -166,14 +171,18 @@ sctype_score <- function(scRNAseqData, scaled = !0, gs, gs2 = NULL, gene_names_t
   }
 
   # subselect genes only found in data
-  names_gs_cp = names(gs); names_gs_2_cp = names(gs2);
+  names_gs_cp = names(gs); 
+  names_gs_2_cp = names(gs2);
+  
   gs = lapply(1:length(gs), function(d_){
     GeneIndToKeep = rownames(scRNAseqData) %in% as.character(gs[[d_]]); rownames(scRNAseqData)[GeneIndToKeep]})
   
   gs2 = lapply(1:length(gs2), function(d_){
     GeneIndToKeep = rownames(scRNAseqData) %in% as.character(gs2[[d_]]); rownames(scRNAseqData)[GeneIndToKeep]})
   
-  names(gs) = names_gs_cp; names(gs2) = names_gs_2_cp;
+  names(gs) = names_gs_cp; 
+  names(gs2) = names_gs_2_cp;
+  
   cell_markers_genes_score = marker_sensitivity[marker_sensitivity$gene_ %in% unique(unlist(gs)),]
 
   # z-scale if not
@@ -190,11 +199,14 @@ sctype_score <- function(scRNAseqData, scaled = !0, gs, gs2 = NULL, gene_names_t
   # combine scores
   es = do.call("rbind", lapply(names(gs), function(gss_){
     sapply(1:ncol(Z), function(j) {
-      gs_z = Z[gs[[gss_]], j]; gz_2 = Z[gs2[[gss_]], j] * -1
+      gs_z = Z[gs[[gss_]], j]; 
+      gz_2 = Z[gs2[[gss_]], j] * -1
+      
       sum_t1 = (sum(gs_z) / sqrt(length(gs_z))); sum_t2 = sum(gz_2) / sqrt(length(gz_2));
       if(is.na(sum_t2)){
         sum_t2 = 0;
       }
+      
       sum_t1 + sum_t2
     })
   }))
@@ -205,24 +217,31 @@ sctype_score <- function(scRNAseqData, scaled = !0, gs, gs2 = NULL, gene_names_t
   es.max
 }
 
+
 ```
+
 
 ## Folder structure
 
+
 ```{r project_directory}
-#| output: false
 
 if(!dir.exists(work_directory)) {
   dir.create(work_directory, recursive = T)
 }
 
-for(sub_directory in c('data', 'figures')) {
+for(sub_directory in c('data', 'figures', 'figures/annotation')) {
   dir.create(paste0(work_directory, '/', sub_directory))
 }
 
+# Cirro-related edition
+file.create('figures/annotation/.empty')
+
 ```
 
+
 ## Loading Seurat object
+
 
 ```{r loading_rds}
 
@@ -235,122 +254,47 @@ set.seed(random_seed)
 
 ```
 
-```{r}
 
-# Extracting cells for downstream annotation
-seurat_object <- subset(
-  seurat_object,
-  subset = sctype == input_parent_level
-)
+## Cell annotation
 
-```
 
 ```{r loading_markers}
 
 # Get cell-type-specific gene sets from our in-built database (DB)
 cell_markers_database <- read_csv(file = input_cell_markers_db, show_col_types = FALSE)
 cell_markers_database <- cell_markers_database %>%
-  filter(parent_level == input_parent_level) %>%
+  filter(parent_level %in% input_parent_level) %>%
   as.data.frame()
-
-# Adding group@state label
-cell_markers_database <- cell_markers_database %>%
-  rowwise() %>%
-  mutate(
-    group_state = paste0(cell_group, "@", cell_annotation)
-  )
 
 # Formatting Cellmarkers database
 gene_list_db <- list(
-  'gs_positive' = split(cell_markers_database$markers, f = cell_markers_database$group_state)
+  'gs_positive' = split(cell_markers_database$markers, f = cell_markers_database$cell_annotation)
 )
 
 ```
-
-## Counts normalization
-
-```{r normalization}
-#| output: false
-
-seurat_object <- NormalizeData(
-  object = seurat_object, 
-  normalization.method = "LogNormalize",
-  scale.factor = 10000)
-
-# Retrieving HVG
-seurat_object <- FindVariableFeatures(
-  seurat_object, selection.method = "vst", nfeatures = thr_n_features)
-
-```
-
-## Filtering and scaling HVG
 
 ```{r}
 
-# Moving clonotye expansion signal
-filtering_vst_markers <- list(
-  "T_Cells" = "^TR[ABDG][VDJ]",
-  "B_Plasma_Cells" = "IGH[KL]V.*"
+# Retrieving HVG
+seurat_object <- FindVariableFeatures(
+  seurat_object, selection.method = "vst", nfeatures = 2000)
+
+# Adding curated markers 
+VariableFeatures(seurat_object) <- union(
+  VariableFeatures(seurat_object),
+  as.vector(unlist(gene_list_db))
 )
 
-if(input_parent_level %in% names(filtering_vst_markers)) {
-  
-  VariableFeatures(seurat_object) <- grep(
-    filtering_vst_markers[[input_parent_level]], VariableFeatures(seurat_object), value = TRUE, invert = TRUE)
-  
-}
-
-# Scaling the dataset
+# Rescaling the dataset
 seurat_object <- ScaleData(seurat_object)
 
 ```
 
-## Dimensionality Reduction
-
-```{r dimensionality_reduction}
-#| output: false
-
-# Running PCA and printing out dimensions
-seurat_object <- RunPCA(seurat_object, verbose = FALSE, npcs = 100)
-print(seurat_object[["pca"]], dims = 1:5, nfeatures = 5)
-
-```
-## Finding neighbors and clusters
-
-```{r finding_neighbors}
-#| output: false
-
-# Finding clusters
-seurat_object <- FindNeighbors(
-  object = seurat_object, 
-  reduction = 'pca', 
-  dims = 1:thr_npc,
-  graph.name = paste0('snn_npc', thr_npc)
-)
-
-seurat_object <- FindClusters(
-  object = seurat_object,
-  graph.name = paste0('snn_npc', thr_npc),
-  resolution = thr_resolution
-)
-
-# Running UMAP reduction
-seurat_object <- RunUMAP(
-  object = seurat_object,
-  reduction = 'pca', 
-  dims = 1:thr_npc,
-  seed.use = random_seed
-)
-
-```
-
-## Cell annotation
-
 ```{r sctype_annotation}
-#| code-fold: true
+#| output: false
 
 # Load example scRNA-seq matrix
-seurat_scaled <- LayerData(
+seurat_scaled <- GetAssayData(
   seurat_object,
   layer = "scale.data"
 )
@@ -358,7 +302,7 @@ seurat_scaled <- LayerData(
 # Calculating scType score
 sctype_calculation <- sctype_score(
   scRNAseqData = seurat_scaled,
-  scaled = TRUE,
+  scaled = FALSE,
   gs = gene_list_db$gs_positive,
   gs2 = NULL
   )
@@ -369,8 +313,7 @@ sctype_results <- do.call("rbind", lapply(unique(seurat_object@meta.data$seurat_
     es.max.cl <- sort(
       rowSums(sctype_calculation[, rownames(seurat_object@meta.data[seurat_object@meta.data$seurat_clusters == cl, ])]), decreasing = !0)
 
-    head(
-      data.frame(cluster = cl, type = names(es.max.cl), scores = es.max.cl, ncells = sum(seurat_object@meta.data$seurat_clusters==cl)), 10)
+    head(data.frame(cluster = cl, type = names(es.max.cl), scores = es.max.cl, ncells = sum(seurat_object@meta.data$seurat_clusters==cl)), 10)
     
     }
   )
@@ -397,53 +340,53 @@ for(cl in unique(sctype_best_scored$cluster)) {
 
 ```
 
-## Cell composition
-
 ```{r sctype_classification}
-#| code-fold: true
 
 # View results
-sctype_best_scored_ordered <- sctype_best_scored %>%
+sctype_best_scored <- sctype_best_scored %>%
   arrange(cluster)
 
 # Adding the markers information
 cell_list <- cell_markers_database[
-  cell_markers_database$group_state %in% sctype_best_scored_ordered$type, c("cell_group", "cell_annotation", "group_state", "markers")]
+  cell_markers_database$cell_annotation %in% sctype_best_scored$type, c("cell_group", "cell_annotation", "markers")]
 
 cell_list <- cell_list %>%
-  group_by(cell_group, cell_annotation, group_state) %>%
+  group_by(cell_group, cell_annotation) %>%
   summarize(signature = paste(markers, collapse = ","))
 
 cell_list <- cell_list %>%
   dplyr::rename(
-    type = group_state
+    type = cell_annotation
   )
 
-sctype_best_scored_ordered <- merge(
-  sctype_best_scored_ordered,
+sctype_best_scored <- merge(
+  sctype_best_scored,
   cell_list,
   by = "type"
 )
 
-sctype_best_scored_ordered <- sctype_best_scored_ordered %>%
+sctype_best_scored <- sctype_best_scored %>%
   select(cell_group, type, cluster, scores, signature)
 
 # Printing output table
 DT::datatable(
-  sctype_best_scored_ordered,
+  sctype_best_scored,
   class = 'cell-border stripe',
   options = list(dom = 'tip')
-)
+  )
 
 ```
 
+
 ## Data Visualization
 
+
 ```{r annotation_umap}
-#| label: fig-umap-state
+#| label: fig-umap-annotation
 #| fig-width: 15
 #| fig-height: 10
 #| fig-align: center
+#| layout-ncol: 2
 
 SCP::CellDimPlot(
   srt = seurat_object, 
@@ -453,21 +396,25 @@ SCP::CellDimPlot(
   label_repel = TRUE,
   show_stat = TRUE,
   theme_use = "theme_blank"
-) +
-  theme(
-    legend.position = "bottom"
-  )
+)
+
+SCP::CellDimPlot(
+  srt = seurat_object, 
+  group.by = "seurat_clusters",
+  reduction = "umap",
+  label = TRUE, 
+  label_repel = TRUE,
+  show_stat = TRUE,
+  theme_use = "theme_blank"
+)
 
 ```
 
-## Module-score
+
+## Module-score {.tabset}
+
 
 ```{r calculating_module_score}
-#| label: fig-module-score
-#| fig-width: 15
-#| fig-height: 10
-#| fig-align: center
-#| output: false
 
 # Calculating ModuleScore
 non_malignant_markers <- gene_list_db$gs_positive
@@ -475,24 +422,34 @@ non_malignant_markers <- gene_list_db$gs_positive
 # Avoiding redundant markers
 non_malignant_markers_index <-
   names(non_malignant_markers) %in% colnames(seurat_object@meta.data)
+
 non_malignant_markers_valid <- non_malignant_markers[!non_malignant_markers_index]
 
-seurat_object <- UCell::AddModuleScore_UCell(
-  seurat_object,
-  ncores = n_threads,
-  features = non_malignant_markers_valid
-)
+if(length(non_malignant_markers_valid) > 1) {
+  
+  for(cell_type in names(non_malignant_markers_valid)) {
+    seurat_object <- AddModuleScore(
+    object = seurat_object,
+    seed = random_seed,
+    features = non_malignant_markers_valid[cell_type],
+    name = cell_type
+    )
+  }
+  
+  # Removing seeds on Module name
+  column_indexes <- sapply(names(non_malignant_markers_valid), function(column) {
+        grep(column, colnames(seurat_object@meta.data))
+  })
+  colnames(seurat_object@meta.data)[column_indexes] <-
+    gsub("1$", "", colnames(seurat_object@meta.data)[column_indexes])
 
-colnames(seurat_object@meta.data) <- 
-  gsub('_UCell$', '', colnames(seurat_object@meta.data))
+}
 
 ```
 
-:::{.callout-tip}
-The @fig-module-score shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
-:::
 
 ### Feature Plot
+
 
 ```{r feature_plot}
 #| label: fig-feat-markers
@@ -505,15 +462,13 @@ FeaturePlot(
   features = names(non_malignant_markers),
   label = TRUE,
   min.cutoff = 'q1'
-)
+  )
 
 ```
 
-:::{.callout-tip}
-The @fig-feat-markers shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
-:::
 
 ### Violin Plot
+
 
 ```{r violin_plot}
 #| label: fig-violin
@@ -523,41 +478,49 @@ The @fig-feat-markers shows stacked violin plots illustrate gene expression dist
 
 VlnPlot(
   object = seurat_object,
-  ncol = 2,
-  features = unique(seurat_object$sctype)
-)
-
-```
-
-:::{.callout-tip}
-The @fig-violin shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
-:::
-
-## BubblePlot
-
-```{r}
-#| label: fig-bubble
-#| fig-width: 18
-#| fig-height: 10
-#| fig-align: center
-
-non_malignant_markers_list <- unique(unlist(non_malignant_markers, use.names = FALSE))
-
-annot_dotplot <- DotPlot(seurat_object, features = non_malignant_markers_list, group.by = "sctype") +
-  theme(
-    axis.text.y = element_text(size = 12),
-    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.9),
-    legend.position = 'top'
+  features = names(non_malignant_markers),
   )
 
-annot_dotplot
+```
+
+
+## Differential expression
+
+
+```{r differential}
+
+all_markers <- FindAllMarkers(
+  object = seurat_object,
+  only.pos = FALSE, 
+  test.use = input_deg_method,
+  max.cells.per.ident = 500,
+  logfc.threshold = thr_fold_change,
+  random.seed = random_seed,
+  min.pct = thr_min_percentage
+  )
 
 ```
-:::{.callout-tip}
-The @fig-bubble shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
-:::
 
-## Cluster composition per cell type
+```{r deg_table, message = FALSE, warning = FALSE, echo = TRUE}
+
+# Reordering all markers data.frame
+all_markers <- all_markers %>%
+  select(cluster, gene, pct.1, pct.2, p_val, avg_log2FC)
+
+# Printing out all markers
+DT::datatable(all_markers, 
+    class = 'cell-border stripe',
+    rownames = FALSE,
+    filter = 'top',
+    width = '100%', 
+    options = list(scrollX = TRUE)
+    )
+
+```
+
+
+## Cell composition
+
 
 ```{r cluster_composition}
 
@@ -592,45 +555,53 @@ seurat_cluster_composition <- seurat_cluster_composition %>%
 ```
 
 ```{r barplot_composition}
-#| label: fig-bar-composition
-#| fig-width: 18
+#| fig-width: 15
 #| fig-height: 10
 #| fig-align: center
 
 # Boxplot
 SCP::CellStatPlot(
   seurat_object,
-  stat.by = "patient_id", 
+  stat.by = "seurat_clusters", 
   group.by = "sctype", 
   label = TRUE
 )
 
 ```
 
-:::{.callout-tip}
-The @fig-bar-composition shows stacked violin plots illustrate gene expression distributions for multiple genes across cell types.
-:::
 
 ## Saving Seurat object
+
 
 ```{r object_dump}
 #| cache: false
 
 if(auto_save) {
 
-  saveRDS(seurat_object, file = paste0('./data/', project_name, '_', input_parent_level, '_annotation_object.RDS'))
+  saveRDS(seurat_object, file = paste0("data/", project_name, "_major_annotation_object.RDS"))
+
+  #
 
   annotation_table <- seurat_object@meta.data %>%
     select(seurat_clusters, sctype) %>%
     tibble::rownames_to_column(var = "barcode")
 
-  write_csv(annotation_table, file = paste0("data/", project_name, "_", input_parent_level, "_annotation.csv"))
+  write_csv(annotation_table, file = paste0("data/", project_name, "_major_annotation.csv"))
+  
+  #
+
+  annotation_list <- paste0(
+    names(table(annotation_table$sctype)), ":", table(annotation_table$sctype)
+  )
+  write_lines(annotation_list, file = paste0("data/", project_name, "_major_annotation.list.txt"))
 
 }
 
 ```
 
+
 ## Parameters log
+
 
 ```{r params_log, message = FALSE, warning = FALSE, echo = FALSE}
 
@@ -638,10 +609,13 @@ print(params)
 
 ```
 
+
 ## Session info
+
 
 ```{r session_info, message = FALSE, warning = FALSE, echo = FALSE}
 
 sessionInfo()
 
 ```
+

@@ -12,9 +12,9 @@ process CELLTYPIST_ANNOTATION {
         path(config)
 
     output:
-        path("_freeze/${notebook.baseName}")                      , emit: cache
+        path("_freeze/${notebook.baseName}")                           , emit: cache
         path("data/${params.project_name}_celltypist_annotation.h5ad") , emit: project_object
-        path("Immune_All")                                        , emit: csv_file
+        path("data/Immune_All")                                        , emit: csv_file
 
     when:
         task.ext.when == null || task.ext.when
@@ -27,10 +27,11 @@ process CELLTYPIST_ANNOTATION {
     stub:
         def param_file = task.ext.args ? "-P anndata_object:${anndata_object} -P ${task.ext.args}" : ""
         """
+        mkdir -p _freeze/${notebook.baseName}
         mkdir -p data figures
 
         touch data/${params.project_name}_celltypist_annotation.h5ad
-        mkdir -p _freeze/${notebook.baseName} Immune_All
+        mkdir -p _freeze/${notebook.baseName} data/Immune_All
         touch _freeze/${notebook.baseName}/${notebook.baseName}.html
         
         echo ${param_file} > _freeze/${notebook.baseName}/params.yml

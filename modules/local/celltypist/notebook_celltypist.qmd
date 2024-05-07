@@ -13,9 +13,10 @@ format:
     toc-depth: 2
     code-fold: show
     code-tools: true
-    fig-align: 'center'
     fig-format: png
+    fig-dpi: 300
     fig-responsive: true
+    fig-align: center
 lightbox:
     match: auto
     effect: zoom

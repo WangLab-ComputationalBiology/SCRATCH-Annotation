@@ -13,7 +13,7 @@ process SCYTPE_STATE_ANNOTATION {
         path(config)
 
     output:
-        path("_freeze/${notebook.baseName}"),                                          emit: cache
+        path("_freeze/notebook_${cell_population}"),                                          emit: cache
         path("data/${params.project_name}_${cell_population}_annotation_object.RDS"),  emit: seurat_rds
         path("data/${params.project_name}_${cell_population}_annotation.csv"),         emit: annotation
 
@@ -23,12 +23,12 @@ process SCYTPE_STATE_ANNOTATION {
     script:
         def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_cell_markers_db:${cell_annotation} -P input_parent_level:'${cell_population}' -P ${task.ext.args}" : ""
         """
-        quarto render ${notebook} ${param_file}
+        quarto render ${notebook} ${param_file} -o notebook_${cell_population}
         """
     stub:
         def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_cell_markers_db:${cell_annotation} -P input_parent_level:'${cell_population}' -P ${task.ext.args}" : ""
         """
-        mkdir -p _freeze/${notebook.baseName}
+        mkdir -p _freeze/notebook_${cell_population}
         mkdir -p data
 
         touch data/${params.project_name}_${cell_population}_annotation_object.RDS

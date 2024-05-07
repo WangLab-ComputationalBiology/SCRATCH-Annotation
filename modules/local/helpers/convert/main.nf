@@ -4,7 +4,7 @@ process HELPER_SCEASY_CONVERTER {
     label 'process_medium'
 
     container 'oandrefonseca/scratch-annotation:main'
-    publishDir "${params.outdir}/${params.project_name}", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/data/${task.process}", mode: 'copy', overwrite: true
 
     input:
         path(seurat_object)

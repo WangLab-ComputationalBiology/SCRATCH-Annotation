@@ -29,8 +29,10 @@ process SCYTPE_MAJOR_ANNOTATION {
         """
         mkdir -p _freeze/${notebook.baseName}
         mkdir -p data
+
         touch data/${params.project_name}_major_annotation_object.RDS
         touch data/${params.project_name}_major_annotation.csv
+        
         echo "B_Plasma_Cells\nEndothelial_Cells\nEpithelial\nFibroblast\nMyeloid\nNK_Cells\nT_Cells" > data/${params.project_name}_major_annotation.list.txt
         """
 
