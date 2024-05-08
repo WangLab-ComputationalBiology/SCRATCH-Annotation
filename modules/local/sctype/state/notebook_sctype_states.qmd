@@ -318,6 +318,7 @@ seurat_object <- RunPCA(seurat_object, verbose = FALSE, npcs = 100)
 print(seurat_object[["pca"]], dims = 1:5, nfeatures = 5)
 
 ```
+
 ## Finding neighbors and clusters
 
 ```{r finding_neighbors}
@@ -560,12 +561,12 @@ The @fig-bubble enables a visual inspection of gene expression levels across dif
 ## Differential expression
 
 ```{r differential}
+#| warning: false
 
 all_markers <- FindAllMarkers(
   object = seurat_object,
   only.pos = FALSE, 
   test.use = input_deg_method,
-  max.cells.per.ident = 500,
   logfc.threshold = thr_fold_change,
   random.seed = random_seed,
   min.pct = thr_min_percentage

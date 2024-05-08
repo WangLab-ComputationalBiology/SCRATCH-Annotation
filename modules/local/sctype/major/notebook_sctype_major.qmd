@@ -488,12 +488,12 @@ The @fig-violin displays the overall distribution associated with a specific cat
 ## Differential expression
 
 ```{r differential}
+#| warning: false
 
 all_markers <- FindAllMarkers(
   object = seurat_object,
   only.pos = FALSE, 
   test.use = input_deg_method,
-  max.cells.per.ident = 500,
   logfc.threshold = thr_fold_change,
   random.seed = random_seed,
   min.pct = thr_min_percentage

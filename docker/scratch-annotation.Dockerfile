@@ -121,6 +121,10 @@ ENV CELLTYPIST_FOLDER=/opt/celltypist
 COPY setup.py /opt/
 RUN python3 /opt/setup.py
 
+# Install presto
+RUN Rscript -e "install.packages('devtools')"
+RUN Rscript -e "devtools::install_github('immunogenomics/presto')"
+
 # Set the working directory
 WORKDIR /data
 
