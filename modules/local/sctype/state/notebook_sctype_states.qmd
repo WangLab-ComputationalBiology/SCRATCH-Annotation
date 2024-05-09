@@ -31,6 +31,8 @@ params:
   input_deg_method: 'wilcox'
   thr_npc: 25
   thr_resolution: 0.25
+  thr_min_percentage: 0.1
+  thr_fold_change: 0.25
   n_threads: 8
   n_memory: 16
   work_directory: !expr here::here()
@@ -53,6 +55,8 @@ input_deg_method <- params$input_deg_method
 thr_n_features <- params$thr_n_features
 thr_npc <- params$thr_npc
 thr_resolution <- params$thr_resolution
+thr_min_percentage <- params$thr_min_percentage
+thr_fold_change <- params$thr_fold_change
 
 # Optional parameters
 
@@ -495,8 +499,8 @@ colnames(seurat_object@meta.data) <-
 
 ```{r feature_plot}
 #| label: fig-feat-markers
-#| fig-width: 14
-#| fig-height: 20
+#| fig-width: 10
+#| fig-height: 12
 #| fig-align: center
 
 FeaturePlot(
@@ -575,6 +579,7 @@ all_markers <- FindAllMarkers(
 ```
 
 ```{r deg_table, message = FALSE, warning = FALSE, echo = TRUE}
+#| column: screen-inset-shaded
 
 # Reordering all markers data.frame
 all_markers <- all_markers %>%
