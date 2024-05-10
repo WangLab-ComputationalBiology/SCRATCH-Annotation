@@ -38,6 +38,11 @@ workflow SCRATCH_ANNOTATION {
         ch_page_config = Channel.fromPath(params.page_config, checkIfExists: true)
             .collect()
 
+        ch_page_config = ch_template
+            .map{ file -> file.find { it.toString().endsWith('.png') } }
+            .combine(ch_page_config)
+            .collect()
+
         // Subsetting based on cell malignancy annotation
         ch_filtered_object = HELPER_SEURAT_SUBSET(
             ch_single_object,
