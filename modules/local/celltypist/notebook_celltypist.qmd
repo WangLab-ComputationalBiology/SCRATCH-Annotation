@@ -344,6 +344,7 @@ sc.tl.rank_genes_groups(
 ```{python}
 #| label: fig-dotplot
 #| fig-cap: 'DotPlot'
+#| column: screen-inset-shaded
 
 sc.pl.rank_genes_groups_dotplot(
     adata,

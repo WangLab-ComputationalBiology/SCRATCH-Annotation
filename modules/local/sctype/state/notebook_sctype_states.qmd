@@ -432,7 +432,12 @@ sctype_best_scored_ordered <- merge(
 sctype_best_scored_ordered <- sctype_best_scored_ordered %>%
   select(cell_group, type, cluster, scores, signature)
 
+```
+
+```{r}
+#| column: screen-inset-shaded
 # Printing output table
+
 DT::datatable(
   sctype_best_scored_ordered,
   class = 'cell-border stripe',
@@ -540,6 +545,7 @@ The @fig-violin displays the overall distribution associated with a specific cat
 #| fig-width: 18
 #| fig-height: 10
 #| fig-align: center
+#| column: screen-inset-shaded
 
 non_malignant_markers_list <- unique(unlist(non_malignant_markers, use.names = FALSE))
 
