@@ -76,9 +76,7 @@ knitr::opts_knit$set(
 Here we will print the parameters
 :::
 
-## Project - `r params$project_name`
-
-This is a Quarto book
+## Loading library
 
 ```{r}
 #| output: false
@@ -363,7 +361,12 @@ sctype_best_scored <- merge(
 sctype_best_scored <- sctype_best_scored %>%
   select(cell_group, type, cluster, scores, signature)
 
+```
+
+```{r}
+#| column: screen-inset-shaded
 # Printing output table
+
 DT::datatable(
   sctype_best_scored,
   class = 'cell-border stripe',
@@ -381,6 +384,7 @@ DT::datatable(
 #| fig-height: 10
 #| fig-align: center
 #| layout-ncol: 2
+#| warning: false
 
 SCP::CellDimPlot(
   srt = seurat_object, 
@@ -502,6 +506,7 @@ all_markers <- FindAllMarkers(
 ```
 
 ```{r deg_table, message = FALSE, warning = FALSE, echo = TRUE}
+#| column: screen-inset-shaded
 
 # Reordering all markers data.frame
 all_markers <- all_markers %>%

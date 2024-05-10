@@ -65,7 +65,7 @@ knitr::opts_knit$set(
 Here we will print the parameters
 :::
 
-# Project: `r params$project_name`
+## Loading library
 
 ```{r}
 #| output: false

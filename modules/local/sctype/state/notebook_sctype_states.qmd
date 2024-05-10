@@ -77,14 +77,10 @@ knitr::opts_knit$set(
 ```
 
 :::{.callout-important collapse="true"}
-
 Here we will print the parameters
-
 :::
 
-# Project: `r params$project_name`
-
-This is a Quarto book
+## Loading library
 
 ```{r}
 #| output: false

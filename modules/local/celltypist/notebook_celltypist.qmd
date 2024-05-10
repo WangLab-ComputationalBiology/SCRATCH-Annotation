@@ -53,14 +53,6 @@ annot_table    = "{work_directory}/data/{cell_model}".format(work_directory = wo
 Here we will print the parameters. To be constructed.
 :::
 
-```{python}
-#| echo: false
-#| output: asis
-
-print(f"# Project Name: {project_name}\n")
-
-```
-
 ## Loading library
 
 ```{python}
