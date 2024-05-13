@@ -8,6 +8,13 @@
                 "title": "Pipeline parameters",
                 "type": "object",
                 "properties": {
+                    "seurat_object": {
+                        "type": "string",
+                        "title": "Seurat RDS",
+                        "file": "**/*_cluster_object.RDS",
+                        "pathType": "dataset",
+                        "description": "Select the object for clustering"
+                    },
                     "organism": {
                         "type": "string",
                         "title": "Organism",
@@ -42,7 +49,8 @@
                                         "type": "string",
                                         "pathType": "references",
                                         "file": "**/data/data/**_main_cell_status.csv",
-                                        "title": "Malignant mask CSV file (optional)"
+                                        "title": "Malignant mask CSV file (optional)",
+                                        "readOnly": true
                                     }
                                 }
                             },

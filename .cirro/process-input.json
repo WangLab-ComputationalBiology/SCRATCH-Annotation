@@ -1,5 +1,5 @@
 {
-    "input_seurat_object": "$.params.inputs[0].s3|/data/data/SCRATCH_CLUSTERING:SEURAT_CLUSTER/data/*_cluster_object.RDS",
+    "input_seurat_object": "$.params.dataset.paramJson.pipeline_parameters.seurat_object",
     "outdir": "$.params.dataset.s3|/data/",
     "organism": "$.params.dataset.paramJson.pipeline_parameters.organism",
     "input_cell_mask": "$.params.dataset.paramJson.pipeline_parameters.input_cell_mask",
