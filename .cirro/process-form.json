@@ -49,8 +49,7 @@
                                         "type": "string",
                                         "pathType": "references",
                                         "file": "**/data/data/**_main_cell_status.csv",
-                                        "title": "Malignant mask CSV file (optional)",
-                                        "readOnly": true
+                                        "title": "Malignant mask CSV file (optional)"
                                     }
                                 }
                             },
