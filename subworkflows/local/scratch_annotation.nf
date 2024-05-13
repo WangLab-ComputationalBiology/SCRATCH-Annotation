@@ -35,6 +35,8 @@ workflow SCRATCH_ANNOTATION {
         ch_notebook_scytpe_ag  = Channel.fromPath(params.notebook_sctype_agg, checkIfExists: true)
 
         ch_template    = Channel.fromPath(params.template, checkIfExists: true)
+            .collect()
+
         ch_page_config = Channel.fromPath(params.page_config, checkIfExists: true)
             .collect()
 
@@ -69,45 +71,49 @@ workflow SCRATCH_ANNOTATION {
             ch_page_config
         )
         
-        // Performing scType hierarchical annotation - Major cell type
-        ch_sctype_major = SCYTPE_MAJOR_ANNOTATION(
-            ch_notebook_scytpe_mj,
-            ch_filtered_object,
-            ch_database,
-            ch_page_config
-        )
+        if(params.organism == "Human") {
 
-        ch_sctype_major_object = ch_sctype_major.seurat_rds
+            // Performing scType hierarchical annotation - Major cell type
+            ch_sctype_major = SCYTPE_MAJOR_ANNOTATION(
+                ch_notebook_scytpe_mj,
+                ch_filtered_object,
+                ch_database,
+                ch_page_config
+            )
 
-        // Reading major cell list
-        ch_major_list = ch_sctype_major.major_list
-            .splitText()
-            .map{ it -> it.split(":") }
-            .filter{ !(it[0] =~ "Unknown|Epithelial|Fibroblast|NK_Cells") }
-            .map{ it[0].trim() }
+            ch_sctype_major_object = ch_sctype_major.seurat_rds
 
-        ch_sctype_state = SCYTPE_STATE_ANNOTATION(
-            ch_notebook_scytpe_st,
-            ch_sctype_major_object,
-            ch_database,
-            ch_major_list,
-            ch_page_config
-        )
+            // Reading major cell list
+            ch_major_list = ch_sctype_major.major_list
+                .splitText()
+                .map{ it -> it.split(":") }
+                .filter{ !(it[0] =~ "Unknown|Epithelial|Fibroblast|NK_Cells") }
+                .map{ it[0].trim() }
 
-        // Aggregating cell annotation
-        ch_sctype_agg = ch_sctype_state.annotation
-            .collect()
+            ch_sctype_state = SCYTPE_STATE_ANNOTATION(
+                ch_notebook_scytpe_st,
+                ch_sctype_major_object,
+                ch_database,
+                ch_major_list,
+                ch_page_config
+            )
 
-        ch_sctype_agg = SCYTPE_AGGREGATE_ANNOTATION(
-            ch_notebook_scytpe_ag,
-            ch_sctype_major_object,
-            ch_sctype_agg,
-            ch_page_config
-        )
+            // Aggregating cell annotation
+            ch_sctype_agg = ch_sctype_state.annotation
+                .collect()
 
-        SCEASY_CONVERTER_TWO(
-            ch_sctype_agg.seurat_rds
-        )
+            ch_sctype_agg = SCYTPE_AGGREGATE_ANNOTATION(
+                ch_notebook_scytpe_ag,
+                ch_sctype_major_object,
+                ch_sctype_agg,
+                ch_page_config
+            )
+
+            SCEASY_CONVERTER_TWO(
+                ch_sctype_agg.seurat_rds
+            )
+
+        }
         
     emit:
         ch_dumps = Channel.empty()
