@@ -314,7 +314,7 @@ seurat_object <- ScaleData(seurat_object)
 #| output: false
 
 # Running PCA and printing out dimensions
-seurat_object <- RunPCA(seurat_object, verbose = FALSE, npcs = 100)
+seurat_object <- RunPCA(seurat_object, verbose = FALSE, npcs = 50)
 print(seurat_object[["pca"]], dims = 1:5, nfeatures = 5)
 
 ```
