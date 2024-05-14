@@ -17,7 +17,8 @@ process SCYTPE_STATE_ANNOTATION {
         path("data/${params.project_name}_${cell_population}_annotation_object.RDS")  , emit: seurat_rds
         path("data/${params.project_name}_${cell_population}_annotation.csv")         , emit: annotation
         path("report/notebook_${cell_population}.html")                               , emit: html
-
+        path("_freeze/**/figure-html/*.png")                                          , emit: figures
+        
     when:
         task.ext.when == null || task.ext.when
 
@@ -32,8 +33,10 @@ process SCYTPE_STATE_ANNOTATION {
         def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_cell_markers_db:${cell_annotation} -P input_parent_level:'${cell_population}' -P ${task.ext.args}" : ""
         def notebook_cell_type = "notebook_${cell_population}"
         """
-        mkdir -p _freeze/${notebook_cell_type}
-        mkdir -p data
+        mkdir -p data _freeze/${notebook_cell_type}
+        mkdir -p _freeze/DUMMY/figure-html
+
+        touch _freeze/DUMMY/figure-html/FILE.png
 
         touch data/${params.project_name}_${cell_population}_annotation_object.RDS
         touch data/${params.project_name}_${cell_population}_annotation.csv

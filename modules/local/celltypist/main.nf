@@ -16,7 +16,7 @@ process CELLTYPIST_ANNOTATION {
         path("data/${params.project_name}_celltypist_annotation.h5ad") , emit: ann_object
         path("data/Immune_All")                                        , emit: csv_file
         path("report/${notebook.baseName}.html")                       , emit: html
-
+        path("_freeze/**/figure-html/*.png")                           , emit: figures
     when:
         task.ext.when == null || task.ext.when
 
@@ -28,8 +28,11 @@ process CELLTYPIST_ANNOTATION {
     stub:
         def param_file = task.ext.args ? "-P anndata_object:${anndata_object} -P ${task.ext.args}" : ""
         """
-        mkdir -p _freeze/${notebook.baseName}
-        mkdir -p data figures
+        mkdir -p data _freeze/${notebook.baseName}
+        mkdir -p _freeze/DUMMY/figure-html
+
+        touch _freeze/DUMMY/figure-html/FILE.png
+
 
         touch data/${params.project_name}_celltypist_annotation.h5ad
         mkdir -p _freeze/${notebook.baseName} data/Immune_All

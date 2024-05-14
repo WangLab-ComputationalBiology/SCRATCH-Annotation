@@ -17,6 +17,7 @@ process SCYTPE_MAJOR_ANNOTATION {
         path("data/${params.project_name}_major_annotation.csv")         , emit: annotation
         path("data/${params.project_name}_major_annotation.list.txt")    , emit: major_list
         path("report/${notebook.baseName}.html")                         , emit: html
+        path("_freeze/**/figure-html/*.png")                             , emit: figures
 
     when:
         task.ext.when == null || task.ext.when
@@ -28,8 +29,10 @@ process SCYTPE_MAJOR_ANNOTATION {
         """
     stub:
         """
-        mkdir -p _freeze/${notebook.baseName}
-        mkdir -p data
+        mkdir -p data _freeze/${notebook.baseName}
+        mkdir -p _freeze/DUMMY/figure-html
+
+        touch _freeze/DUMMY/figure-html/FILE.png
 
         touch data/${params.project_name}_major_annotation_object.RDS
         touch data/${params.project_name}_major_annotation.csv
