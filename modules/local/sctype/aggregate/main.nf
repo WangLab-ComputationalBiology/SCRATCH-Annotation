@@ -20,12 +20,12 @@ process SCYTPE_AGGREGATE_ANNOTATION {
         task.ext.when == null || task.ext.when
 
     script:
-        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P cell_annotation_files:${cell_annotation_files} -P ${task.ext.args}" : ""
+        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P cell_annotation_files:'${cell_annotation_files.join(';')}' -P ${task.ext.args}" : ""
         """
         quarto render ${notebook} ${param_file}
         """
     stub:
-        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P cell_annotation_files:${cell_annotation_files} -P ${task.ext.args}" : ""
+        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P cell_annotation_files:'${cell_annotation_files.join(';')}' -P ${task.ext.args}" : ""
         """
         mkdir -p _freeze/${notebook.baseName}
         

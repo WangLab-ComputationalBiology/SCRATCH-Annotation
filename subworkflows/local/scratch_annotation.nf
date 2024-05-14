@@ -105,6 +105,9 @@ workflow SCRATCH_ANNOTATION {
             ch_sctype_agg = ch_sctype_state.annotation
                 .collect()
 
+            ch_sctype_agg.
+                view()
+
             ch_sctype_agg = SCYTPE_AGGREGATE_ANNOTATION(
                 ch_notebook_scytpe_ag,
                 ch_sctype_major_object,
