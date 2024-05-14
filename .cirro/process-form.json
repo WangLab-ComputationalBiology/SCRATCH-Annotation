@@ -78,7 +78,7 @@
                     "thr_npc": {
                         "type": "integer",
                         "default": 25,
-                        "title": "Number features for FindVariableFeatures"
+                        "title": "Number PCAs for FindNeighbors"
                     },
                     "thr_resolution": {
                         "type": "number",

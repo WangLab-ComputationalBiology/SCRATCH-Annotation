@@ -231,7 +231,7 @@ plot(cell_hierarchical, main = "Dendrogram", xlab = "Index", ylab = "Height")
 SCP::CellStatPlot(
   seurat_object,
   stat.by = "seurat_clusters", 
-  group.by = "sctype", 
+  group.by = "scytpe_subset", 
   label = TRUE
 )
 
