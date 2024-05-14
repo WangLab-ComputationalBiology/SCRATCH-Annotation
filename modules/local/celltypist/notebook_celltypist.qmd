@@ -357,7 +357,7 @@ sc.pl.rank_genes_groups_dotplot(
 ```
 
 :::{.callout-tip}
-The @fig-dotplot shows Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+The @fig-dotplot shows the gene expression across cell clusters.
 :::
 
 ## Saving Data object
