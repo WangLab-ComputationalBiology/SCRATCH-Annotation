@@ -31,8 +31,11 @@ workflow SCRATCH_ANNOTATION {
         // Importing notebook
         ch_notebook_celltypist = Channel.fromPath(params.notebook_celltypist, checkIfExists: true)
         ch_notebook_scytpe_mj  = Channel.fromPath(params.notebook_sctype_major, checkIfExists: true)
+        
         ch_notebook_scytpe_st  = Channel.fromPath(params.notebook_sctype_state, checkIfExists: true)
+            .collect()
         ch_notebook_scytpe_ag  = Channel.fromPath(params.notebook_sctype_agg, checkIfExists: true)
+            .collect()
 
         ch_template    = Channel.fromPath(params.template, checkIfExists: true)
             .collect()

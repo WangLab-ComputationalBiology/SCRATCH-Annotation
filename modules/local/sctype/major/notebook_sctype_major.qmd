@@ -380,6 +380,8 @@ DT::datatable(
 ```{r annotation_umap}
 #| label: fig-umap-annotation
 #| fig-cap: "UMAP"
+#| - "UMAP Annotation"
+#| - "UMAP Clusters"
 #| fig-width: 15
 #| fig-height: 10
 #| fig-align: center
