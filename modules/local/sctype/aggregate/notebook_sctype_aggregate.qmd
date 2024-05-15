@@ -248,7 +248,7 @@ The @fig-bar-composition provides an overall view of cell composition across dis
 
 if(auto_save) {
 
-  saveRDS(seurat_object, file = paste0("data/", project_name, "_sctype_final_object.RDS"))
+  saveRDS(seurat_object, file = paste0("data/", project_name, "_sctype_agg_annotation_object.RDS"))
 
 }
 

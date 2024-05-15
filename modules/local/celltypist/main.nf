@@ -13,7 +13,7 @@ process CELLTYPIST_ANNOTATION {
 
     output:
         path("_freeze/${notebook.baseName}")                           , emit: cache
-        path("data/${params.project_name}_celltypist_annotation.h5ad") , emit: ann_object
+        path("data/${params.project_name}_celltypist_annotation_object.h5ad") , emit: ann_object
         path("data/Immune_All")                                        , emit: csv_file
         path("report/${notebook.baseName}.html")                       , emit: html
         path("_freeze/**/figure-html/*.png")                           , emit: figures
@@ -34,7 +34,7 @@ process CELLTYPIST_ANNOTATION {
         touch _freeze/DUMMY/figure-html/FILE.png
 
 
-        touch data/${params.project_name}_celltypist_annotation.h5ad
+        touch data/${params.project_name}_celltypist_annotation_object.h5ad
         mkdir -p _freeze/${notebook.baseName} data/Immune_All
         touch _freeze/${notebook.baseName}/${notebook.baseName}.html
 

@@ -13,7 +13,7 @@ process SCYTPE_AGGREGATE_ANNOTATION {
 
     output:
         path("_freeze/${notebook.baseName}")                          , emit: cache
-        path("data/${params.project_name}_sctype_final_object.RDS")   , emit: seurat_rds
+        path("data/${params.project_name}_sctype_agg_annotation_object.RDS")   , emit: seurat_rds
         path("report/${notebook.baseName}.html")                      , emit: html
 
     when:
@@ -30,7 +30,7 @@ process SCYTPE_AGGREGATE_ANNOTATION {
         mkdir -p _freeze/${notebook.baseName}
         
         mkdir -p data
-        touch data/${params.project_name}_sctype_final_object.RDS
+        touch data/${params.project_name}_sctype_agg_annotation_object.RDS
 
         mkdir -p report
         touch report/${notebook.baseName}.html
