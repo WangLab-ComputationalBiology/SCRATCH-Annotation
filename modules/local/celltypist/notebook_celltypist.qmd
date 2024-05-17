@@ -32,7 +32,7 @@ import os
 
 # Parameters
 project_name   = "project"
-anndata_object = "/Users/affaustino/Projects/SCRATCH-Annotation/data//Ovarian_main_cluster_object.20k_filtered.h5ad"
+anndata_object = "/Users/affaustino/Projects/SCRATCH-Annotation/data/Ovarian_main_cluster_object.20k_filtered.h5ad"
 cell_database  = "/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv"
 cell_model     = ["Immune_All_High.pkl", "Immune_All_Low.pkl"]
 organism       = "Human"
@@ -115,6 +115,9 @@ model_low  = models.Model.load(model = cell_model[0])
 model_high = models.Model.load(model = cell_model[1])
 
 if organism == "Mouse":
+
+    print("Converting model to {organism} markers.")
+
     model_low.convert()
     model_high.convert()
 
