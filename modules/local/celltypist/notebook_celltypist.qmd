@@ -44,7 +44,7 @@ if not os.path.exists(os.path.join(work_directory, 'data')):
     os.mkdir(os.path.join(work_directory, 'data')) 
 
 # Directory and outputs
-output_object  = "{work_directory}/data/{project_name}_{object_label}".format(work_directory = work_directory, project_name = project_name, object_label = "_celltypist_annotation_object.h5ad")
+output_object  = "{work_directory}/data/{project_name}_{object_label}".format(work_directory = work_directory, project_name = project_name, object_label = "celltypist_annotation_object.h5ad")
 annot_table    = "{work_directory}/data/{cell_model}".format(work_directory = work_directory, cell_model = "Immune_All")
 
 ```
