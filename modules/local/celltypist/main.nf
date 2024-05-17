@@ -12,11 +12,11 @@ process CELLTYPIST_ANNOTATION {
         path(config)
 
     output:
-        path("_freeze/${notebook.baseName}")                           , emit: cache
+        path("_freeze/${notebook.baseName}")                                  , emit: cache
         path("data/${params.project_name}_celltypist_annotation_object.h5ad") , emit: ann_object
-        path("data/Immune_All")                                        , emit: csv_file
-        path("report/${notebook.baseName}.html")                       , emit: html
-        path("_freeze/**/figure-html/*.png")                           , emit: figures
+        path("data/Immune_All")                                               , emit: csv_file
+        path("report/${notebook.baseName}.html")                              , emit: html
+        path("_freeze/**/figure-html/*.png")                                  , emit: figures
     when:
         task.ext.when == null || task.ext.when
 
