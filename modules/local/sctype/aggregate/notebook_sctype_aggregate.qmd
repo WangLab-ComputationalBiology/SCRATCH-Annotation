@@ -143,6 +143,8 @@ seurat_object$scytpe_subset <- ifelse(
   is.na(seurat_object$scytpe_subset), seurat_object$sctype, seurat_object$scytpe_subset
 )
 
+seurat_object$predicted_labels <- seurat_object$scytpe_subset
+
 ```
 
 ## Data Visualization
