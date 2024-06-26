@@ -102,6 +102,7 @@ RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
 
 # Install packages on Github
 RUN Rscript -e "devtools::install_github(${DEV_DEPS})"
+RUN Rscript -e "devtools::install_github('satijalab/azimuth', 'seurat5')"
 
 # Install R packages related to cell annotation
 # ARG R_ANNOT_DEPS="c(\)"
