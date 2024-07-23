@@ -1,7 +1,9 @@
 # SCRATCH Annotation Subworkflow
 
 ## Introduction
-This repository contains a Nextflow subworkflow for annotating Seurat objects. The subworkflow integrates various processes to handle and analyze the provided input files, ensuring reproducibility and scalability.
+SCRATCH Annotation is a subworkflow responsible for cell annotation and cell state inference. It leverages both knowledge and reference-based methods for performing cell identification. Note, that `SCRATCH Annotation` was designed to infer TME annotation. As for malignant identification, please refer to our CNV-based subworkflow, `SCRATCH CNV`.
+
+> **Disclaimer:** Subworkflows are chained modules providing a high-level functionality (e.g., Alignment, QC, Differential expression) within a pipeline context. These subworkflows should ideally be bundled with the pipeline implementation and shared among different pipelines as needed.
 
 ## Prerequisites
 Before running the subworkflow, ensure you have the following installed:
