@@ -1,9 +1,11 @@
+Here is the updated README with the default values from `nextflow.config` included:
+
+---
+
 # SCRATCH Annotation Subworkflow
 
 ## Introduction
-SCRATCH Annotation is a subworkflow responsible for cell annotation and cell state inference. It leverages both knowledge and reference-based methods for performing cell identification. Note, that `SCRATCH Annotation` was designed to infer TME annotation. As for malignant identification, please refer to our CNV-based subworkflow, `SCRATCH CNV`.
-
-> **Disclaimer:** Subworkflows are chained modules providing a high-level functionality (e.g., Alignment, QC, Differential expression) within a pipeline context. These subworkflows should ideally be bundled with the pipeline implementation and shared among different pipelines as needed.
+This repository contains a Nextflow subworkflow for annotating Seurat objects. The subworkflow integrates various processes to handle and analyze the provided input files, ensuring reproducibility and scalability.
 
 ## Prerequisites
 Before running the subworkflow, ensure you have the following installed:
@@ -26,14 +28,21 @@ nextflow run main.nf -profile [docker/singularity] --input_seurat_object <path/t
 ```
 
 ### Parameters
-- `--input_seurat_object`: Path to the Seurat object input file (required).
-- `--annotation_db`: Path to the annotation database file (required).
-- `--project_name`: Name of the project for organizing results (required).
-- `-profile`: Execution profile. Use `docker` or `singularity` depending on your containerization preference.
+- `--input_seurat_object`: Path to the Seurat object input file (default: `data/Yost_main_cluster_object.RDS`).
+- `--annotation_db`: Path to the annotation database file (default: `assets/cell_markers_database.csv`).
+- `--input_cell_mask`: Path to the cell mask file (default: `data/Yost_main_cell_status.csv`).
+- `--outdir`: Output directory (default: `launchDir`).
+- `--project_name`: Name of the project for organizing results (default: `project`).
+- `--organism`: Organism for annotation, either "Human" or "Mouse" (default: `Human`).
+- `--thr_n_features`: Threshold for the number of features (default: `2000`).
+- `--thr_npc`: Threshold for the number of principal components (default: `25`).
+- `--thr_resolution`: Threshold for resolution (default: `0.50`).
+- `--skip_celltypist`: Skip CellTypist annotation (default: `false`).
+- `--skip_sctype`: Skip scType annotation (default: `false`).
 
 ### Example
 ```bash
-nextflow run main.nf -profile docker --input_seurat_object data/seurat_object.RDS --annotation_db data/annotation_db --project_name Annotation_Project
+nextflow run main.nf -profile docker --input_seurat_object data/Yost_main_cluster_object.RDS --annotation_db assets/cell_markers_database.csv --input_cell_mask data/Yost_main_cell_status.csv --outdir ./results --project_name Annotation_Project --organism Human --thr_n_features 2000 --thr_npc 25 --thr_resolution 0.50 --skip_celltypist false --skip_sctype false
 ```
 
 ## Configuration
