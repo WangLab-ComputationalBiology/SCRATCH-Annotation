@@ -1,7 +1,3 @@
-Here is the updated README with the default values from `nextflow.config` included:
-
----
-
 # SCRATCH Annotation Subworkflow
 
 ## Introduction
