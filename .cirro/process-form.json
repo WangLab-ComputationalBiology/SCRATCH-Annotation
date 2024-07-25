@@ -119,7 +119,11 @@
               "title": "Reference RDS",
               "file": "**/*_reference_object.RDS",
               "pathType": "dataset",
-              "description": "Select a reference object for Azimuth annotation"
+              "description": "Select a reference object to perform cell annotation"
+            },
+            "skip_azimuth": {
+              "type": "boolean",
+              "title": "Skipping Azimuth annotation"
             }
           }
         }
