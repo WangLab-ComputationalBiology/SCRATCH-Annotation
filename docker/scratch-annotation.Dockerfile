@@ -126,7 +126,7 @@ RUN Rscript -e "install.packages('devtools')"
 RUN Rscript -e "devtools::install_github('immunogenomics/presto')"
 
 # Install Azimuth
-RUN Rscript -e "remotes::install_github('satijalab/azimuth', ref = 'master')"
+RUN Rscript -e "devtools::install_github('satijalab/azimuth')"
 
 # Set the working directory
 WORKDIR /data
