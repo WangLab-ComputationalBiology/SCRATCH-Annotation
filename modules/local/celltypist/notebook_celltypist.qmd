@@ -34,7 +34,7 @@ import os
 project_name   = "project"
 anndata_object = "/Users/affaustino/Projects/SCRATCH-Annotation/data/Ovarian_main_cluster_object.20k_filtered.h5ad"
 cell_database  = "/Users/affaustino/Projects/SCRATCH-Annotation/assets/cell_markers_database.csv"
-cell_model     = ["Immune_All_High.pkl", "Immune_All_Low.pkl"]
+cell_model     = "Immune_All_Low.pkl"
 organism       = "Human"
 model_update   = False
 
@@ -111,53 +111,22 @@ models.download_models(
 
 ```{python}
 
-model_low  = models.Model.load(model = cell_model[0])
-model_high = models.Model.load(model = cell_model[1])
+model  = models.Model.load(model = cell_model)
 
 if organism == "Mouse":
 
     print("Converting model to {organism} markers.")
 
-    model_low.convert()
-    model_high.convert()
+    model.convert()
 
 ```
 
-## Prediction Low-granularity
-
-```{python}
-
-predictions_low = celltypist.annotate(
-    adata, model = cell_model[0], majority_voting = True
-)
-
-```
-
-```{python}
-#| code-fold: true
-
-predictions_low_adata = predictions_low.to_adata()
-
-```
-
-```{python}
-#| code-fold: true
-
-adata.obs["celltypist_cell_label_fine"] = predictions_low_adata.obs.loc[
-    adata.obs.index, "majority_voting"
-]
-adata.obs["celltypist_conf_score_fine"] = predictions_low_adata.obs.loc[
-    adata.obs.index, "conf_score"
-]
-
-```
-
-## Prediction High-granularity
+## Celltypist Prediction
 
 ```{python}
 
 predictions_high = celltypist.annotate(
-    adata, model = cell_model[1], majority_voting = True
+    adata, model = cell_model, majority_voting = True
 )
 
 ```
@@ -189,36 +158,6 @@ adata.obs["celltypist_conf_score_coarse"] = predictions_high_adata.obs.loc[
 sc.tl.umap(adata)
 
 ```
-
-```{python}
-#| label: fig-umap-high
-#| fig-cap: 'Celltypist Immune_All_High annotation'
-#| fig-subcap:
-#|  - Low granularity
-#|  - Prediction score
-#| fig-cap-location: top
-
-sc.pl.umap(
-    adata,
-    color = ["celltypist_cell_label_fine"],
-    frameon = False,
-    sort_order = False,
-    wspace = 1
-)
-
-sc.pl.umap(
-    adata,
-    color = ["celltypist_conf_score_fine"],
-    frameon = False,
-    sort_order = False,
-    wspace = 1
-)
-
-```
-
-:::{.callout-tip}
-The @fig-umap-high cell annotation based on Celltypist `Immune_All_High`.
-:::
 
 ```{python}
 #| label: fig-umap-low
