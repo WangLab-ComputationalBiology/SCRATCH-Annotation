@@ -6,17 +6,17 @@ process SCYTPE_MAJOR_ANNOTATION {
     container 'oandrefonseca/scratch-annotation:main'
 
     input:
-        path(notebook)
+        path(notebook_major)
         path(seurat_object)
         path(cell_annotation)
         path(config)
 
     output:
-        path("_freeze/${notebook.baseName}")                             , emit: cache
+        path("_freeze/${notebook_major.baseName}")                       , emit: cache
         path("data/${params.project_name}_major_annotation_object.RDS")  , emit: seurat_rds
         path("data/${params.project_name}_major_annotation.csv")         , emit: annotation
         path("data/${params.project_name}_major_annotation.list.txt")    , emit: major_list
-        path("report/${notebook.baseName}.html")                         , emit: html
+        path("report/${notebook_major.baseName}.html")                         , emit: html
         path("_freeze/**/figure-html/*.png")                             , emit: figures
 
     when:
@@ -25,11 +25,11 @@ process SCYTPE_MAJOR_ANNOTATION {
     script:
         def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P input_cell_markers_db:${cell_annotation} -P ${task.ext.args}" : ""
         """
-        quarto render ${notebook} ${param_file}
+        quarto render ${notebook_major} ${param_file}
         """
     stub:
         """
-        mkdir -p data _freeze/${notebook.baseName}
+        mkdir -p data _freeze/${notebook_major.baseName}
         mkdir -p _freeze/DUMMY/figure-html
 
         touch _freeze/DUMMY/figure-html/FILE.png
@@ -38,7 +38,7 @@ process SCYTPE_MAJOR_ANNOTATION {
         touch data/${params.project_name}_major_annotation.csv
 
         mkdir -p report
-        touch report/${notebook.baseName}.html
+        touch report/${notebook_major.baseName}.html
 
         echo "B_Plasma_Cells\nEndothelial_Cells\nEpithelial\nFibroblast\nMyeloid\nNK_Cells\nT_Cells" > data/${params.project_name}_major_annotation.list.txt
         """
