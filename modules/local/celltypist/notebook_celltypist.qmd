@@ -210,7 +210,7 @@ The @fig-dendrogram displays the hierarchical clustering across the cell types. 
 top_genes = dict()
 
 for cell_type in adata.obs["celltypist_cell_label_coarse"].unique():
-    markers = list(model_high.extract_top_markers(cell_type, 3))
+    markers = list(model.extract_top_markers(cell_type, 3))
     for gene in markers:
         if gene in list(adata.var_names):
             top_genes.setdefault(cell_type, []).append(gene)

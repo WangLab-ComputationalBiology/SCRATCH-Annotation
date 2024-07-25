@@ -1,4 +1,4 @@
-process AZIMUTH {
+process AZIMUTH_ANNOTATION {
 
     tag "Running Azimuth annotation"
     label 'process_medium'

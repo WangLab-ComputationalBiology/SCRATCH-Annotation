@@ -30,17 +30,19 @@ workflow {
     """
 
     // Mandatory inputs
-    ch_single_object   = Channel.fromPath(input_seurat_object, checkIfExists: true)
-    ch_database        = Channel.fromPath(annotation_db, checkIfExists: true)
+    ch_single_object    = Channel.fromPath(input_seurat_object, checkIfExists: true)
+    ch_database         = Channel.fromPath(annotation_db, checkIfExists: true)
 
     // Optional inputs
     ch_cell_malignancy = Channel.fromPath(params.input_cell_mask)
+    ch_reference_object = Channel.fromPath(params.input_reference_object, checkIfExists: true)
 
     // Running subworkflows
     SCRATCH_ANNOTATION(
         ch_single_object,
         ch_cell_malignancy,
-        ch_database
+        ch_database,
+        ch_reference_object
     )
 
 }
