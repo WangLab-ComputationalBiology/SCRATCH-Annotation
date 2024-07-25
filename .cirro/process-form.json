@@ -1,106 +1,128 @@
 {
     "ui": {},
     "form": {
-        "title": "SCRATCH Annotation",
-        "type": "object",
-        "properties": {
-            "pipeline_parameters": {
-                "title": "Pipeline parameters",
-                "type": "object",
-                "properties": {
-                    "seurat_object": {
-                        "type": "string",
-                        "title": "Seurat RDS",
-                        "file": "**/*_cluster_object.RDS",
-                        "pathType": "dataset",
-                        "description": "Select the object for clustering"
-                    },
-                    "organism": {
-                        "type": "string",
-                        "title": "Organism",
-                        "default": "Human",
-                        "enum": [
-                            "Human",
-                            "Mouse"
-                        ]
-                    },
-                    "input_cell_mask_source": {
-                        "type": "string",
-                        "title": "Malignant mask",
-                        "description": "A tabular including the cell barcodes and status (e.g., Malignant/TME)",
-                        "enum": [
-                            "Not Applicable",
-                            "Custom"
-                            ],
-                        "default": "Not Applicable"
-                    }
-                },
-                "dependencies": {
-                    "input_cell_mask_source": {
-                    "oneOf": [
-                            {
-                                "properties": {
-                                    "input_cell_mask_source": {
-                                        "enum": [
-                                            "Custom"
-                                        ]
-                                    },
-                                    "input_cell_mask": {
-                                        "type": "string",
-                                        "pathType": "references",
-                                        "file": "**/data/data/**_main_cell_status.csv",
-                                        "title": "Malignant mask CSV file (optional)"
-                                    }
-                                }
-                            },
-                            {
-                            "properties": {
-                                "input_cell_mask_source": {
-                                "enum": [
-                                        "Not Applicable"
-                                        ]
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
+      "title": "SCRATCH Annotation",
+      "type": "object",
+      "properties": {
+        "pipeline_parameters": {
+          "title": "Pipeline parameters",
+          "type": "object",
+          "properties": {
+            "seurat_object": {
+              "type": "string",
+              "title": "Seurat RDS",
+              "file": "**/*_cluster_object.RDS",
+              "pathType": "dataset",
+              "description": "Select the object for clustering"
             },
-            "sctype_parameters": {
-                "title": "scType parameters",
-                "type": "object",
-                "properties": {
-                    "thr_n_features": {
-                        "type": "integer",
-                        "default": 2000,
-                        "title": "Number of features to select as top variable features"
-                    },
-                    "thr_npc": {
-                        "type": "integer",
-                        "default": 25,
-                        "title": "Number PCAs for FindNeighbors"
-                    },
-                    "thr_resolution": {
-                        "type": "number",
-                        "default": 0.50,
-                        "title": "Resolution threshold"
-                    },
-                    "skip_sctype": {
-                        "type": "boolean",
-                        "title": "Skipping scType annotation"
-                    }
-                }
+            "organism": {
+              "type": "string",
+              "title": "Organism",
+              "default": "Human",
+              "enum": [
+                "Human",
+                "Mouse"
+              ]
             },
-            "celltypist_parameters": {
-            "title": "Celltypist parameters",
-            "type": "object",
-            "properties": {
-                    "skip_celltypist": {
-                        "type": "boolean",
-                        "title": "Skipping Celltypist annotation"
-                    }
-                }
+            "input_cell_mask_source": {
+              "type": "string",
+              "title": "Malignant mask",
+              "description": "A tabular including the cell barcodes and status (e.g., Malignant/TME)",
+              "enum": [
+                "Not Applicable",
+                "Custom"
+              ],
+              "default": "Not Applicable"
             }
+          },
+          "dependencies": {
+            "input_cell_mask_source": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "input_cell_mask_source": {
+                      "enum": [
+                        "Custom"
+                      ]
+                    },
+                    "input_cell_mask": {
+                      "type": "string",
+                      "pathType": "references",
+                      "file": "**/data/data/**_main_cell_status.csv",
+                      "title": "Malignant mask CSV file (optional)"
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "input_cell_mask_source": {
+                      "enum": [
+                        "Not Applicable"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "sctype_parameters": {
+          "title": "scType parameters",
+          "type": "object",
+          "properties": {
+            "thr_n_features": {
+              "type": "integer",
+              "default": 2000,
+              "title": "Number of features to select as top variable features"
+            },
+            "thr_npc": {
+              "type": "integer",
+              "default": 25,
+              "title": "Number PCAs for FindNeighbors"
+            },
+            "thr_resolution": {
+              "type": "number",
+              "default": 0.5,
+              "title": "Resolution threshold"
+            },
+            "skip_sctype": {
+              "type": "boolean",
+              "title": "Skipping scType annotation"
+            }
+          }
+        },
+        "celltypist_parameters": {
+          "title": "Celltypist parameters",
+          "type": "object",
+          "properties": {
+            "input_cell_model": {
+              "type": "string",
+              "title": "Model",
+              "default": "Immune Cell subtype",
+              "enum": [
+                "Immune_All_Low.pkl",
+                "Immune_All_High.pkl"
+              ]
+            },
+            "skip_celltypist": {
+              "type": "boolean",
+              "title": "Skipping Celltypist annotation"
+            }
+          }
+        },
+        "azmituh_parameters": {
+          "title": "Azmith parameters",
+          "type": "object",
+          "properties": {
+            "input_reference_object": {
+              "type": "string",
+              "title": "Reference RDS",
+              "file": "**/*_reference_object.RDS",
+              "pathType": "dataset",
+              "description": "Select a reference object for Azimuth annotation"
+            }
+          }
         }
+      }    
     }
 }

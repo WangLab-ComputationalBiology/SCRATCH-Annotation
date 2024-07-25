@@ -7,5 +7,7 @@
     "thr_npc": "$.params.dataset.paramJson.sctype_parameters.thr_npc",
     "thr_resolution": "$.params.dataset.paramJson.sctype_parameters.thr_resolution",
     "skip_sctype": "$.params.dataset.paramJson.sctype_parameters.skip_sctype",
+    "input_cell_model": "$.params.dataset.paramJson.celltypist_parameters.input_cell_model",
     "skip_celltypist": "$.params.dataset.paramJson.celltypist_parameters.skip_celltypist"
+    
 }
