@@ -39,9 +39,11 @@ workflow SCRATCH_ANNOTATION {
         ch_notebook_scytpe_ag  = Channel.fromPath(params.notebook_sctype_agg, checkIfExists: true)
             .collect()
 
+        ch_notebook_azimuth    = Channel.fromPath(params.notebook_azimuth, checkIfExists: true)
+
+        // Quarto configurations
         ch_template    = Channel.fromPath(params.template, checkIfExists: true)
             .collect()
-
         ch_page_config = Channel.fromPath(params.page_config, checkIfExists: true)
             .collect()
 
@@ -124,9 +126,9 @@ workflow SCRATCH_ANNOTATION {
         }
 
         // Azimuth annotation
-        if(!params.input_cell_mask.contains("NO_FILE")) {
+        if(!params.input_reference_object.contains("NO_FILE")) {
 
-            ch_azimuth_annotation = SCYTPE_MAJOR_ANNOTATION(
+            ch_azimuth_annotation = AZIMUTH_ANNOTATION(
                 ch_notebook_azimuth,
                 ch_filtered_object,
                 ch_reference_object,
