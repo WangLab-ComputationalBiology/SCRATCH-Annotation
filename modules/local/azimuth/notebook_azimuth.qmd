@@ -25,7 +25,7 @@ lightbox:
 params:
   project_name: 'Project'
   seurat_object: 'SCRATCH-Annotation/data/Yost_main_cluster_object.RDS'
-  reference_object: 'SCRATCH-Annotation/data/tme_reference.RDS'
+  reference_object: 'SCRATCH-Annotation/data/tme_reference_object.RDS'
   n_threads: 8
   n_memory: 16
   work_directory: !expr here::here()

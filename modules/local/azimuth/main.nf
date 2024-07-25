@@ -8,7 +8,7 @@ process AZIMUTH_ANNOTATION {
     input:
         path(notebook)
         path(seurat_object)
-        path(cell_annotation_files)
+        path(reference_object)
         path(config)
 
     output:
@@ -20,12 +20,12 @@ process AZIMUTH_ANNOTATION {
         task.ext.when == null || task.ext.when
 
     script:
-        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P cell_annotation_files:'${cell_annotation_files.join(';')}' -P ${task.ext.args}" : ""
+        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P reference_object:'${reference_object}' -P ${task.ext.args}" : ""
         """
         quarto render ${notebook} ${param_file}
         """
     stub:
-        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P cell_annotation_files:'${cell_annotation_files.join(';')}' -P ${task.ext.args}" : ""
+        def param_file = task.ext.args ? "-P seurat_object:${seurat_object} -P reference_object:'${reference_object}' -P ${task.ext.args}" : ""
         """
         mkdir -p _freeze/${notebook.baseName}
         

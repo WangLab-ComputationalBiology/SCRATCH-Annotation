@@ -8,6 +8,7 @@
     "thr_resolution": "$.params.dataset.paramJson.sctype_parameters.thr_resolution",
     "skip_sctype": "$.params.dataset.paramJson.sctype_parameters.skip_sctype",
     "input_cell_model": "$.params.dataset.paramJson.celltypist_parameters.input_cell_model",
-    "skip_celltypist": "$.params.dataset.paramJson.celltypist_parameters.skip_celltypist"
-    
+    "skip_celltypist": "$.params.dataset.paramJson.celltypist_parameters.skip_celltypist",
+    "input_reference_object": "$.params.dataset.paramJson.azmituh_parameters.input_reference_object",
+    "skip_azimuth": "$.params.dataset.paramJson.azmituh_parameters.skip_azimuth"
 }
