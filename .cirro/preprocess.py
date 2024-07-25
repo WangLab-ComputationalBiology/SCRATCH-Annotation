@@ -13,6 +13,12 @@ def setup_input_parameters(ds: PreprocessDataset):
             "${baseDir}/assets/NO_FILE"
         )
 
+    if ds.params.get("input_reference_object") is None:
+        ds.add_param(
+            "input_reference_object",
+            "${baseDir}/assets/NO_FILE"
+        )
+
 if __name__ == "__main__":
 
     ds = PreprocessDataset.from_running()
