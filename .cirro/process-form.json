@@ -98,7 +98,7 @@
             "input_cell_model": {
               "type": "string",
               "title": "Model",
-              "default": "Immune Cell subtype",
+              "default": "Immune_All_Low.pkl",
               "enum": [
                 "Immune_All_Low.pkl",
                 "Immune_All_High.pkl"
