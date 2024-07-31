@@ -7,6 +7,7 @@
             "pipeline_parameters": {
                 "title": "Pipeline parameters",
                 "type": "object",
+                "required": ["seurat_object"],
                 "properties": {
                     "seurat_object": {
                         "type": "string",
