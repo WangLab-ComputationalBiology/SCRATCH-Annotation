@@ -37,6 +37,7 @@ nextflow run main.nf -profile [docker/singularity] --input_seurat_object <path/t
 - `--thr_resolution`: Threshold for resolution (default: `0.50`).
 - `--skip_celltypist`: Skip CellTypist annotation (default: `false`).
 - `--skip_sctype`: Skip scType annotation (default: `false`).
+- `-profile`: Execution profile. Use `docker` or `singularity`  depending on your containerization preference. Alternatively, you can create an HPC-aware profile for your institution.
 
 ### Example
 ```bash
@@ -44,7 +45,7 @@ nextflow run main.nf -profile docker --input_seurat_object data/Yost_main_cluste
 ```
 
 ## Configuration
-The subworkflow can be configured using the `nextflow.config` file. Modify this file to set default parameters, profiles, and other settings.
+The subworkflow can be configured using the `nextflow.config` file. Modify this file to set default parameters, profiles, and other settings. An institution profile should be created whenever running the pipeline in an HPC environment, please refer to [Step-by-step guide to writing an institutional profile](https://nf-co.re/docs/tutorials/use_nf-core_pipelines/config_institutional_profile)
 
 ## Output
 Upon successful completion, the results will be available in a directory named after your project (`<project_name>`). You can open the report in your browser:
