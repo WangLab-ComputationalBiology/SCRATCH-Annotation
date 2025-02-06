@@ -126,6 +126,9 @@ RUN python3 /opt/setup.py
 RUN Rscript -e "install.packages('devtools')"
 RUN Rscript -e "devtools::install_github('immunogenomics/presto')"
 
+# Install Azimuth
+RUN Rscript -e "devtools::install_github('satijalab/azimuth')"
+
 # Set the working directory
 WORKDIR /data
 
