@@ -16,7 +16,9 @@ option_list <- list(
   make_option(c("-m", "--metadata"), type = "character",
               help = "Metadata with cell status (TME/Malignant)", metavar = "character"),
   make_option(c("-o", "--outdir"), type = "character", default = './',
-              help = "Output directory path", metavar = "character")
+              help = "Output directory path", metavar = "character"),
+  make_option(c("-s", "--subset"), action = "store_true", default = FALSE,
+       help = "Whether to save a subset of the original object")
 )
 
 opt_parser <- OptionParser(option_list = option_list)
@@ -42,11 +44,11 @@ seurat_object <- Seurat::AddMetaData(
   seurat_object, metadata = metadata
   )
 
+if (opt$subset) {
 seurat_object <- subset(
   seurat_object, subset = cell_status == "TME"
 )
-
-#
+}
 
 saveRDS(
   seurat_object, file = file.path(opt$outdir, gsub(".RDS", "_filtered.RDS", basename(opt$file))))

@@ -18,7 +18,7 @@ process HELPER_SEURAT_SUBSET {
 
     script:
         """
-        seurat_subset.R -f ${seurat_object} -m ${cell_malignancy}
+        seurat_append_and_subset.R -f ${seurat_object} -m ${cell_malignancy} --subset
         """
     stub:
         """
