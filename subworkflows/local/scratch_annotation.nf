@@ -7,6 +7,7 @@ include { CELLTYPIST_ANNOTATION                                } from '../../mod
 include { SCYTPE_MAJOR_ANNOTATION                              } from '../../modules/local/sctype/major/main.nf'
 include { SCYTPE_STATE_ANNOTATION                              } from '../../modules/local/sctype/state/main.nf'
 include { SCYTPE_AGGREGATE_ANNOTATION                          } from '../../modules/local/sctype/aggregate/main.nf'
+include { AZIMUTH_ANNOTATION                                   } from '../../modules/local/azimuth/main.nf'
 include { HELPER_SCEASY_CONVERTER as SCEASY_CONVERTER_TWO      } from '../../modules/local/helpers/convert/main.nf'
 
 // include { METATIME_ANNOTATION       } from '../../modules/local/sctype/state/main.nf'
@@ -25,6 +26,7 @@ workflow SCRATCH_ANNOTATION {
         ch_single_object    // channel: []
         ch_cell_malignancy  // channel: []
         ch_database         // channel: []
+        ch_reference_object // channel: []
 
     main:
 
@@ -37,9 +39,11 @@ workflow SCRATCH_ANNOTATION {
         ch_notebook_scytpe_ag  = Channel.fromPath(params.notebook_sctype_agg, checkIfExists: true)
             .collect()
 
+        ch_notebook_azimuth    = Channel.fromPath(params.notebook_azimuth, checkIfExists: true)
+
+        // Quarto configurations
         ch_template    = Channel.fromPath(params.template, checkIfExists: true)
             .collect()
-
         ch_page_config = Channel.fromPath(params.page_config, checkIfExists: true)
             .collect()
 
@@ -120,7 +124,19 @@ workflow SCRATCH_ANNOTATION {
             )
 
         }
-        
+
+        // Azimuth annotation
+        if(!params.input_reference_object.contains("NO_FILE")) {
+
+            ch_azimuth_annotation = AZIMUTH_ANNOTATION(
+                ch_notebook_azimuth,
+                ch_filtered_object,
+                ch_reference_object,
+                ch_page_config
+            )
+
+        }
+
     emit:
         ch_dumps = Channel.empty()
 

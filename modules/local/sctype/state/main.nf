@@ -3,7 +3,10 @@ process SCYTPE_STATE_ANNOTATION {
     tag "Running scType annotation - ${cell_population} subsets/states"
     label 'process_medium'
 
-    container 'oandrefonseca/scratch-annotation:main'
+    // container 'oandrefonseca/scratch-annotation:main'
+    // container '/home/sazaidi/Softwares/SCRATCH-Annotation-dev/scratch-annotation.sif'
+    container 'syedsazaidi/scratch-annotation:latest'
+    
 
     input:
         path(notebook)

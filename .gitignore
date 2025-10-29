@@ -1,39 +1,12 @@
-# Nextflow
+alpine-quarto_1.6.43.sif
+.DS_Store
+.Rhistory
 .nextflow*
 work/
-.DS_Store
-testing/
-testing*
-
-# Test
-Project/
-data/
+results/
 figures/
-output/
-TODO.md
-
-# Data
-*.h5ad
 *.RDS
-*.sqlite
-*.pt
-
-# Quarto
-notebook_*_files/
-notebook_*_cache/
-notebook_*.html
-_freeze/*
-report/*
-tmp/
-
-
-# Jupyter Notebook
-.ipynb_checkpoints
-.jupyter_cache/
-*.pyc
-*.ipynb
-
-# R environments
-.Rproj.user
-.Rproj
-.Rhistory
+*.rds
+*.zip
+*.tar.gz
+*.sif

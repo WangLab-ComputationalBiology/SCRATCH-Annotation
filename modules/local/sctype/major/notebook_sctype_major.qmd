@@ -87,6 +87,7 @@ library(ggplot2)
 library(Seurat)
 library(HGNChelper)
 library(future)
+library(SCP)
 
 # Setting plan and memory limit
 options(future.globals.maxSize = n_memory*1024^3)

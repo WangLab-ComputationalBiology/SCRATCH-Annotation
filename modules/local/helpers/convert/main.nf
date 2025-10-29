@@ -3,7 +3,11 @@ process HELPER_SCEASY_CONVERTER {
     tag "Converting ${seurat_object.baseName} to AnnData"
     label 'process_medium'
 
-    container 'oandrefonseca/scratch-annotation:main'
+    // container 'oandrefonseca/scratch-annotation:main'
+    // container '/home/sazaidi/Softwares/SCRATCH-Annotation-dev/scratch-annotation.sif'
+    // container 'oandrefonseca-scratch-annotation-main.sif'
+    container 'syedsazaidi/scratch-annotation:latest'
+    
     publishDir "${params.outdir}/data/${task.process}", mode: 'copy', overwrite: true
 
     input:

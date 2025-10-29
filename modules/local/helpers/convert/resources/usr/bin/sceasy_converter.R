@@ -4,6 +4,15 @@ library(Seurat)
 library(dplyr)
 library(sceasy)
 library(optparse)
+library(SingleCellExperiment)
+# library(reticulate)
+use_python("/opt/venv/bin/python", required = TRUE)
+# use_python("python3", required = TRUE)
+# use_python("/usr/bin/python3", required = TRUE)
+# reticulate::use_python("~/scratch_pyenv/bin/python", required = TRUE)
+#Sys.setenv(KMP_DUPLICATE_LIB_OK = "TRUE")
+
+#
 
 #Sys.setenv(KMP_DUPLICATE_LIB_OK = "TRUE")
 
@@ -33,14 +42,14 @@ print(opt)
 #
 
 if(opt$type == "Seurat") {
-
+  
   seurat_object <- readRDS(file = opt$file)
   sce_object <- as.SingleCellExperiment(
     seurat_object)
   
   output <- file.path(opt$outdir, gsub(".RDS", ".h5ad", basename(opt$file)))
-
+  
   convertFormat(sce_object, from = "sce", to = "anndata",
                 outFile = output)
-
+  
 }

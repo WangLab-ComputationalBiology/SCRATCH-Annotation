@@ -3,7 +3,11 @@ process CELLTYPIST_ANNOTATION {
     tag "Running Celltypist annotation"
     label 'process_medium'
 
-    container 'oandrefonseca/scratch-annotation:main'
+    // container 'oandrefonseca/scratch-annotation:main'
+    // container 'syedsazaidi/scratch-annotation:v1.0'
+    // container '/home/sazaidi/Softwares/SCRATCH-Annotation-dev/scratch-annotation.sif'
+    container 'syedsazaidi/scratch-annotation:latest'
+    
     publishDir "${params.outdir}/${params.project_name}", mode: 'copy', overwrite: true
 
     input:

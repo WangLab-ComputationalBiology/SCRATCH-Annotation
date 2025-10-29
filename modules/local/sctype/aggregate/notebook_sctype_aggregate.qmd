@@ -99,7 +99,7 @@ for(sub_directory in c('data', 'figures')) {
 
 # Reading seurat object
 seurat_object <- readRDS(file = seurat_object)
-
+# seurat_object = project_major_annotation_object
 # Setting random seed
 random_seed <- 2203
 set.seed(random_seed)
@@ -112,6 +112,7 @@ set.seed(random_seed)
 #| output: false
 
 # Read and combine all data files into a single data frame
+# cell_annotation_files_aggregate = "../major/../../../../data-Final/SCRATCH_ANNOTATION:SCYTPE_MAJOR_ANNOTATION/data/project_major_annotation.csv"
 cell_annotation_files_aggregate <- purrr::map_df(
     cell_annotation_files, read_csv
   )
@@ -181,13 +182,21 @@ The @fig-sctype-final displays the final annotation after the hierarchical appro
 ```{r annotation_tree}
 #| warning: false
 
-# Aggregate data by annotations
+# # Aggregate data by annotations
+# cell_average <- AverageExpression(
+#   seurat_object,
+#   assay = 'RNA',
+#   slot = 'scale.data',
+#   return.seurat = FALSE,
+#   group.by = "scytpe_subset")
+# Aggregate data by annotations (Seurat 5 syntax)
 cell_average <- AverageExpression(
-  seurat_object, 
-  assay = 'RNA',
-  slot = 'scale.data',
-  return.seurat = FALSE, 
-  group.by = "scytpe_subset")
+  seurat_object,
+  assay        = 'RNA',
+  layer        = 'scale.data',    # use `layer`
+  return.seurat = FALSE,
+  group.by     = "scytpe_subset")
+
 
 cell_average <- cell_average$RNA
 

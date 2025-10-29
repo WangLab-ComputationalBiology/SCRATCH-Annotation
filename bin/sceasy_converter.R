@@ -4,7 +4,11 @@ library(Seurat)
 library(dplyr)
 library(sceasy)
 library(optparse)
-
+library(SingleCellExperiment)
+library(reticulate)
+use_python("/opt/venv/bin/python", required = TRUE)
+# use_python("python", required = TRUE)
+# reticulate::use_python("~/scratch_pyenv/bin/python", required = TRUE)
 #Sys.setenv(KMP_DUPLICATE_LIB_OK = "TRUE")
 
 #
