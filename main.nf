@@ -1,7 +1,6 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl = 2
 
-// include { SCRATCH_ANNOTATION } from './subworkflows/local/scratch_annotation.nf'
 include { SCRATCH_ANNOTATION } from './subworkflows/local/scratch_annotation.nf' 
 
 
