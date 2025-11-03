@@ -3,9 +3,6 @@ process SCYTPE_MAJOR_ANNOTATION {
     tag "Running scType annotation - Major cells"
     label 'process_medium'
 
-    // container 'oandrefonseca/scratch-annotation:main'
-    // container 'syedsazaidi/scratch-annotation:v1.0'
-    // container '/home/sazaidi/Softwares/SCRATCH-Annotation-dev/scratch-annotation.sif'
     container 'syedsazaidi/scratch-annotation:latest'
 
     input:
