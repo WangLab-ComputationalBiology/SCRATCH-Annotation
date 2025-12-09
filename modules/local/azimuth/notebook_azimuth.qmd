@@ -28,7 +28,7 @@ params:
   reference_object: 'SCRATCH-Annotation/assets/ref.Rds'
   n_threads: 8
   n_memory: 16
-  work_directory: !expr here::here()
+  work_directory: "." 
   auto_save: TRUE
 ---
 
@@ -39,6 +39,7 @@ params:
 project_name <- params$project_name
 seurat_object <- params$seurat_object
 reference_object <- params$reference_object
+work_directory <- if (!is.null(params$work_directory)) params$work_directory else "."
   
 # Optional parameters
 
@@ -101,6 +102,24 @@ seurat_object <- readRDS(file = seurat_object)
 
 # Reading reference object
 reference_object <- readRDS(file = reference_object)
+
+# Ensure reference has a 'seurat_annotation' column
+meta_cols <- colnames(reference_object@meta.data)
+
+if (!"seurat_annotation" %in% meta_cols) {
+  if ("seurat_annotations" %in% meta_cols) {
+    # create an alias so downstream code works unchanged
+    reference_object$seurat_annotation <- reference_object$seurat_annotations
+  } else {
+    stop(
+      "Reference object has no 'seurat_annotation' or 'seurat_annotations' column. ",
+      "Available metadata columns are: ",
+      paste(meta_cols, collapse = ", ")
+    )
+  }
+}
+
+
 
 # Setting random seed
 random_seed <- 2203
