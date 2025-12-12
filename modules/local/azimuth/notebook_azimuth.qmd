@@ -95,7 +95,7 @@ for(sub_directory in c('data', 'figures')) {
 ```
 ## Loading Seurat object
 
-```{r}
+```{r LoadingDta}
 
 # Reading seurat object
 seurat_object <- readRDS(file = seurat_object)
@@ -126,10 +126,9 @@ random_seed <- 2203
 set.seed(random_seed)
 
 ```
-
 ## Projecting annotation
 
-```{r}
+```{r Anchors}
 #| output: false
 
 # find anchors
@@ -138,14 +137,14 @@ anchors <- FindTransferAnchors(reference = reference_object, query = seurat_obje
 # transfer labels
 predictions <- TransferData(
   anchorset = anchors,
-  refdata = reference_object$seurat_annotation
+  refdata = reference_object$seurat_annotations
 )
 
 ```
 
 ## Adding metadata
 
-```{r}
+```{r RenamingAnnotation}
 
 # Renaming annotation column
 predictions <- predictions %>%
@@ -162,7 +161,7 @@ seurat_object <- AddMetaData(
 
 ## Data Visualization
 
-```{r annotation_umap}
+```{r AnnotationUMAP}
 #| label: fig-azimuth-annot
 #| fig-cap: 'UMAP'
 #| fig-width: 15
@@ -185,11 +184,8 @@ SCP::CellDimPlot(
 
 ```
 
-:::{.callout-tip}
-The @fig-azimuth-annot displays the final annotation after the hierarchical approach. Major cell types are shown when not further informantion is available on the cell annotation database.
-:::
 
-```{r}
+```{r CellDimPlot}
 
 SCP::CellDimPlot(
   srt = seurat_object, 
@@ -208,9 +204,8 @@ SCP::CellDimPlot(
 
 ```
 
-## Quality metrics
 
-```{r}
+```{r FeatureDimPlot}
 
 # ClusterPreservationScore
 
@@ -228,7 +223,7 @@ SCP::FeatureDimPlot(
 ```
 
 
-```{r}
+```{r Assay}
 
 #
 
@@ -263,9 +258,6 @@ ht <- SCP::FeatureStatPlot(
 print(ht)
 dev.off()
 
-
-
-
 ```
 
 ## Azimuth dendrogram
@@ -275,7 +267,7 @@ dev.off()
 
 # Aggregate data by annotations
 cell_average <- AverageExpression(
-  seurat_object, 
+  seurat_v4, 
   assay = 'RNA',
   layer = 'scale.data',
   return.seurat = FALSE, 
@@ -296,8 +288,7 @@ cell_hierarchical <- stats::hclust(cell_dist_matrix)
 
 ```
 
-```{r}
-#| label: fig-dendrogram-final
+```{r figDendrogram}
 #| fig-cap: 'Dendrogram'
 #| fig-width: 10
 #| fig-height: 12
@@ -309,228 +300,178 @@ plot(cell_hierarchical, main = "Dendrogram", xlab = "Index", ylab = "Height", ha
 
 ```
 
-:::{.callout-tip}
-[Beta] The @fig-dendrogram-final displays the hierarchical clustering across the cell types based on average normalized expression from `scale.data`. The average expression per cell population is correlated based on Pearson. Therefore, correlated cells should display closet distances, i.e., clustering into near branches.
-:::
+```{r DE1}
+message(">>> [DE] sanity checks at: ", Sys.time())
 
-## Differential expression
+if (!exists("seurat_v4")) {
+stop(">>> [DE] ERROR: object 'seurat_v4' not found. Did the previous chunk defining it run?")
+}
 
-```{r}
+message("Object size (seurat_v4): ", format(object.size(seurat_v4), units = "GB"))
+message("Number of cells: ", ncol(seurat_v4))
+message("Number of genes: ", nrow(seurat_v4))
+message("Meta.data columns: ", paste(colnames(seurat_v4@meta.data), collapse = ", "))
 
-pancreas_sub <- SCP::RunDEtest(
-  srt = seurat_v4, 
-  group_by = "seurat_clusters", 
-  fc.threshold = 1, only.pos = FALSE)
+if (!"azimuth_labels" %in% colnames(seurat_v4@meta.data)) {
+stop(
+">>> [DE] ERROR: column 'azimuth_labels' not found in meta.data. ",
+"Available columns: ", paste(colnames(seurat_v4@meta.data), collapse = ", ")
+)
+}
+
+
 
 ```
 
-```{r}
 
-DEGs <- pancreas_sub@tools$DEtest_seurat_clusters$AllMarkers_wilcox
-DEGs <- DEGs[with(DEGs, avg_log2FC > 1 & p_val_adj < 0.05), ]
+```{r FindAllMarkers}
+message(">>> [DE] running FindAllMarkers for azimuth_labels at: ", Sys.time())
 
-
-
-#pancreas_sub <- RunDEtest(
-#  srt = pancreas_sub, 
-#  group_by = "azimuth_labels", 
-#  fc.threshold = 1, 
-#  only.pos = FALSE)
-
-# BiocParallel::register(BiocParallel::SerialParam())
-
-
-
-pancreas_sub <- RunDEtest(
-  srt = pancreas_sub, 
-  group_by = "azimuth_labels", 
-  fc.threshold = 1, 
-  only.pos = FALSE,
-  BPPARAM     = BiocParallel::SerialParam())
-  
-           
-# Annotate features with transcription factors and surface proteins
-# pancreas_sub <- SCP::AnnotateFeatures(pancreas_sub, species = "Homo_sapiens", db = c("TF", "CSPA"))
-
-
-# Now annotate:
-pancreas_sub <- SCP::AnnotateFeatures(
-  srt     = pancreas_sub,
-  species = "Homo_sapiens",
-  db      = c("TF","CSPA"),
-  db_update = FALSE
-)
-
-
-ht <- SCP::FeatureHeatmap(
-  srt = pancreas_sub, 
-  group.by = "azimuth_labels", 
-  features = DEGs$gene, 
-  feature_split = DEGs$group1,
-  species = "Homo_sapiens", 
-  db = c("GO_BP", "KEGG", "WikiPathway"), 
-  anno_terms = TRUE,
-  feature_annotation = c("TF", "CSPA"), 
-  feature_annotation_palcolor = list(c("gold", "steelblue"), c("forestgreen")),
-  height = 5, width = 1
-)
-print(ht$plot)
-
-# Create output directory if it doesn't exist
-dir.create(file.path("..", "data", "SCRATCH_ANNOTATION", "AZIMUTH_ANNOTATION", "figures"), showWarnings = FALSE, recursive = TRUE)
-
-# Define heatmap file path
-#heatmap_path <- file.path("../data/SCRATCH_ANNOTATION*AZIMUTH_ANNOTATION", "figures", paste0(project_name, "_pathway_heatmap.pdf"))
-heatmap_path <- file.path("..", "data", "SCRATCH_ANNOTATION", "AZIMUTH_ANNOTATION", "figures", paste0(project_name, "_pathway_heatmap.pdf"))
-
-# Save heatmap
-pdf(heatmap_path, width = 18, height = 8)
-print(ht$plot)
-dev.off()
-
-# Include in report
-#knitr::include_graphics(heatmap_path)
-
-```
-
-```{r Enrichment plots}
-pancreas_sub <- RunEnrichment(
-  srt = pancreas_sub, group_by = "azimuth_labels", db = "GO_BP", species = "Homo_sapiens",
-  DE_threshold = "avg_log2FC > log2(1.5) & p_val_adj < 0.05"
-)
-EnrichmentPlot(
-  srt = pancreas_sub, group_by = "azimuth_labels", group_use = c("Epithelial", "T cell", "B cell"),
-  plot_type = "bar"
-)
-library(patchwork)
-
-# your three single‐group bar‐plots
-p_tcell <- EnrichmentPlot(
-  srt       = pancreas_sub,
-  group_by  = "azimuth_labels",
-  group_use = "T cell",
-  plot_type = "bar"
-) + coord_flip() + labs(title = "T cell")
-
-p_bcell <- EnrichmentPlot(
-  srt       = pancreas_sub,
-  group_by  = "azimuth_labels",
-  group_use = "B cell",
-  plot_type = "bar"
-) + coord_flip() + labs(title = "B cell")
-
-p_epi <- EnrichmentPlot(
-  srt       = pancreas_sub,
-  group_by  = "azimuth_labels",
-  group_use = "Epithelial",
-  plot_type = "bar"
-) + coord_flip() + labs(title = "Epithelial")
-
-# a little spacer
-spacer <- plot_spacer()
-
-combined <- (p_tcell | p_bcell | spacer) /
-            (p_epi   |spacer   |  spacer) +
-  plot_layout(
-    heights = c(1, 1),   # equal height for top and bottom rows
-    widths  = c(1, 1, 1)  # three equal columns
-  ) & 
-  theme_minimal(base_size = 14) & 
-  theme(
-    axis.title.y      = element_blank(),
-    panel.grid.major  = element_blank(),
-    plot.title        = element_text(hjust = 0.5)
-  )
-
-print(combined)
-
-
-EnrichmentPlot(
-  srt = pancreas_sub, group_by = "azimuth_labels", group_use = "Epithelial",
-  plot_type = "network"
-)
-
-EnrichmentPlot(
-  srt = pancreas_sub, group_by = "azimuth_labels", group_use = "Epithelial",
-  plot_type = "enrichmap"
-)
-
-```
-```{r}
-
-seurat_annotation <- seurat_object
+seurat_annotation <- seurat_v4
 Idents(seurat_annotation) <- "azimuth_labels"
 
-all_markers <- FindAllMarkers(
-  object = seurat_annotation,
-  only.pos = FALSE, 
-  test.use = 'wilcox',
-  logfc.threshold = 0.25,
-  random.seed = random_seed,
-  min.pct = 0.1
+all_markers_azimuth <- tryCatch(
+{
+FindAllMarkers(
+object = seurat_annotation,
+assay = "RNA",
+only.pos = FALSE,
+test.use = "wilcox",
+logfc.threshold = 0.25,
+min.pct = 0.1
+)
+},
+error = function(e) {
+message(">>> [DE] FindAllMarkers ERROR: ", conditionMessage(e))
+return(NULL)
+}
 )
 
+if (is.null(all_markers_azimuth)) {
+message(">>> [DE] FindAllMarkers returned NULL; downstream DE plots will be skipped.")
+} else {
+message(">>> [DE] Total markers (azimuth_labels): ", nrow(all_markers_azimuth))
+
+
+
+saveRDS(
+all_markers_azimuth,
+file = file.path("data", paste0(project_name, "_DE_azimuth_all.rds"))
+)
+
+DE_azimuth_sig <- subset(
+all_markers_azimuth,
+avg_log2FC > 1 & p_val_adj < 0.05
+)
+message(">>> [DE] Significant markers (log2FC > 1 & padj < 0.05): ", nrow(DE_azimuth_sig))
+
+saveRDS(
+DE_azimuth_sig,
+file = file.path("data", paste0(project_name, "_DE_azimuth_sig.rds"))
+)
+}
 ```
 
-```{r}
+```{r MarkerBasedVisualization}
+if (exists("all_markers_azimuth") &&
+is.data.frame(all_markers_azimuth) &&
+nrow(all_markers_azimuth) > 0) {
 
-top_markers <- all_markers %>%
-  group_by(cluster) %>%
-  top_n(5, avg_log2FC)
+top_markers <- all_markers_azimuth %>%
+dplyr::group_by(cluster) %>%  # 'cluster' here is azimuth_labels
+dplyr::slice_max(order_by = avg_log2FC, n = 5, with_ties = FALSE)
 
-table(top_markers$cluster)
-table(top_markers$gene)
+message("Top markers per azimuth label:")
+print(table(top_markers$cluster))
 
-```
+message("Number of unique top marker genes:")
+print(length(unique(top_markers$gene)))
+} else {
+message(">>> [DE_top_markers_summary] No markers available; skipping summary.")
+}
 
-```{r}
+if (exists("DE_azimuth_sig") &&
+is.data.frame(DE_azimuth_sig) &&
+nrow(DE_azimuth_sig) > 0) {
+
+message(">>> [DE_azimuth_heatmap] building heatmap")
+
+top_markers_heat <- DE_azimuth_sig %>%
+dplyr::group_by(cluster) %>% # 'cluster' = azimuth_labels
+dplyr::slice_max(order_by = avg_log2FC, n = 10, with_ties = FALSE)
+
+DoHeatmap(
+object = seurat_annotation,
+features = unique(top_markers_heat$gene),
+group.by = "azimuth_labels"
+) +
+scale_fill_viridis_c(option = "B") +
+theme(
+axis.text.x = element_text(
+angle = 90,
+vjust = 0.5,
+hjust = 1,
+size = 6
+),
+axis.text.y = element_text(size = 6)
+)
+} else {
+message(">>> [DE_azimuth_heatmap] No significant DE markers; skipping heatmap.")
+}
+
+if (exists("all_markers_azimuth") &&
+is.data.frame(all_markers_azimuth) &&
+nrow(all_markers_azimuth) > 0) {
+
+message(">>> [DE_azimuth_dotplot] building DotPlot")
+
+top_markers_dot <- all_markers_azimuth %>%
+dplyr::group_by(cluster) %>%
+dplyr::slice_max(order_by = avg_log2FC, n = 5, with_ties = FALSE)
 
 DotPlot(
-  seurat_annotation,
-  features = top_markers$gene
+seurat_annotation,
+features = unique(top_markers_dot$gene),
+group.by = "azimuth_labels"
 ) +
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1, size = 6)
-  )
-  
-  
+RotatedAxis() +
+theme(
+axis.text.x = element_text(size = 6),
+axis.text.y = element_text(size = 6)
+)
+} else {
+message(">>> [DE_azimuth_dotplot] No markers table available; skipping DotPlot.")
+}
+
 ```
 
-## Cell composition
-
-```{r barplot_composition}
-#| label: fig-bar-composition
-#| fig-cap: 'Barplot'
+```{r CellComposition}
+#| fig-cap: 'Cell composition by Azimuth labels and Seurat clusters'
 #| fig-width: 18
 #| fig-height: 10
 #| fig-align: center
 
-# Boxplot
 SCP::CellStatPlot(
-  seurat_object,
-  stat.by = "seurat_clusters", 
-  group.by = "azimuth_labels", 
-  label = TRUE
+seurat_object,
+stat.by  = "seurat_clusters",
+group.by = "azimuth_labels",
+label    = TRUE
 )
 
 ```
 
-:::{.callout-tip}
-The @fig-bar-composition provides an overall view of cell composition across distinct clusters on the dataset.
-:::
-
-## Saving Seurat object
-
-```{r object_dump}
+```{r Savinf AzumuthAnnotaitonObject}
 #| cache: false
 
-if(auto_save) {
-
-  saveRDS(seurat_object, file = paste0("data/", project_name, "_Azimuth_annotation_object.RDS"))
-
+if (isTRUE(auto_save)) {
+saveRDS(
+seurat_object,
+file = file.path("data", paste0(project_name, "_Azimuth_annotation_object.RDS"))
+)
 }
 
 ```
+
 
 ## Parameters log
 
