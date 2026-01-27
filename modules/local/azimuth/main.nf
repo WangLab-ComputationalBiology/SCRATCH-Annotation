@@ -16,6 +16,7 @@ process AZIMUTH_ANNOTATION {
         path("_freeze/${notebook.baseName}")                          , emit: cache
         path("data/${params.project_name}_Azimuth_annotation_object.RDS")   , emit: seurat_rds
         path("report/${notebook.baseName}.html")                      , emit: html
+        path ("figures/**")                                              , emit: figures
 
     when:
         task.ext.when == null || task.ext.when
