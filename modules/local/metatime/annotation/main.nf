@@ -3,8 +3,6 @@ process METATIME_ANNOTATION {
     tag ""
     label 'process_medium'
 
-    // container 'oandrefonseca/scratch-annotation:main'
-    // container '/home/sazaidi/Softwares/SCRATCH-Annotation-dev/scratch-annotation.sif'
     container 'syedsazaidi/scratch-annotation:latest'
 
     input:
