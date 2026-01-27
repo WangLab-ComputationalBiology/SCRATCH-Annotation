@@ -16,6 +16,7 @@ process SCYTPE_AGGREGATE_ANNOTATION {
         path("_freeze/${notebook_aggregate.baseName}")                          , emit: cache
         path("data/${params.project_name}_sctype_agg_annotation_object.RDS")   , emit: seurat_rds
         path("report/${notebook_aggregate.baseName}.html")                      , emit: html
+        path("figures/**")                                                      , emit: figures
 
     when:
         task.ext.when == null || task.ext.when
