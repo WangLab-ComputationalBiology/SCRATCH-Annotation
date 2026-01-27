@@ -5,6 +5,7 @@ description: |
 execute:
   freeze: auto
   cache: false
+  fig-path: figures/
 format:
   html:
     toc: true
@@ -69,11 +70,28 @@ work_directory <- params$work_directory
 timestamp <- params$timestamp
 auto_save <- params$auto_save
 
+
+if(!dir.exists(work_directory)) {
+  dir.create(work_directory, recursive = T)
+}
+
+# for(sub_directory in c('data', 'figures')) {
+#   dir.create(paste0(work_directory, '/', sub_directory))
+# }
+dir.create(file.path(work_directory, "figures"), recursive = TRUE, showWarnings = FALSE)
+dir.create(file.path(work_directory, "data"), recursive = TRUE, showWarnings = FALSE)
+
+
 # Rmarkdown options
 knitr::opts_knit$set(
   root.dir = work_directory
   )
 
+knitr::opts_chunk$set(
+  fig.path = "figures/",
+  dev = "png",
+  dpi = 300
+)
 ```
 
 :::{.callout-important collapse="true"}
@@ -212,18 +230,7 @@ sctype_score <- function(scRNAseqData, scaled = !0, gs, gs2 = NULL, gene_names_t
 
 ## Folder structure
 
-```{r project_directory}
-#| output: false
 
-if(!dir.exists(work_directory)) {
-  dir.create(work_directory, recursive = T)
-}
-
-for(sub_directory in c('data', 'figures')) {
-  dir.create(paste0(work_directory, '/', sub_directory))
-}
-
-```
 
 ## Loading Seurat object
 
@@ -454,7 +461,7 @@ DT::datatable(
 #| fig-height: 10
 #| fig-align: center
 
-SCP::CellDimPlot(
+p <- SCP::CellDimPlot(
   srt = seurat_object, 
   group.by = "sctype",
   reduction = "umap",
@@ -466,7 +473,7 @@ SCP::CellDimPlot(
   theme(
     legend.position = "bottom"
   )
-
+print(p)
 ```
 
 :::{.callout-tip}
@@ -504,7 +511,7 @@ colnames(seurat_object@meta.data) <-
 #| fig-height: 12
 #| fig-align: center
 
-FeaturePlot(
+fp <- FeaturePlot(
   object = seurat_object,
   features = names(non_malignant_markers),
   label = TRUE,
@@ -512,6 +519,7 @@ FeaturePlot(
   min.cutoff = 'q1'
 )
 
+print (fp)
 ```
 
 :::{.callout-tip}
@@ -526,12 +534,13 @@ The @fig-feat-markers represents a 'FeaturePlot' which allows coloring the cells
 #| fig-height: 20
 #| fig-align: center
 
-VlnPlot(
+vp <- VlnPlot(
   object = seurat_object,
   ncol = 2,
   features = unique(seurat_object$sctype)
 )
 
+print (vp)
 ```
 
 :::{.callout-tip}
@@ -556,7 +565,7 @@ annot_dotplot <- DotPlot(seurat_object, features = non_malignant_markers_list, g
     legend.position = 'top'
   )
 
-annot_dotplot
+print (annot_dotplot)
 
 ```
 
@@ -639,13 +648,14 @@ seurat_cluster_composition <- seurat_cluster_composition %>%
 #| fig-align: center
 
 # Boxplot
-SCP::CellStatPlot(
+csp <- SCP::CellStatPlot(
   seurat_object,
   stat.by = "patient_id", 
   group.by = "sctype", 
   label = TRUE
 )
 
+print (csp)
 ```
 
 :::{.callout-tip}
