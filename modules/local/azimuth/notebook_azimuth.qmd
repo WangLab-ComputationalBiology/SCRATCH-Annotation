@@ -5,6 +5,7 @@ description: |
 execute:
   freeze: auto
   cache: false
+  fig-path: figures/
 format:
   html:
     toc: true
@@ -56,6 +57,11 @@ knitr::opts_knit$set(
   root.dir = work_directory
   )
 
+knitr::opts_chunk$set(
+  fig.path = "figures/",
+  dev = "png",
+  dpi = 300
+)
 ```
 
 :::{.callout-important collapse="true"}
@@ -162,64 +168,67 @@ seurat_object <- AddMetaData(
 ## Data Visualization
 
 ```{r AnnotationUMAP}
-#| label: fig-azimuth-annot
-#| fig-cap: 'UMAP'
-#| fig-width: 15
-#| fig-height: 10
-#| fig-align: center
-#| layout-nrow: 2
+#| label: fig-azimuth-annotation-umap
+#| fig-cap: "Azimuth annotation UMAP"
+#| fig-width: 12
+#| fig-height: 9
 
-SCP::CellDimPlot(
-  srt = seurat_object, 
+annotation_UMAP <- SCP::CellDimPlot(
+  srt = seurat_object,
   group.by = "azimuth_labels",
   reduction = "umap",
-  label = TRUE, 
+  label = TRUE,
   label_repel = TRUE,
   show_stat = TRUE,
   theme_use = "theme_blank"
 ) +
-  theme(
-    legend.position = "right"
-  )
+  theme(legend.position = "right")
+
+annotation_UMAP 
 
 ```
 
 
 ```{r CellDimPlot}
+#| label: fig-azimuth-celldimplot-split
+#| fig-cap: "Azimuth split UMAP (one panel per label)"
+#| fig-width: 14
+#| fig-height: 9
 
-SCP::CellDimPlot(
-  srt = seurat_object, 
+p_split <- SCP::CellDimPlot(
+  srt = seurat_object,
   group.by = "azimuth_labels",
   split.by = "azimuth_labels",
   reduction = "umap",
-  label = FALSE, 
+  label = FALSE,
   label_repel = FALSE,
   show_stat = TRUE,
   legend.position = "none",
   theme_use = "theme_blank"
 ) +
-  theme(
-    legend.position = "right"
-  )
+  theme(legend.position = "right")
 
+p_split
 ```
 
 
 ```{r FeatureDimPlot}
+#| label: fig-azimuth-featuredimplot-predscore
+#| fig-cap: "Azimuth mapping score (prediction.score.max)"
+#| fig-width: 12
+#| fig-height: 9
 
-# ClusterPreservationScore
-
-# MappingScore
-SCP::FeatureDimPlot(
-  srt = seurat_object, 
+p_score <- SCP::FeatureDimPlot(
+  srt = seurat_object,
   features = "prediction.score.max",
   reduction = "umap",
-  label = FALSE, 
+  label = FALSE,
   label_repel = FALSE,
   show_stat = TRUE,
   theme_use = "theme_blank"
-) 
+)
 
+p_score 
 ```
 
 
@@ -295,8 +304,10 @@ cell_hierarchical <- stats::hclust(cell_dist_matrix)
 #| fig-align: center
 
 # Printing dendrogram
-
-plot(cell_hierarchical, main = "Dendrogram", xlab = "Index", ylab = "Height", hang = -1)
+Cairo::CairoPNG(filename = "figures/FigDendogram.png", width = 1800, height = 1400, res = 300)
+FigDendogram.png <- plot(cell_hierarchical, main = "Dendrogram", xlab = "Index", ylab = "Height", hang = -1)
+print(FigDendogram.png)
+dev.off()
 
 ```
 
@@ -371,6 +382,126 @@ file = file.path("data", paste0(project_name, "_DE_azimuth_sig.rds"))
 )
 }
 ```
+
+```{r azimuth_de_tables}
+#| message: true
+
+if (exists("all_markers_azimuth") &&
+    is.data.frame(all_markers_azimuth) &&
+    nrow(all_markers_azimuth) > 0) {
+
+  top_markers <- all_markers_azimuth %>%
+    dplyr::group_by(cluster) %>%
+    dplyr::slice_max(order_by = avg_log2FC, n = 5, with_ties = FALSE) %>%
+    dplyr::ungroup()
+
+  # Save tables
+  readr::write_csv(top_markers, file.path("data", paste0(project_name, "_azimuth_top_markers_fc.csv")))
+  saveRDS(top_markers, file.path("data", paste0(project_name, "_azimuth_top_markers_fc.rds")))
+
+  message("Top markers per azimuth label:")
+  print(table(top_markers$cluster))
+
+  message("Number of unique top marker genes:")
+  print(length(unique(top_markers$gene)))
+
+  # Print a preview in HTML
+  print(utils::head(top_markers, 20))
+
+} else {
+  message(">>> [DE_top_markers_summary] No markers available; skipping.")
+}
+
+if (exists("DE_azimuth_sig") &&
+    is.data.frame(DE_azimuth_sig) &&
+    nrow(DE_azimuth_sig) > 0) {
+
+  top_markers_heat <- DE_azimuth_sig %>%
+    dplyr::group_by(cluster) %>%
+    dplyr::slice_max(order_by = avg_log2FC, n = 10, with_ties = FALSE) %>%
+    dplyr::ungroup()
+
+  # Save tables
+  readr::write_csv(top_markers_heat, file.path("data", paste0(project_name, "_azimuth_sig_top10_fc.csv")))
+  saveRDS(top_markers_heat, file.path("data", paste0(project_name, "_azimuth_sig_top10_fc.rds")))
+
+  message("Saved top markers for heatmap: ", nrow(top_markers_heat))
+
+} else {
+  message(">>> [DE_azimuth_heatmap] No significant DE markers; skipping tables.")
+}
+```
+
+```{r fig-azimuth-de-heatmap}
+#| fig-cap: "Azimuth DE heatmap (top markers per label)"
+#| fig-width: 14
+#| fig-height: 10
+#| fig-path: "figures/azimuth_de_heatmap_"
+#| dev: pdf
+
+if (exists("DE_azimuth_sig") &&
+    is.data.frame(DE_azimuth_sig) &&
+    nrow(DE_azimuth_sig) > 0 &&
+    exists("top_markers_heat") &&
+    nrow(top_markers_heat) > 0) {
+
+  p_heat <- DoHeatmap(
+    object  = seurat_annotation,
+    features = unique(top_markers_heat$gene),
+    group.by = "azimuth_labels"
+  ) +
+    scale_fill_viridis_c(option = "B") +
+    theme(
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 6),
+      axis.text.y = element_text(size = 6)
+    )
+
+  p_heat
+} else {
+  plot.new()
+  text(0.5, 0.5, "No significant DE markers available for heatmap.")
+}
+
+```
+
+
+```{r fig-azimuth-de-dotplot}
+#| fig-cap: "Azimuth DE dotplot (top markers per label)"
+#| fig-width: 14
+#| fig-height: 8
+#| fig-path: "figures/azimuth_de_dotplot_"
+#| dev: pdf
+
+if (exists("all_markers_azimuth") &&
+    is.data.frame(all_markers_azimuth) &&
+    nrow(all_markers_azimuth) > 0) {
+
+  top_markers_dot <- all_markers_azimuth %>%
+    dplyr::group_by(cluster) %>%
+    dplyr::slice_max(order_by = avg_log2FC, n = 5, with_ties = FALSE) %>%
+    dplyr::ungroup()
+
+  # Save table backing the plot
+  readr::write_csv(top_markers_dot, file.path("data", paste0(project_name, "_azimuth_dotplot_top5_fc.csv")))
+  saveRDS(top_markers_dot, file.path("data", paste0(project_name, "_azimuth_dotplot_top5_fc.rds")))
+
+  p_dot <- DotPlot(
+    seurat_annotation,
+    features = unique(top_markers_dot$gene),
+    group.by = "azimuth_labels"
+  ) +
+    RotatedAxis() +
+    theme(axis.text.x = element_text(size = 6),
+          axis.text.y = element_text(size = 6))
+
+  p_dot
+} else {
+  plot.new()
+  text(0.5, 0.5, "No marker table available for dotplot.")
+}
+
+```
+
 
 ```{r MarkerBasedVisualization}
 if (exists("all_markers_azimuth") &&
@@ -451,12 +582,16 @@ message(">>> [DE_azimuth_dotplot] No markers table available; skipping DotPlot."
 #| fig-height: 10
 #| fig-align: center
 
-SCP::CellStatPlot(
+Cairo::CairoPNG(filename = "figures/CellComposition.png", width = 1800, height = 1400, res = 300)
+
+CP <-SCP::CellStatPlot(
 seurat_object,
 stat.by  = "seurat_clusters",
 group.by = "azimuth_labels",
 label    = TRUE
 )
+print(CP)
+dev.off()
 
 ```
 
