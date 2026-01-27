@@ -16,8 +16,9 @@ process SCYTPE_MAJOR_ANNOTATION {
         path("data/${params.project_name}_major_annotation_object.RDS")  , emit: seurat_rds
         path("data/${params.project_name}_major_annotation.csv")         , emit: annotation
         path("data/${params.project_name}_major_annotation.list.txt")    , emit: major_list
-        path("report/${notebook_major.baseName}.html")                         , emit: html
-        path("_freeze/**/figure-html/*.png")                             , emit: figures
+        path("report/${notebook_major.baseName}.html")                   , emit: html
+        // path("_freeze/**/figure-html/*.png")                             , emit: figures
+        path ("figures/**")                                              , emit: figures
 
     when:
         task.ext.when == null || task.ext.when
@@ -36,6 +37,9 @@ process SCYTPE_MAJOR_ANNOTATION {
 
         touch data/${params.project_name}_major_annotation_object.RDS
         touch data/${params.project_name}_major_annotation.csv
+
+        mkdir -p figures
+        touch figures/FILE.png
 
         mkdir -p report
         touch report/${notebook_major.baseName}.html
