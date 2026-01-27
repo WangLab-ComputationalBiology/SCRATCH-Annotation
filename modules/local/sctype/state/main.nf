@@ -18,7 +18,8 @@ process SCYTPE_STATE_ANNOTATION {
         path("data/${params.project_name}_${cell_population}_annotation_object.RDS")  , emit: seurat_rds
         path("data/${params.project_name}_${cell_population}_annotation.csv")         , emit: annotation
         path("report/notebook_${cell_population}.html")                               , emit: html
-        path("_freeze/**/figure-html/*.png")                                          , emit: figures
+        path ("figures/**")                                              , emit: figures
+        // path("_freeze/**/figure-html/*")                                          , emit: figures
         
     when:
         task.ext.when == null || task.ext.when
