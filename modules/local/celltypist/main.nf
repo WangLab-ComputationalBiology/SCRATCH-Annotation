@@ -4,6 +4,7 @@ process CELLTYPIST_ANNOTATION {
     label 'process_medium'
 
     container 'syedsazaidi/scratch-annotation:latest'
+    // container '/home/sazaidi/Softwares/SCRATCH-Annotation-dev/scratch-annotation.sif'
     
     publishDir "${params.outdir}/${params.project_name}", mode: 'copy', overwrite: true
 
@@ -17,6 +18,7 @@ process CELLTYPIST_ANNOTATION {
         path("data/${params.project_name}_celltypist_annotation_object.h5ad") , emit: ann_object
         path("data/Immune_All")                                               , emit: csv_file
         path("report/${notebook.baseName}.html")                              , emit: html
+        // path ("figures/**")                                              , emit: figures
         path("_freeze/**/figure-html/*.png")                                  , emit: figures
     when:
         task.ext.when == null || task.ext.when
