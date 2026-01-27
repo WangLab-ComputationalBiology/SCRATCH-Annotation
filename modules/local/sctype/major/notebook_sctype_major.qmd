@@ -5,6 +5,7 @@ description: |
 execute:
   freeze: auto
   cache: false
+  fig-path: figures/
 format:
   html:
     toc: true
@@ -70,6 +71,11 @@ knitr::opts_knit$set(
   root.dir = work_directory
   )
 
+knitr::opts_chunk$set(
+  fig.path = "figures/",   # all plot files go here
+  dev = "png",
+  dpi = 300
+)
 ```
 
 ::: {.callout-important collapse="true"}
@@ -383,12 +389,11 @@ DT::datatable(
 #| fig-cap: "UMAP"
 #| fig-subcap:
 #| - "UMAP Annotation"
-#| - "UMAP Clusters"
+#| - "UMAP Seurat clusters"
 #| fig-width: 15
 #| fig-height: 10
-#| fig-align: center
 #| layout-ncol: 2
-#| warning: false
+
 
 SCP::CellDimPlot(
   srt = seurat_object, 
@@ -409,6 +414,7 @@ SCP::CellDimPlot(
   show_stat = TRUE,
   theme_use = "theme_blank"
 )
+
 
 ```
 
@@ -460,13 +466,14 @@ if(length(non_malignant_markers_valid) > 1) {
 #| fig-height: 10
 #| fig-align: center
 
-FeaturePlot(
+fp <- FeaturePlot(
   object = seurat_object,
   features = names(non_malignant_markers),
   label = TRUE,
   min.cutoff = 'q1'
   )
 
+print (fp)
 ```
 
 :::{.callout-tip}
@@ -482,11 +489,12 @@ The @fig-feat-markers represents a 'FeaturePlot' which allows coloring the cells
 #| fig-height: 10
 #| fig-align: center
 
-VlnPlot(
+vp <- VlnPlot(
   object = seurat_object,
   features = names(non_malignant_markers),
   )
 
+print (vp)
 ```
 
 :::{.callout-tip}
@@ -569,13 +577,14 @@ seurat_cluster_composition <- seurat_cluster_composition %>%
 #| fig-align: center
 
 # Boxplot
-SCP::CellStatPlot(
+bpc <- SCP::CellStatPlot(
   seurat_object,
   stat.by = "seurat_clusters", 
   group.by = "sctype", 
   label = TRUE
 )
 
+print (bpc)
 ```
 
 :::{.callout-tip}
