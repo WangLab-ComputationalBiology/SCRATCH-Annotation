@@ -59,6 +59,12 @@ knitr::opts_knit$set(
   root.dir = work_directory
   )
 
+knitr::opts_chunk$set(
+  fig.path = "figures/",   
+  dev      = "png",
+  dpi      = 300
+)
+
 ```
 
 :::{.callout-important collapse="true"}
