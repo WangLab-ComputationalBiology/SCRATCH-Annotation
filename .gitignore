@@ -10,3 +10,4 @@ figures/
 *.zip
 *.tar.gz
 *.sif
+.nf-test*
