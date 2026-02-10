@@ -3,9 +3,14 @@ nextflow_process{
     script  'modules/local/azimuth/main.nf'
     process 'AZIMUTH_ANNOTATION'
 
+
     setup {
         run("CREATE_DATA"){
             script "tests/data/create_data.nf"
+            params {
+                max_cpus = 2
+                max_memory = '4 GB'
+            }
             process {
 
             }
@@ -16,12 +21,6 @@ nextflow_process{
 
         when {
             process {
-                // """
-                // input[0] = file("${projectDir}/modules/local/azimuth/notebook_azimuth.qmd")
-                // input[1] = file("${projectDir}/tests/data/sr_tiny.rds")
-                // input[2] = file("${projectDir}/tests/data/sr_ref_tiny.rds")
-                // input[3] = file(params.page_config)
-                // """
                 """
                 input[0] = file("${projectDir}/modules/local/azimuth/notebook_azimuth.qmd")
                 input[1] = CREATE_DATA.out.sr_tiny
