@@ -43,6 +43,7 @@ sr[["seurat_clusters"]] <- sample(
   size = n_cells,
   replace = TRUE
 )
+Idents(sr) <- "seurat_clusters"
 
 saveRDS(sr, file = "sr_tiny.rds")
 
