@@ -12,7 +12,9 @@ nextflow_process{
                 max_memory = '4 GB'
             }
             process {
-
+            """
+            input[0] = file("${projectDir}/assets/cell_markers_database.csv")
+            """
             }
         }
     }
