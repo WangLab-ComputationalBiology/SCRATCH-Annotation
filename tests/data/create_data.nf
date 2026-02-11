@@ -5,6 +5,9 @@ process CREATE_DATA {
 
     container 'syedsazaidi/scratch-annotation:latest'
 
+    input: 
+        path(cell_markers_database)
+
     output:
         path("sr_tiny.rds") ,      emit: sr_tiny
         path("sr_ref_tiny.rds") ,  emit: sr_ref_tiny

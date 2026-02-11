@@ -1,0 +1,41 @@
+nextflow_process{
+    name    'sctype_test'
+    script  'modules/local/sctype/major/main.nf'
+    process 'SCYTPE_MAJOR_ANNOTATION'
+
+
+    setup {
+        run("CREATE_DATA"){
+            script "tests/data/create_data.nf"
+            params {
+                max_cpus = 2
+                max_memory = '4 GB'
+            }
+            process {
+            """
+            input[0] = file("${projectDir}/assets/cell_markers_database.csv")
+            """
+            }
+        }
+    }
+
+    test("Run Sctype") {
+
+        tag "sctype"
+
+        when {
+            process {
+                """
+                input[0] = file("${projectDir}/modules/local/sctype/major/notebook_sctype_major.qmd")
+                input[1] = CREATE_DATA.out.sr_tiny
+                input[2] = file("${projectDir}/assets/cell_markers_database.csv")
+                input[3] = file(params.page_config)
+                """
+            }
+        }
+
+        then {
+            assert process.success
+        }
+    }
+}
