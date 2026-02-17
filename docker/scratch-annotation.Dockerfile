@@ -8,6 +8,9 @@ WORKDIR /opt
 ENV TZ=US/Central
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone
+# pass your PAT at build time so remotes::install_github can auth
+ARG GITHUB_PAT
+ENV GITHUB_PAT=${GITHUB_PAT}
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -20,108 +23,144 @@ RUN apt-get update && apt-get install -y \
     libcurl4-gnutls-dev \
     libssl-dev \
     libxml2-dev \
-    libgsl-dev \
-    python3 \
-    python3-pip \
-    python3-venv
+    default-jre \
+    libgfortran5 \
+    liblapack-dev \
+    libopenblas-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff5-dev \
+    zlib1g-dev \
+    libxt-dev
 
 
 # Updating quarto to Quarto v1.4.553
-RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.553/quarto-1.4.553-linux-amd64.deb -O quarto-1.4.553-linux-amd64.deb \
-    && dpkg -i quarto-1.4.553-linux-amd64.deb \
-    && rm quarto-1.4.553-linux-amd64.deb
+RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.553/quarto-1.4.553-linux-amd64.deb -O quarto-1.4.553-linux-amd64.deb
+RUN dpkg -i quarto-1.4.553-linux-amd64.deb
 
-# Install fundamental R packages
-ARG R_DEPS="c(\
-    'tidyverse', \
-    'devtools', \
-    'rmarkdown', \
-    'patchwork', \
-    'BiocManager', \
-    'remotes', \
-    'optparse', \
-    'R.utils', \
-    'here', \
-    'HGNChelper', \
-    'reticulate' \
-    )"
+# # Install remotes package
+# RUN R -e "install.packages('remotes')"
 
-ARG DEV_DEPS="c(\
-    'bnprks/BPCells', \
-    'cellgeni/sceasy', \
-    'immunogenomics/presto', \
-    'PaulingLiu/ROGUE', \
-    'zhanghao-njmu/SCP', \
-    'immunogenomics/presto', \
-    'satijalab/azimuth' \
-    )"
-    
-ARG WEB_DEPS="c(\
-    'shiny', \
-    'DT', \
-    'kable', \
-    'kableExtra', \
-    'flexdashboard', \
-    'plotly' \
-    )"
 
-ARG R_BIOC_DEPS="c(\
-    'Biobase', \
-    'BiocGenerics', \
-    'DelayedArray', \
-    'DelayedMatrixStats', \
-    'S4Vectors',\
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
+
+# Install core R packages
+RUN Rscript -e "install.packages(c('R.utils','rmarkdown','devtools','tidyverse','readr', 'dplyr', 'ggplot2', 'cowplot', 'remotes', 'BiocManager','reticulate', 'HGNChelper', 'optparse'), repos='http://cran.us.r-project.org')"
+
+
+RUN Rscript -e "BiocManager::install(c('S4Vectors','DelayedMatrixStats','BiocGenerics','Biobase', 'SummarizedExperiment', 'AnnotationDbi', 'org.Hs.eg.db'), ask=FALSE, update=TRUE)"
+RUN Rscript -e "BiocManager::install(c( \
+    'HDF5Array','rhdf5','rhdf5lib', \
     'SingleCellExperiment', \
-    'SummarizedExperiment', \
-    'HDF5Array', \ 
-    'limma', \
-    'lme4', \
-    'terra', \ 
-    'ggrastr', \
-    'Rsamtools', \
-    'UCell', \
-    'DropletUtils', \
-    'MAST', \
-    'DESeq2', \
-    'batchelor', \
-    'scran', \
-    'DOSE', \ 
-    'enrichplot', \
-    'clusterProfiler', \
-    'scDblFinder' \
-    )"
-
- 
-# Install Seurat Wrappers
-RUN wget https://github.com/satijalab/seurat/archive/refs/heads/seurat5.zip -O /tmp/seurat-v5.zip \
-    && wget https://github.com/satijalab/seurat-data/archive/refs/heads/seurat5.zip -O /tmp/seurat-data.zip \
-    && wget https://github.com/satijalab/seurat-wrappers/archive/refs/heads/seurat5.zip -O /tmp/seurat-wrappers.zip \
-    && Rscript -e "devtools::install_local('/tmp/seurat-v5.zip')" \
-    && Rscript -e "devtools::install_local('/tmp/seurat-data.zip')" \
-    && Rscript -e "devtools::install_local('/tmp/seurat-wrappers.zip')" \
-    && rm -rf /tmp/*.zip
+    'GOSemSim','MatrixGenerics','treeio','DOSE','ggtree','enrichplot', \
+    'clusterProfiler','DirichletMultinomial','rtracklayer','GenomicFeatures', \
+    'BSgenome','ensembldb','TFBSTools', \
+    'BSgenome.Hsapiens.UCSC.hg38','EnsDb.Hsapiens.v86' \
+  ), \
+  ask=FALSE, update=FALSE )"
 
 # Setting repository URL
 ARG R_REPO="http://cran.us.r-project.org"
 
-# Caching R-lib on the building process
-RUN Rscript -e "install.packages(${R_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)" \
-    && Rscript -e "install.packages(${WEB_DEPS}, Ncpus = 8, repos = '${R_REPO}', clean = TRUE)" \
-    && Rscript -e "BiocManager::install(${R_BIOC_DEPS})" \
-    && Rscript -e "devtools::install_github(${DEV_DEPS})"
+
+# # Install BiocManager
+# RUN Rscript -e "BiocManager::install(${R_BIOC_DEPS})"
+RUN Rscript -e 'remotes::install_github("ctlab/fgsea")'
 
 
-# Install Python packages for data science
+
+# Install Seurat Wrappers
+RUN wget https://github.com/satijalab/seurat/archive/refs/heads/seurat5.zip -O /opt/seurat-v5.zip
+RUN wget https://github.com/satijalab/seurat-data/archive/refs/heads/seurat5.zip -O /opt/seurat-data.zip
+RUN wget https://github.com/satijalab/seurat-wrappers/archive/refs/heads/seurat5.zip -O /opt/seurat-wrappers.zip
+
+RUN Rscript -e "devtools::install_local('/opt/seurat-v5.zip')"
+RUN Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
+RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
+
+
+
+# Install SCP package from GitHub
+# RUN Rscript -e "remotes::install_github('bnprks/BPCells/r')"
+RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, force = TRUE)"
+# RUN Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, force = TRUE)"
+RUN Rscript -e "remotes::install_github('zhanghao-njmu/SCP', upgrade = 'always', dependencies = TRUE, force = TRUE)"
+RUN Rscript -e "remotes::install_github('cellgeni/sceasy', upgrade = 'always', dependencies = TRUE, force = TRUE)"
+
+
+
+
+# Create and activate virtual environment
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# # Upgrade pip and install Python packages in venv
+# RUN pip install --upgrade pip && \
+#     pip install numpy pandas scikit-learn matplotlib seaborn jupyter jupyter-cache papermill
+
+# Create and activate a virtual environment before installing Python packages
 RUN python3 -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir --upgrade pip \
-    && /opt/venv/bin/pip install --no-cache-dir \
-      numpy pandas scikit-learn matplotlib seaborn jupyter jupyter-cache \
-      papermill scSpectra celltypist metatime session_info \
+    && /opt/venv/bin/pip install --no-cache-dir numpy pandas scikit-learn matplotlib seaborn jupyter jupyter-cache papermill anndata scanpy scipy session_info scSpectra metatime celltypist \
     && ln -s /opt/venv/bin/python /usr/local/bin/python \
     && ln -s /opt/venv/bin/pip /usr/local/bin/pip
+# Create and activate virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Set the working directory
-WORKDIR /data
+# Setting celltypist variable
+ENV CELLTYPIST_FOLDER=/opt/celltypist
+
+# Installing celltypist models
+COPY setup.py /opt/
+RUN python3 /opt/setup.py
+
+# Additional packages
+RUN apt-get install -y libhdf5-dev
+RUN Rscript -e "install.packages('hdf5r')"
+
+
+# Java + Fortran 
+RUN apt-get update && apt-get install -y default-jre libgfortran5
+
+# JAGS
+RUN apt-get install -y jags
+
+
+# Install annotables
+RUN Rscript -e "devtools::install_github('stephenturner/annotables')"
+# RUN Rscript -e "install.packages('rJava', repos = 'http://cran.us.r-project.org')"
+RUN Rscript -e "devtools::install_github('miccec/yaGST', dependencies = TRUE, upgrade = 'never')"
+
+# RUN Rscript -e "devtools::install_github('AntonioDeFalco/SCEVAN', dependencies = TRUE, upgrade = 'never')"
+# install SCP
+RUN Rscript -e "remotes::install_github( \
+  'zhanghao-njmu/SCP', \
+  dependencies=TRUE, \
+  upgrade='always', \
+  auth_token = Sys.getenv('GITHUB_PAT'))"
+
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+       libgsl-dev \
+    && rm -rf /var/lib/apt/lists/*  
+  # Install DirichletMultinomial + TFBSTools (and all of their R & Bioc deps)
+
+RUN Rscript -e "install.packages(c('DirichletMultinomial','TFBSTools'), dependencies = TRUE, repos = BiocManager::repositories())"
+
+# install Azimuth
+RUN Rscript -e "remotes::install_github( \
+  'satijalab/azimuth', ref = 'master', \
+  dependencies=TRUE, \
+  upgrade='always', \
+  auth_token = Sys.getenv('GITHUB_PAT'))"
+
+
+# Cleaning apt-get cache
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
 
 # Command to run on container start
 CMD ["bash"]
+
