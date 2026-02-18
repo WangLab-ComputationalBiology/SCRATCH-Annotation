@@ -3,6 +3,8 @@ nextflow_process{
     script  'modules/local/azimuth/main.nf'
     process 'AZIMUTH_ANNOTATION'
 
+    config  'nextflow.config'
+
 
     setup {
         run("CREATE_DATA"){
@@ -20,6 +22,9 @@ nextflow_process{
     }
 
     test("Run Azimuth") {
+        
+        tag    'azimuth'
+        config 'tests/nextflow.config'
 
         when {
             process {

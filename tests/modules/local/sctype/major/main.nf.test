@@ -3,7 +3,6 @@ nextflow_process{
     script  'modules/local/sctype/major/main.nf'
     process 'SCYTPE_MAJOR_ANNOTATION'
 
-
     setup {
         run("CREATE_DATA"){
             script "tests/data/create_data.nf"
@@ -21,7 +20,8 @@ nextflow_process{
 
     test("Run Sctype") {
 
-        tag "sctype"
+        tag     'sctype'
+        config  'tests/nextflow.config'
 
         when {
             process {
