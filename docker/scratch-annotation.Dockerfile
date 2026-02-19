@@ -94,15 +94,8 @@ RUN Rscript -e "BiocManager::install(c( \
     ,'EnsDb.Hsapiens.v86' \
   ), ask=FALSE, update=FALSE )"
 
-# Setting repository URL
-ARG R_REPO="http://cran.us.r-project.org"
 
-
-# # Install BiocManager
-# RUN Rscript -e "BiocManager::install(${R_BIOC_DEPS})"
 RUN Rscript -e 'remotes::install_github("ctlab/fgsea")'
-
-
 
 # Install Seurat Wrappers
 RUN wget https://github.com/satijalab/seurat/archive/refs/heads/seurat5.zip -O /opt/seurat-v5.zip
@@ -113,24 +106,14 @@ RUN Rscript -e "devtools::install_local('/opt/seurat-v5.zip')"
 RUN Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
 RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
 
-
-
 # Install SCP package from GitHub
-# RUN Rscript -e "remotes::install_github('bnprks/BPCells/r')"
 RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, upgrade = 'always',force = TRUE)"
 RUN Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, upgrade = 'always', force = TRUE)"
 RUN Rscript -e "devtools::install_github('cellgeni/sceasy', dependencies = TRUE, upgrade = 'always', force = TRUE)"
 
-
-
-
 # Create and activate virtual environment
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-
-# # Upgrade pip and install Python packages in venv
-# RUN pip install --upgrade pip && \
-#     pip install numpy pandas scikit-learn matplotlib seaborn jupyter jupyter-cache papermill
 
 # Create and activate a virtual environment before installing Python packages
 RUN python3 -m venv /opt/venv \
@@ -162,7 +145,6 @@ RUN apt-get install -y jags
 
 # Install annotables
 RUN Rscript -e "devtools::install_github('stephenturner/annotables')"
-# RUN Rscript -e "install.packages('rJava', repos = 'http://cran.us.r-project.org')"
 RUN Rscript -e "devtools::install_github('miccec/yaGST', dependencies = TRUE, upgrade = 'never')"
 
 
@@ -170,8 +152,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
        libgsl-dev \
     && rm -rf /var/lib/apt/lists/*  
-  # Install DirichletMultinomial + TFBSTools (and all of their R & Bioc deps)
 
+# Install DirichletMultinomial + TFBSTools (and all of their R & Bioc deps)
 RUN Rscript -e "install.packages(c('DirichletMultinomial','TFBSTools'), dependencies = TRUE, repos = BiocManager::repositories())"
 
 # install Azimuth
