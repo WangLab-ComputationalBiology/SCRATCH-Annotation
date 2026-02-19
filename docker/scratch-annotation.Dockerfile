@@ -12,6 +12,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 ARG GITHUB_PAT
 ENV GITHUB_PAT=${GITHUB_PAT}
 
+ENV R_REPOS="https://packagemanager.posit.co/cran/latest"
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     software-properties-common \
@@ -45,19 +47,52 @@ RUN dpkg -i quarto-1.4.553-linux-amd64.deb
 RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
 
 # Install core R packages
-RUN Rscript -e "install.packages(c('R.utils','rmarkdown','devtools','tidyverse','readr', 'dplyr', 'ggplot2', 'cowplot', 'remotes', 'BiocManager','reticulate', 'HGNChelper', 'optparse'), repos='http://cran.us.r-project.org')"
+RUN Rscript -e "install.packages(c( \
+  'R.utils', \
+  'rmarkdown', \
+  'devtools', \
+  'tidyverse', \
+  'readr', \
+  'dplyr', \
+  'ggplot2', \
+  'cowplot', \
+  'remotes', \
+  'BiocManager',\
+  'reticulate', \
+  'HGNChelper', \
+  'optparse'), repos='${R_REPOS}')"
 
 
-RUN Rscript -e "BiocManager::install(c('S4Vectors','DelayedMatrixStats','BiocGenerics','Biobase', 'SummarizedExperiment', 'AnnotationDbi', 'org.Hs.eg.db'), ask=FALSE, update=TRUE)"
 RUN Rscript -e "BiocManager::install(c( \
-    'HDF5Array','rhdf5','rhdf5lib', \
+  'S4Vectors', \
+  'DelayedMatrixStats', \
+  'BiocGenerics',\
+  'Biobase', \
+  'SummarizedExperiment', \
+  'AnnotationDbi', \
+  'org.Hs.eg.db'), ask=FALSE, update=TRUE)"
+
+RUN Rscript -e "BiocManager::install(c( \
+    'HDF5Array', \
+    'rhdf5', \
+    'rhdf5lib', \
     'SingleCellExperiment', \
-    'GOSemSim','MatrixGenerics','treeio','DOSE','ggtree','enrichplot', \
-    'clusterProfiler','DirichletMultinomial','rtracklayer','GenomicFeatures', \
-    'BSgenome','ensembldb','TFBSTools', \
-    'BSgenome.Hsapiens.UCSC.hg38','EnsDb.Hsapiens.v86' \
-  ), \
-  ask=FALSE, update=FALSE )"
+    'GOSemSim', \
+    'MatrixGenerics', \
+    'treeio', \
+    'DOSE',\
+    'ggtree',\
+    'enrichplot', \
+    'clusterProfiler',\
+    'DirichletMultinomial',\
+    'rtracklayer',\
+    'GenomicFeatures', \
+    'BSgenome',\
+    'ensembldb',\
+    'TFBSTools', \
+    'BSgenome.Hsapiens.UCSC.hg38'\
+    ,'EnsDb.Hsapiens.v86' \
+  ), ask=FALSE, update=FALSE )"
 
 # Setting repository URL
 ARG R_REPO="http://cran.us.r-project.org"
@@ -82,10 +117,9 @@ RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
 
 # Install SCP package from GitHub
 # RUN Rscript -e "remotes::install_github('bnprks/BPCells/r')"
-RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, force = TRUE)"
-# RUN Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, force = TRUE)"
-RUN Rscript -e "remotes::install_github('zhanghao-njmu/SCP', upgrade = 'always', dependencies = TRUE, force = TRUE)"
-RUN Rscript -e "remotes::install_github('cellgeni/sceasy', upgrade = 'always', dependencies = TRUE, force = TRUE)"
+RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, upgrade = 'always',force = TRUE)"
+RUN Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, upgrade = 'always', force = TRUE)"
+RUN Rscript -e "devtools::install_github('cellgeni/sceasy', dependencies = TRUE, upgrade = 'always', force = TRUE)"
 
 
 
@@ -111,8 +145,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 ENV CELLTYPIST_FOLDER=/opt/celltypist
 
 # Installing celltypist models
-COPY setup.py /opt/
-RUN python3 /opt/setup.py
+# COPY setup.py /opt/
+# RUN python3 /opt/setup.py
 
 # Additional packages
 RUN apt-get install -y libhdf5-dev
@@ -131,14 +165,6 @@ RUN Rscript -e "devtools::install_github('stephenturner/annotables')"
 # RUN Rscript -e "install.packages('rJava', repos = 'http://cran.us.r-project.org')"
 RUN Rscript -e "devtools::install_github('miccec/yaGST', dependencies = TRUE, upgrade = 'never')"
 
-# RUN Rscript -e "devtools::install_github('AntonioDeFalco/SCEVAN', dependencies = TRUE, upgrade = 'never')"
-# install SCP
-RUN Rscript -e "remotes::install_github( \
-  'zhanghao-njmu/SCP', \
-  dependencies=TRUE, \
-  upgrade='always', \
-  auth_token = Sys.getenv('GITHUB_PAT'))"
-
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -149,11 +175,7 @@ RUN apt-get update && \
 RUN Rscript -e "install.packages(c('DirichletMultinomial','TFBSTools'), dependencies = TRUE, repos = BiocManager::repositories())"
 
 # install Azimuth
-RUN Rscript -e "remotes::install_github( \
-  'satijalab/azimuth', ref = 'master', \
-  dependencies=TRUE, \
-  upgrade='always', \
-  auth_token = Sys.getenv('GITHUB_PAT'))"
+RUN Rscript -e "devtools::install_github('satijalab/azimuth', ref = 'master', dependencies=TRUE, upgrade='never')"
 
 
 # Cleaning apt-get cache
