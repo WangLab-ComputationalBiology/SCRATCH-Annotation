@@ -103,7 +103,7 @@ RUN Rscript -e "BiocManager::install(c( \
 RUN Rscript -e 'remotes::install_github("ctlab/fgsea")'
 
 # Install Seurat Wrappers
-RUN wget https://github.com/satijalab/seurat/archive/refs/heads/seurat5.zip -O /opt/seurat-v5.zip
+RUN wget https://github.com/satijalab/seurat/archive/refs/tags/v5.3.1.zip -O /opt/seurat-v5.zip
 RUN wget https://github.com/satijalab/seurat-data/archive/refs/heads/seurat5.zip -O /opt/seurat-data.zip
 RUN wget https://github.com/satijalab/seurat-wrappers/archive/refs/heads/seurat5.zip -O /opt/seurat-wrappers.zip
 
@@ -112,9 +112,9 @@ RUN Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
 RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
 
 # Install SCP package from GitHub
-RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, upgrade = 'always',force = TRUE)"
-RUN Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, upgrade = 'always', force = TRUE)"
-RUN Rscript -e "devtools::install_github('cellgeni/sceasy', dependencies = TRUE, upgrade = 'always', force = TRUE)"
+RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, upgrade = 'never',force = TRUE)"
+RUN Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, upgrade = 'never', force = TRUE)"
+RUN Rscript -e "devtools::install_github('cellgeni/sceasy', dependencies = TRUE, upgrade = 'never', force = TRUE)"
 
 # Create and activate virtual environment
 RUN python3 -m venv /opt/venv
