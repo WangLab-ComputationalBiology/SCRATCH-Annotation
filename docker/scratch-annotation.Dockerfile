@@ -33,18 +33,23 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libtiff5-dev \
     zlib1g-dev \
-    libxt-dev
+    libxt-dev \
+    default-jre \
+    libgfortran5 \
+    jags \
+    python3 \
+    python3-pip \
+    python3-venv \
+    libhdf5-dev \
+    libgsl-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 
 # Updating quarto to Quarto v1.4.553
 RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.553/quarto-1.4.553-linux-amd64.deb -O quarto-1.4.553-linux-amd64.deb
 RUN dpkg -i quarto-1.4.553-linux-amd64.deb
 
-# # Install remotes package
-# RUN R -e "install.packages('remotes')"
-
-
-RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
 
 # Install core R packages
 RUN Rscript -e "install.packages(c( \
@@ -131,39 +136,17 @@ ENV CELLTYPIST_FOLDER=/opt/celltypist
 # COPY setup.py /opt/
 # RUN python3 /opt/setup.py
 
-# Additional packages
-RUN apt-get install -y libhdf5-dev
 RUN Rscript -e "install.packages('hdf5r')"
-
-
-# Java + Fortran 
-RUN apt-get update && apt-get install -y default-jre libgfortran5
-
-# JAGS
-RUN apt-get install -y jags
-
 
 # Install annotables
 RUN Rscript -e "devtools::install_github('stephenturner/annotables')"
 RUN Rscript -e "devtools::install_github('miccec/yaGST', dependencies = TRUE, upgrade = 'never')"
-
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-       libgsl-dev \
-    && rm -rf /var/lib/apt/lists/*  
 
 # Install DirichletMultinomial + TFBSTools (and all of their R & Bioc deps)
 RUN Rscript -e "install.packages(c('DirichletMultinomial','TFBSTools'), dependencies = TRUE, repos = BiocManager::repositories())"
 
 # install Azimuth
 RUN Rscript -e "devtools::install_github('satijalab/azimuth', ref = 'master', dependencies=TRUE, upgrade='never')"
-
-
-# Cleaning apt-get cache
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
-
 
 # Command to run on container start
 CMD ["bash"]
