@@ -28,6 +28,7 @@ nextflow run main.nf -profile [docker/singularity] --input_seurat_object <path/t
 ### Parameters
 - `--input_seurat_object`: Path to the Seurat object input file (default: `data/Yost_main_cluster_object.RDS`).
 - `--annotation_db`: Path to the annotation database file (default: `assets/cell_markers_database.csv`).
+- `--input_reference_object`: Path to the Azimuth annotation database (User input required)
 - `--input_cell_mask`: Path to the cell mask file (default: `assets/NO_FILE`).
 - `--outdir`: Output directory (default: `launchDir`).
 - `--project_name`: Name of the project for organizing results (default: `project`).
