@@ -115,7 +115,9 @@ RUN wget https://github.com/satijalab/seurat/archive/refs/tags/v5.3.1.zip -O /op
 # Install SCP package from GitHub
 RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, upgrade = 'never',force = TRUE)" \
   && Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, upgrade = 'never', force = TRUE)" \
-  && Rscript -e "devtools::install_github('cellgeni/sceasy', dependencies = TRUE, upgrade = 'never', force = TRUE)" 
+  && Rscript -e "devtools::install_github('cellgeni/sceasy', dependencies = TRUE, upgrade = 'never', force = TRUE)" \
+  # uninstall reactome.db that SCP pulls (1.7Gb)
+  && Rscript -e "remove.packages('reactome.db')"
 
 # Install annotables
 RUN Rscript -e "devtools::install_github('stephenturner/annotables')" \
