@@ -122,10 +122,10 @@ RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE
 RUN Rscript -e "devtools::install_github('stephenturner/annotables')" \
   && Rscript -e "devtools::install_github('miccec/yaGST', dependencies = TRUE, upgrade = 'never')"
 
-# Create and activate a virtual environment before installing Python packages
+# Create and activate a virtual environment before installing Python packages 
+# Note the no-gpu version of torch to avoid ~5Gb dependencies and keep image size smaller
 RUN python3 -m venv /opt/venv \
     && /opt/venv/bin/pip install --no-cache-dir --upgrade pip \
-    #install torch with cpu support only to avoid huge CUDA
     && /opt/venv/bin/pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
     && /opt/venv/bin/pip install --no-cache-dir numpy pandas scikit-learn \
      matplotlib seaborn jupyter jupyter-cache papermill anndata scanpy scipy \
