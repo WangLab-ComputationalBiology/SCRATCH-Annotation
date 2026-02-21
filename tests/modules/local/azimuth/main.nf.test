@@ -3,7 +3,7 @@ nextflow_process{
     script  'modules/local/azimuth/main.nf'
     process 'AZIMUTH_ANNOTATION'
 
-    config  'nextflow.config'
+
 
 
     setup {

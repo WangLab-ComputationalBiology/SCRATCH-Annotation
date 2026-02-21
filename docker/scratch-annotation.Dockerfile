@@ -32,8 +32,7 @@ RUN apt-get update && apt-get install -y \
     libtiff5-dev \
     zlib1g-dev \
     libxt-dev \
-    default-jre \
-    libgfortran5 \
+
     jags \
     python3 \
     python3-pip \
@@ -95,8 +94,8 @@ RUN Rscript -e "BiocManager::install(c( \
     'BSgenome',\
     'ensembldb',\
     'TFBSTools', \
-    'BSgenome.Hsapiens.UCSC.hg38'\
-    ,'EnsDb.Hsapiens.v86' \
+    'BSgenome.Hsapiens.UCSC.hg38', \
+    'EnsDb.Hsapiens.v86' \
   ), ask=FALSE, update=FALSE )"
 
 
@@ -113,7 +112,7 @@ RUN wget https://github.com/satijalab/seurat/archive/refs/tags/v5.3.1.zip -O /op
   && Rscript -e "devtools::install_github('satijalab/azimuth', ref = 'master', dependencies=TRUE, upgrade='never')"
 
 # Install SCP package from GitHub
-RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, upgrade = 'never',force = TRUE)" \
+RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, upgrade = 'never', force = TRUE)" \
   && Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, upgrade = 'never', force = TRUE)" \
   && Rscript -e "devtools::install_github('cellgeni/sceasy', dependencies = TRUE, upgrade = 'never', force = TRUE)" \
   # uninstall reactome.db that SCP pulls (1.7Gb)
@@ -122,7 +121,6 @@ RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE
 # Install annotables
 RUN Rscript -e "devtools::install_github('stephenturner/annotables')" \
   && Rscript -e "devtools::install_github('miccec/yaGST', dependencies = TRUE, upgrade = 'never')"
- 
 
 # Create and activate a virtual environment before installing Python packages
 RUN python3 -m venv /opt/venv \
