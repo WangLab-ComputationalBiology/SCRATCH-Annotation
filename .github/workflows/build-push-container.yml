@@ -5,9 +5,7 @@ name: build-push-container
 on:
   push:
     paths:
-      - '**/env.yml'
-      - '**/Dockerfile'
-      - '**/*.dockerfile'
+      - 'docker/scratch-annotation.Dockerfile'
       - '.github/workflows/build-push-container.yml'
   workflow_dispatch:
 
@@ -53,6 +51,7 @@ jobs:
         id: push
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
+          file: docker/scratch-annotation.Dockerfile
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
