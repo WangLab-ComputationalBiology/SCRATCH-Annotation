@@ -124,6 +124,9 @@ RUN Rscript -e "devtools::install_github('stephenturner/annotables')" \
 
 # Create and activate a virtual environment before installing Python packages
 RUN python3 -m venv /opt/venv \
+    && /opt/venv/bin/pip install --no-cache-dir --upgrade pip \
+    #install torch with cpu support only to avoid huge CUDA
+    && /opt/venv/bin/pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
     && /opt/venv/bin/pip install --no-cache-dir numpy pandas scikit-learn \
      matplotlib seaborn jupyter jupyter-cache papermill anndata scanpy scipy \
      session_info scSpectra metatime celltypist \
