@@ -6,11 +6,9 @@ WORKDIR /opt
 
 # Timezone settings
 ENV TZ=US/Central
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone
-# pass your PAT at build time so remotes::install_github can auth
-ARG GITHUB_PAT
-ENV GITHUB_PAT=${GITHUB_PAT}
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+  && echo $TZ > /etc/timezone
+
 
 ENV R_REPOS="https://packagemanager.posit.co/cran/latest"
 
@@ -65,9 +63,11 @@ RUN Rscript -e "install.packages(c( \
   'BiocManager',\
   'reticulate', \
   'HGNChelper', \
-  'optparse'), repos='${R_REPOS}')"
+  'hdf5r', \
+  'optparse' \
+  ), repos='${R_REPOS}')"
 
-
+# Bioconductor packages
 RUN Rscript -e "BiocManager::install(c( \
   'S4Vectors', \
   'DelayedMatrixStats', \
@@ -75,9 +75,9 @@ RUN Rscript -e "BiocManager::install(c( \
   'Biobase', \
   'SummarizedExperiment', \
   'AnnotationDbi', \
-  'org.Hs.eg.db'), ask=FALSE, update=TRUE)"
-
-RUN Rscript -e "BiocManager::install(c( \
+  'org.Hs.eg.db' \
+  ), ask=FALSE, update=TRUE)" \
+  && Rscript -e "BiocManager::install(c( \
     'HDF5Array', \
     'rhdf5', \
     'rhdf5lib', \
@@ -102,51 +102,36 @@ RUN Rscript -e "BiocManager::install(c( \
 
 RUN Rscript -e 'remotes::install_github("ctlab/fgsea")'
 
-# Install Seurat Wrappers
-RUN wget https://github.com/satijalab/seurat/archive/refs/tags/v5.3.1.zip -O /opt/seurat-v5.zip
-RUN wget https://github.com/satijalab/seurat-data/archive/refs/heads/seurat5.zip -O /opt/seurat-data.zip
-RUN wget https://github.com/satijalab/seurat-wrappers/archive/refs/heads/seurat5.zip -O /opt/seurat-wrappers.zip
-
-RUN Rscript -e "devtools::install_local('/opt/seurat-v5.zip')"
-RUN Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
-RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
+# Seurat and wrappers
+RUN wget https://github.com/satijalab/seurat/archive/refs/tags/v5.3.1.zip -O /opt/seurat-v5.zip \
+  && wget https://github.com/satijalab/seurat-data/archive/refs/heads/seurat5.zip -O /opt/seurat-data.zip \
+  && wget https://github.com/satijalab/seurat-wrappers/archive/refs/heads/seurat5.zip -O /opt/seurat-wrappers.zip \
+  && Rscript -e "devtools::install_local('/opt/seurat-v5.zip')" \
+  && Rscript -e "devtools::install_local('/opt/seurat-data.zip')" \
+  && Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')" \
+  && rm /opt/seurat-v5.zip /opt/seurat-data.zip /opt/seurat-wrappers.zip \
+  && Rscript -e "devtools::install_github('satijalab/azimuth', ref = 'master', dependencies=TRUE, upgrade='never')"
 
 # Install SCP package from GitHub
-RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, upgrade = 'never',force = TRUE)"
-RUN Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, upgrade = 'never', force = TRUE)"
-RUN Rscript -e "devtools::install_github('cellgeni/sceasy', dependencies = TRUE, upgrade = 'never', force = TRUE)"
+RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, upgrade = 'never',force = TRUE)" \
+  && Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, upgrade = 'never', force = TRUE)" \
+  && Rscript -e "devtools::install_github('cellgeni/sceasy', dependencies = TRUE, upgrade = 'never', force = TRUE)" 
 
-# Create and activate virtual environment
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# Install annotables
+RUN Rscript -e "devtools::install_github('stephenturner/annotables')" \
+  && Rscript -e "devtools::install_github('miccec/yaGST', dependencies = TRUE, upgrade = 'never')"
+ 
 
 # Create and activate a virtual environment before installing Python packages
 RUN python3 -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir numpy pandas scikit-learn matplotlib seaborn jupyter jupyter-cache papermill anndata scanpy scipy session_info scSpectra metatime celltypist \
+    && /opt/venv/bin/pip install --no-cache-dir numpy pandas scikit-learn \
+     matplotlib seaborn jupyter jupyter-cache papermill anndata scanpy scipy \
+     session_info scSpectra metatime celltypist \
     && ln -s /opt/venv/bin/python /usr/local/bin/python \
     && ln -s /opt/venv/bin/pip /usr/local/bin/pip
-# Create and activate virtual environment
-RUN python -m venv /opt/venv
+
 ENV PATH="/opt/venv/bin:$PATH"
-
-# Setting celltypist variable
 ENV CELLTYPIST_FOLDER=/opt/celltypist
-
-# Installing celltypist models
-# COPY setup.py /opt/
-# RUN python3 /opt/setup.py
-
-RUN Rscript -e "install.packages('hdf5r')"
-
-# Install annotables
-RUN Rscript -e "devtools::install_github('stephenturner/annotables')"
-RUN Rscript -e "devtools::install_github('miccec/yaGST', dependencies = TRUE, upgrade = 'never')"
-
-# Install DirichletMultinomial + TFBSTools (and all of their R & Bioc deps)
-RUN Rscript -e "install.packages(c('DirichletMultinomial','TFBSTools'), dependencies = TRUE, repos = BiocManager::repositories())"
-
-# install Azimuth
-RUN Rscript -e "devtools::install_github('satijalab/azimuth', ref = 'master', dependencies=TRUE, upgrade='never')"
 
 # Command to run on container start
 CMD ["bash"]
