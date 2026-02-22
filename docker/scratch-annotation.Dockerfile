@@ -6,11 +6,11 @@ WORKDIR /opt
 
 # Timezone settings
 ENV TZ=US/Central
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone
-# pass your PAT at build time so remotes::install_github can auth
-ARG GITHUB_PAT
-ENV GITHUB_PAT=${GITHUB_PAT}
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+  && echo $TZ > /etc/timezone
+
+
+ENV R_REPOS="https://packagemanager.posit.co/cran/latest"
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -31,135 +31,110 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libtiff5-dev \
     zlib1g-dev \
-    libxt-dev
+    libxt-dev \
+
+    jags \
+    python3 \
+    python3-pip \
+    python3-venv \
+    libhdf5-dev \
+    libgsl-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 
 # Updating quarto to Quarto v1.4.553
 RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.4.553/quarto-1.4.553-linux-amd64.deb -O quarto-1.4.553-linux-amd64.deb
 RUN dpkg -i quarto-1.4.553-linux-amd64.deb
 
-# # Install remotes package
-# RUN R -e "install.packages('remotes')"
-
-
-RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
 
 # Install core R packages
-RUN Rscript -e "install.packages(c('R.utils','rmarkdown','devtools','tidyverse','readr', 'dplyr', 'ggplot2', 'cowplot', 'remotes', 'BiocManager','reticulate', 'HGNChelper', 'optparse'), repos='http://cran.us.r-project.org')"
+RUN Rscript -e "install.packages(c( \
+  'R.utils', \
+  'rmarkdown', \
+  'devtools', \
+  'tidyverse', \
+  'readr', \
+  'dplyr', \
+  'ggplot2', \
+  'cowplot', \
+  'remotes', \
+  'BiocManager',\
+  'reticulate', \
+  'HGNChelper', \
+  'hdf5r', \
+  'optparse' \
+  ), repos='${R_REPOS}')"
 
-
-RUN Rscript -e "BiocManager::install(c('S4Vectors','DelayedMatrixStats','BiocGenerics','Biobase', 'SummarizedExperiment', 'AnnotationDbi', 'org.Hs.eg.db'), ask=FALSE, update=TRUE)"
+# Bioconductor packages
 RUN Rscript -e "BiocManager::install(c( \
-    'HDF5Array','rhdf5','rhdf5lib', \
+  'S4Vectors', \
+  'DelayedMatrixStats', \
+  'BiocGenerics',\
+  'Biobase', \
+  'SummarizedExperiment', \
+  'AnnotationDbi', \
+  'org.Hs.eg.db' \
+  ), ask=FALSE, update=TRUE)" \
+  && Rscript -e "BiocManager::install(c( \
+    'HDF5Array', \
+    'rhdf5', \
+    'rhdf5lib', \
     'SingleCellExperiment', \
-    'GOSemSim','MatrixGenerics','treeio','DOSE','ggtree','enrichplot', \
-    'clusterProfiler','DirichletMultinomial','rtracklayer','GenomicFeatures', \
-    'BSgenome','ensembldb','TFBSTools', \
-    'BSgenome.Hsapiens.UCSC.hg38','EnsDb.Hsapiens.v86' \
-  ), \
-  ask=FALSE, update=FALSE )"
+    'GOSemSim', \
+    'MatrixGenerics', \
+    'treeio', \
+    'DOSE',\
+    'ggtree',\
+    'enrichplot', \
+    'clusterProfiler',\
+    'DirichletMultinomial',\
+    'rtracklayer',\
+    'GenomicFeatures', \
+    'BSgenome',\
+    'ensembldb',\
+    'TFBSTools', \
+    'BSgenome.Hsapiens.UCSC.hg38', \
+    'EnsDb.Hsapiens.v86' \
+  ), ask=FALSE, update=FALSE )"
 
-# Setting repository URL
-ARG R_REPO="http://cran.us.r-project.org"
 
-
-# # Install BiocManager
-# RUN Rscript -e "BiocManager::install(${R_BIOC_DEPS})"
 RUN Rscript -e 'remotes::install_github("ctlab/fgsea")'
 
-
-
-# Install Seurat Wrappers
-RUN wget https://github.com/satijalab/seurat/archive/refs/heads/seurat5.zip -O /opt/seurat-v5.zip
-RUN wget https://github.com/satijalab/seurat-data/archive/refs/heads/seurat5.zip -O /opt/seurat-data.zip
-RUN wget https://github.com/satijalab/seurat-wrappers/archive/refs/heads/seurat5.zip -O /opt/seurat-wrappers.zip
-
-RUN Rscript -e "devtools::install_local('/opt/seurat-v5.zip')"
-RUN Rscript -e "devtools::install_local('/opt/seurat-data.zip')"
-RUN Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')"
-
-
+# Seurat and wrappers
+RUN wget https://github.com/satijalab/seurat/archive/refs/tags/v5.3.1.zip -O /opt/seurat-v5.zip \
+  && wget https://github.com/satijalab/seurat-data/archive/refs/heads/seurat5.zip -O /opt/seurat-data.zip \
+  && wget https://github.com/satijalab/seurat-wrappers/archive/refs/heads/seurat5.zip -O /opt/seurat-wrappers.zip \
+  && Rscript -e "devtools::install_local('/opt/seurat-v5.zip')" \
+  && Rscript -e "devtools::install_local('/opt/seurat-data.zip')" \
+  && Rscript -e "devtools::install_local('/opt/seurat-wrappers.zip')" \
+  && rm /opt/seurat-v5.zip /opt/seurat-data.zip /opt/seurat-wrappers.zip \
+  && Rscript -e "devtools::install_github('satijalab/azimuth', ref = 'master', dependencies=TRUE, upgrade='never')"
 
 # Install SCP package from GitHub
-# RUN Rscript -e "remotes::install_github('bnprks/BPCells/r')"
-RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, force = TRUE)"
-# RUN Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, force = TRUE)"
-RUN Rscript -e "remotes::install_github('zhanghao-njmu/SCP', upgrade = 'always', dependencies = TRUE, force = TRUE)"
-RUN Rscript -e "remotes::install_github('cellgeni/sceasy', upgrade = 'always', dependencies = TRUE, force = TRUE)"
-
-
-
-
-# Create and activate virtual environment
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# # Upgrade pip and install Python packages in venv
-# RUN pip install --upgrade pip && \
-#     pip install numpy pandas scikit-learn matplotlib seaborn jupyter jupyter-cache papermill
-
-# Create and activate a virtual environment before installing Python packages
-RUN python3 -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir numpy pandas scikit-learn matplotlib seaborn jupyter jupyter-cache papermill anndata scanpy scipy session_info scSpectra metatime celltypist \
-    && ln -s /opt/venv/bin/python /usr/local/bin/python \
-    && ln -s /opt/venv/bin/pip /usr/local/bin/pip
-# Create and activate virtual environment
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Setting celltypist variable
-ENV CELLTYPIST_FOLDER=/opt/celltypist
-
-# Installing celltypist models
-COPY setup.py /opt/
-RUN python3 /opt/setup.py
-
-# Additional packages
-RUN apt-get install -y libhdf5-dev
-RUN Rscript -e "install.packages('hdf5r')"
-
-
-# Java + Fortran 
-RUN apt-get update && apt-get install -y default-jre libgfortran5
-
-# JAGS
-RUN apt-get install -y jags
-
+RUN Rscript -e "devtools::install_github('PaulingLiu/ROGUE', dependencies = TRUE, upgrade = 'never', force = TRUE)" \
+  && Rscript -e "devtools::install_github('zhanghao-njmu/SCP', dependencies = TRUE, upgrade = 'never', force = TRUE)" \
+  && Rscript -e "devtools::install_github('cellgeni/sceasy', dependencies = TRUE, upgrade = 'never', force = TRUE)" \
+  # uninstall reactome.db that SCP pulls (1.7Gb)
+  && Rscript -e "remove.packages('reactome.db')"
 
 # Install annotables
-RUN Rscript -e "devtools::install_github('stephenturner/annotables')"
-# RUN Rscript -e "install.packages('rJava', repos = 'http://cran.us.r-project.org')"
-RUN Rscript -e "devtools::install_github('miccec/yaGST', dependencies = TRUE, upgrade = 'never')"
+RUN Rscript -e "devtools::install_github('stephenturner/annotables')" \
+  && Rscript -e "devtools::install_github('miccec/yaGST', dependencies = TRUE, upgrade = 'never')"
 
-# RUN Rscript -e "devtools::install_github('AntonioDeFalco/SCEVAN', dependencies = TRUE, upgrade = 'never')"
-# install SCP
-RUN Rscript -e "remotes::install_github( \
-  'zhanghao-njmu/SCP', \
-  dependencies=TRUE, \
-  upgrade='always', \
-  auth_token = Sys.getenv('GITHUB_PAT'))"
+# Create and activate a virtual environment before installing Python packages 
+# Note the no-gpu version of torch to avoid ~5Gb dependencies and keep image size smaller
+RUN python3 -m venv /opt/venv \
+    && /opt/venv/bin/pip install --no-cache-dir --upgrade pip \
+    && /opt/venv/bin/pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
+    && /opt/venv/bin/pip install --no-cache-dir numpy pandas scikit-learn \
+     matplotlib seaborn jupyter jupyter-cache papermill anndata scanpy scipy \
+     session_info scSpectra metatime celltypist \
+    && ln -s /opt/venv/bin/python /usr/local/bin/python \
+    && ln -s /opt/venv/bin/pip /usr/local/bin/pip
 
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-       libgsl-dev \
-    && rm -rf /var/lib/apt/lists/*  
-  # Install DirichletMultinomial + TFBSTools (and all of their R & Bioc deps)
-
-RUN Rscript -e "install.packages(c('DirichletMultinomial','TFBSTools'), dependencies = TRUE, repos = BiocManager::repositories())"
-
-# install Azimuth
-RUN Rscript -e "remotes::install_github( \
-  'satijalab/azimuth', ref = 'master', \
-  dependencies=TRUE, \
-  upgrade='always', \
-  auth_token = Sys.getenv('GITHUB_PAT'))"
-
-
-# Cleaning apt-get cache
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
-
+ENV PATH="/opt/venv/bin:$PATH"
+ENV CELLTYPIST_FOLDER=/opt/celltypist
 
 # Command to run on container start
 CMD ["bash"]
