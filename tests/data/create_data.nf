@@ -9,6 +9,7 @@ process CREATE_DATA {
     output:
         path('sr_tiny.rds') ,      emit: sr_tiny
         path('sr_ref_tiny.rds') ,  emit: sr_ref_tiny
+        path('cell_status.csv') ,  emit: cell_status
 
     script:
     template 'make-test-seurat.r'

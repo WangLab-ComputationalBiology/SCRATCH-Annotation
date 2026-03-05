@@ -93,6 +93,13 @@ sr <- make_small_seurat(cmdb, ncell_each = 100)
 sr[["patient_id"]] <- "Patient1"
 saveRDS(sr, file = "sr_tiny.rds")
 
+# simulate cell malignancy status metadata for testing
+cell_status <- data.frame(
+  barcode = colnames(sr),
+  cell_status = sample(c("TME", "Malignant"), size = ncol(sr), replace = TRUE)
+)
+write.csv(cell_status, file = "cell_status.csv", row.names = FALSE)
+
 # a small ref Seurat object for testing
 sr_ref <- make_small_seurat(cmdb, ncell_each = 100)
 

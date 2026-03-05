@@ -1,0 +1,43 @@
+nextflow_process{
+    name    'helpers_subset_test'
+    script  'modules/local/helpers/subset/main.nf'
+    process 'HELPER_SEURAT_SUBSET'
+
+
+
+
+    setup {
+        run("CREATE_DATA"){
+            script "tests/data/create_data.nf"
+            params {
+                max_cpus = 2
+                max_memory = '4 GB'
+            }
+            process {
+            """
+            input[0] = file("${projectDir}/assets/cell_markers_database.csv")
+            """
+            }
+        }
+    }
+
+    test("Run Subset") {
+        
+        tag    'helpers'
+        tag    'subset'
+        config 'tests/nextflow.config'
+
+        when {
+            process {
+                """
+                input[0] = CREATE_DATA.out.sr_tiny
+                input[1] = CREATE_DATA.out.cell_status
+                """
+            }
+        }
+
+        then {
+            assert process.success
+        }
+    }
+}
