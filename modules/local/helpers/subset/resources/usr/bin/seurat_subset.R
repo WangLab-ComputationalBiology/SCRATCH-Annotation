@@ -48,5 +48,7 @@ seurat_object <- subset(
 
 #
 
-saveRDS(
-  seurat_object, file = file.path(opt$outdir, gsub(".RDS", "_filtered.RDS", basename(opt$file))))
+saveRDS(seurat_object,
+        file = file.path(opt$outdir, gsub(".RDS", "_filtered.RDS",
+                                          basename(opt$file),
+                                          ignore.case = TRUE)))
