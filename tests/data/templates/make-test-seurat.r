@@ -64,15 +64,17 @@ make_small_seurat <- function(cmdb, ncell_each = 100) {
   if (ncol(counts) < 2500) {
     n_genes_to_add <- 2500 - ncol(counts)
     random_genes <- paste0("DUMMY", seq_len(n_genes_to_add))
-    random_counts <- matrix(
+    random_counts_matrix <- matrix(
       data = rnbinom(nrow(counts) * n_genes_to_add, size = 1, mu = 100),
       nrow = nrow(counts),
       ncol = n_genes_to_add,
       dimnames = list(rownames(counts), random_genes)
-    ) |> as.data.frame()
-    #set 80% of the random counts to 0 to make them more realistic
-    zeroes <- sample(length(random_counts), size = length(random_counts) * 0.8)
-    random_counts[zeroes] <- 0
+    )
+    # set 80% of the random counts to 0 to make them more realistic
+    n_elements <- length(random_counts_matrix)
+    zeroes <- sample(n_elements, size = floor(n_elements * 0.8))
+    random_counts_matrix[zeroes] <- 0
+    random_counts <- as.data.frame(random_counts_matrix)
     counts <- cbind(counts, random_counts)
   }
 
