@@ -1,0 +1,67 @@
+nextflow_process{
+    name    'sctype_test'
+    script  'modules/local/sctype/aggregate/main.nf'
+    process 'SCYTPE_AGGREGATE_ANNOTATION'
+
+    setup {
+        run("CREATE_DATA"){
+            script "tests/data/create_data.nf"
+            params {
+                max_cpus = 2
+                max_memory = '4 GB'
+            }
+            process {
+            """
+            input[0] = file("${projectDir}/assets/cell_markers_database.csv")
+            """
+            }
+        }
+        run("SCYTPE_MAJOR_ANNOTATION"){
+            script "modules/local/sctype/major/main.nf"
+            process {
+            """
+            input[0] = file("${projectDir}/modules/local/sctype/major/notebook_sctype_major.qmd")
+            input[1] = CREATE_DATA.out.sr_tiny
+            input[2] = file("${projectDir}/assets/cell_markers_database.csv")
+            input[3] = file(params.page_config)
+            """
+            }
+        }
+        run("SCYTPE_STATE_ANNOTATION"){
+            script "modules/local/sctype/state/main.nf"
+            process {
+            """
+            input[0] = file("${projectDir}/modules/local/sctype/state/notebook_sctype_states.qmd")
+            input[1] = SCYTPE_MAJOR_ANNOTATION.out.seurat_rds
+            input[2] = file("${projectDir}/assets/cell_markers_database.csv")
+            input[3] = SCYTPE_MAJOR_ANNOTATION.out.major_list.splitText().map{ iter -> iter.split(":") }
+                    .filter{ !(it[0] =~ "Unknown|Epithelial|Fibroblast|NK_Cells") }
+                    .map{ it[0].trim() }
+            input[4] = file(params.page_config)
+            """
+            }
+        }
+    }
+
+    test("Run Sctype Aggregate") {
+
+        tag     'sctype'
+        tag     'sctype-aggregate'
+        config  'tests/nextflow.config'
+
+        when {
+            process {
+                """
+                input[0] = file("${projectDir}/modules/local/sctype/aggregate/notebook_sctype_aggregate.qmd")
+                input[1] = SCYTPE_MAJOR_ANNOTATION.out.seurat_rds
+                input[2] = SCYTPE_STATE_ANNOTATION.out.annotation.collect()
+                input[3] = file(params.page_config)
+                """
+            }
+        }
+
+        then {
+            assert process.success
+        }
+    }
+}

@@ -10,3 +10,6 @@ figures/
 *.zip
 *.tar.gz
 *.sif
+_nf-test* # temporary files for nf-test - quarto does not produce _freeze and _report if testdir starts with dot
+
+/.quarto/

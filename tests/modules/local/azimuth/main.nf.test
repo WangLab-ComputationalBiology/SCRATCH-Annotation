@@ -1,0 +1,44 @@
+nextflow_process{
+    name    'azimuth_test'
+    script  'modules/local/azimuth/main.nf'
+    process 'AZIMUTH_ANNOTATION'
+
+
+
+
+    setup {
+        run("CREATE_DATA"){
+            script "tests/data/create_data.nf"
+            params {
+                max_cpus = 2
+                max_memory = '4 GB'
+            }
+            process {
+            """
+            input[0] = file("${projectDir}/assets/cell_markers_database.csv")
+            """
+            }
+        }
+    }
+
+    test("Run Azimuth") {
+        
+        tag    'azimuth'
+        config 'tests/nextflow.config'
+
+        when {
+            process {
+                """
+                input[0] = file("${projectDir}/modules/local/azimuth/notebook_azimuth.qmd")
+                input[1] = CREATE_DATA.out.sr_tiny
+                input[2] = CREATE_DATA.out.sr_ref_tiny
+                input[3] = file(params.page_config)
+                """
+            }
+        }
+
+        then {
+            assert process.success
+        }
+    }
+}

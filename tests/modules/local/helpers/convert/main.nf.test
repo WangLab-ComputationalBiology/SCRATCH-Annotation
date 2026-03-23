@@ -1,0 +1,42 @@
+nextflow_process{
+    name    'helpers_convert_test'
+    script  'modules/local/helpers/convert/main.nf'
+    process 'HELPER_SCEASY_CONVERTER'
+
+
+
+
+    setup {
+        run("CREATE_DATA"){
+            script "tests/data/create_data.nf"
+            params {
+                max_cpus = 2
+                max_memory = '4 GB'
+            }
+            process {
+            """
+            input[0] = file("${projectDir}/assets/cell_markers_database.csv")
+            """
+            }
+        }
+    }
+
+    test("Run Converter") {
+        tag    'helpers'
+        tag    'sceasy'
+        tag    'convert'
+        config 'tests/nextflow.config'
+
+        when {
+            process {
+                """
+                input[0] = CREATE_DATA.out.sr_tiny
+                """
+            }
+        }
+
+        then {
+            assert process.success
+        }
+    }
+}
