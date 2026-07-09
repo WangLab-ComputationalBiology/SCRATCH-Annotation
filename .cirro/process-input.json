@@ -1,0 +1,4 @@
+{
+  "input_seurat_object": "$.params.dataset.paramJson.input_seurat_object",
+  "outdir": "$.params.dataset.s3|/data/"
+}

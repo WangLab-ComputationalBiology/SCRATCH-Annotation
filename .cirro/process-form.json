@@ -1,0 +1,14 @@
+{
+  "form": {
+    "properties": {
+      "input_seurat_object": {
+        "type": "string",
+        "title": "input_seurat_object",
+        "description": "Input seurat object",
+        "pathType": "dataset",
+        "file": "**/*.RDS"
+      }
+    }
+  },
+  "ui": {}
+}
